@@ -1,9 +1,11 @@
 # Ludo Lovers — Design System and Navigation
 **Status:** Product specification / planned implementation  
 **Roadmap:** Step 03.3  
+**Visual source of truth:** User-uploaded Ludo Lovers Visual Design System reference image.  
 **Brand rule:** Use the existing official Ludo Lovers logo exactly as supplied. Do not redraw, recolor, crop destructively, or replace it without explicit approval.
 
 ## 1. Design principles
+- Follow the uploaded reference image for the premium dark gaming style, gold edging, vivid player colors, and romantic accents.
 - Premium royal gaming with modern romance; polished, warm, social, and readable rather than childish.
 - Keep familiar Ludo gameplay cues while making the board and interface original.
 - Use motion to communicate actions and outcomes, not as constant decoration.
@@ -11,25 +13,24 @@
 - Keep the same palette across the board, navigation, cards, dialogs, and dashboard.
 - Avoid intrusive ads during active gameplay.
 
-## 2. Brand colors
+## 2. Approved color palette from the uploaded reference
+Use these exact hex values for the brand palette. Do not substitute approximate colors or invent alternate brand colors.
+
 | Token | Hex | Intended use |
 |---|---|---|
-| brandOrange | #FF8928 | Primary calls to action, highlights |
-| playerGreen | #33FF28 | Green player identity; use darker companion shades where needed |
-| playerBlue | #289EFF | Blue player identity |
-| brandMagenta | #F428FF | Love Mode accents and selected highlights |
-| premiumDark | #17131B (provisional) | Main dark surfaces |
-| surfaceRaised | #241D29 (provisional) | Cards, sheets, panels |
-| textPrimary | #FFF8F0 (provisional) | Main text on dark surfaces |
-| textSecondary | #C9BECF (provisional) | Secondary text |
-| success | #62D995 (provisional) | Success state |
-| warning | #FFC857 (provisional) | Warnings |
-| danger | #FF626C (provisional) | Errors and destructive actions |
+| brandOrange | #FF8928 | Primary buttons, highlights, orange player identity |
+| playerGreen | #33FF28 | Green player identity and accents |
+| playerBlue | #289EFF | Blue player identity and accents |
+| brandMagenta | #F428FF | Magenta player identity and Love Mode accents |
+| brandGold | #FFD700 | Premium borders, royal details, highlights |
+| brandRed | #FF3830 | Red player identity and selected warnings |
+| brandBlack | #080B0B | Main dark background/surfaces |
+| brandCream | #FFF8E1 | Light text and dice surfaces where contrast permits |
 
-The four brand/player colors above are fixed project requirements. Supporting colors are provisional design tokens and can be tuned after device contrast checks. Do not use bright green or magenta for long paragraphs. Check text/background contrast and provide more than color alone to communicate status.
+The eight values above are transcribed from the uploaded reference image and are the approved palette. Use darker/lighter shades only as secondary UI treatments when required for contrast or state distinction; never replace the base palette colors. Keep long text in readable cream/neutral text rather than vivid green or magenta. Validate text/background contrast and never communicate state by color alone.
 
 ## 3. Typography
-- Use a clean, modern sans-serif with reliable Android rendering.
+- Follow the reference's premium display-heading feel for branding, while using a readable Android-safe sans-serif for most interface text.
 - Provisional hierarchy: Display (28–32sp, bold), Screen title (24sp, semibold), Section title (18–20sp, semibold), Body (14–16sp), Caption/metadata (12–13sp).
 - Keep important game status at a comfortably readable size; avoid tiny text for dice results, room codes, timers, and turn indicators.
 - Use sentence case for labels; reserve all caps for very short tags.
@@ -38,22 +39,23 @@ The four brand/player colors above are fixed project requirements. Supporting co
 ## 4. Spacing, shape, and elevation
 - Base spacing scale: 4, 8, 12, 16, 20, 24, 32.
 - Minimum interactive target: aim for 48×48 logical pixels on Android.
-- Buttons/cards: consistent corner-radius family (12, 16, 24); use pill shapes only for compact chips or clear primary actions.
-- Use restrained shadows and subtle gradients. Keep surfaces visually distinct without excessive glow.
+- Buttons/cards: consistent corner-radius family (12, 16, 24); use pill shapes for compact chips or clear primary actions.
+- Use restrained shadows and gold/orange edging inspired by the reference. Reserve stronger glow for key actions, selected states, dice, and celebratory effects.
 - Respect safe areas, system bars, keyboard insets, and smaller Android screens.
 - Avoid layout that relies on fixed pixel positions; use responsive constraints.
 
 ## 5. Component rules
 ### Primary button
-- Filled brand-orange background, dark readable text when contrast passes; otherwise use a tested light text treatment.
+- Gold/orange visual treatment inspired by the reference; use approved #FF8928 and #FFD700 as the core colors.
+- Use dark readable text only when contrast passes; otherwise use a tested light text treatment.
 - Clear pressed, disabled, loading, and focus states.
 - Only one dominant primary action per screen where practical.
 
 ### Secondary button
-- Outlined or raised surface; do not compete with the primary action.
+- Dark raised surface with a clear border; do not compete with the primary action.
 
 ### Cards
-- Use the raised dark surface, clear title/body hierarchy, and consistent padding.
+- Use #080B0B or a closely related dark treatment, readable cream text, and restrained borders.
 - Interactive cards need pressed feedback and a visible selected state.
 
 ### Status chips
@@ -164,7 +166,7 @@ The client renders the board, but online game rules, dice outcomes, legal moves,
 
 ## 14. Acceptance checklist
 - [ ] Existing official logo is used unchanged.
-- [ ] Fixed palette is used consistently.
+- [ ] All eight approved palette hex values match the uploaded reference exactly.
 - [ ] Main navigation contains Home, Friends, Play, Profile.
 - [ ] Primary and secondary actions have visible states and accessible tap targets.
 - [ ] Active match can be recovered from Home when eligible.
@@ -175,4 +177,4 @@ The client renders the board, but online game rules, dice outcomes, legal moves,
 - [ ] No secrets are committed to the repository.
 
 ## 15. Scope note
-This document records the agreed design and navigation direction. It does not mean the Flutter application or screens have already been implemented. Supporting colors and detailed typography remain provisional until tested in the actual app.
+This document records the agreed design and navigation direction. It does not mean the Flutter application or screens have already been implemented. The palette values above are fixed; typography sizing and layout details will be validated in the actual app.
