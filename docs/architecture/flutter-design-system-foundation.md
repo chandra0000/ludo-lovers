@@ -1,10 +1,11 @@
 # Ludo Lovers — Flutter Design System Foundation
 **Roadmap:** Step 04  
 **Status:** Implementation specification and starter code  
-**Important:** These are proposed starter files. They have not been compiled or tested in a Flutter environment yet.
+**Visual source of truth:** User-uploaded Ludo Lovers Visual Design System reference image.  
+**Important:** These are proposed starter files. They have not been compiled or tested in a Flutter environment yet. Use the existing official logo unchanged.
 
 ## Goal
-Create a single source of truth for color, typography, spacing, shape, and theme so every screen feels consistent. Use the existing official Ludo Lovers logo unchanged.
+Create a single source of truth for color, typography, spacing, shape, and theme so every screen follows the approved reference. Exact brand colors below must not be approximated or replaced.
 
 ## Proposed starter file layout
 ```
@@ -20,22 +21,27 @@ apps/mobile/lib/app/theme/
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-  // Fixed Ludo Lovers brand/player colors.
+  // Exact colors transcribed from the approved reference image.
   static const brandOrange = Color(0xFFFF8928);
   static const playerGreen = Color(0xFF33FF28);
   static const playerBlue = Color(0xFF289EFF);
   static const brandMagenta = Color(0xFFF428FF);
+  static const brandGold = Color(0xFFFFD700);
+  static const brandRed = Color(0xFFFF3830);
+  static const brandBlack = Color(0xFF080B0B);
+  static const brandCream = Color(0xFFFFF8E1);
 
-  // Provisional supporting colors. Validate contrast on real devices.
-  static const premiumDark = Color(0xFF17131B);
-  static const surface = Color(0xFF241D29);
-  static const surfaceElevated = Color(0xFF302638);
-  static const textPrimary = Color(0xFFFFF8F0);
-  static const textSecondary = Color(0xFFC9BECF);
-  static const success = Color(0xFF62D995);
-  static const warning = Color(0xFFFFC857);
-  static const danger = Color(0xFFFF626C);
-  static const outline = Color(0xFF594B60);
+  // Semantic UI roles use the approved palette as their source.
+  // Contrast-specific treatments may be derived, but must not redefine the brand colors.
+  static const premiumDark = brandBlack;
+  static const surface = Color(0xFF111516);
+  static const surfaceElevated = Color(0xFF1A2022);
+  static const textPrimary = brandCream;
+  static const textSecondary = Color(0xFFD6D0BE);
+  static const success = playerGreen;
+  static const warning = brandGold;
+  static const danger = brandRed;
+  static const outline = Color(0xFF66552A);
 }
 ```
 
@@ -62,7 +68,7 @@ abstract final class AppRadii {
 ```
 
 ## 3. app_typography.dart
-```
+```dart
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
@@ -134,7 +140,7 @@ abstract final class AppTheme {
       primary: AppColors.brandOrange,
       secondary: AppColors.brandMagenta,
       error: AppColors.danger,
-      onPrimary: AppColors.premiumDark,
+      onPrimary: AppColors.brandBlack,
       onSurface: AppColors.textPrimary,
     );
 
@@ -170,7 +176,7 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.brandOrange,
-          foregroundColor: AppColors.premiumDark,
+          foregroundColor: AppColors.brandBlack,
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
@@ -231,9 +237,9 @@ MaterialApp(
 This is an example of how the theme is connected, not a complete runnable app by itself. `AppHomeScreen` must be implemented separately.
 
 ## 6. Reusable widgets to build next
-- `PrimaryButton`: loading, disabled, and pressed states.
-- `SecondaryButton`: outlined/quiet action.
-- `AppCard`: consistent surface, border, and padding.
+- `PrimaryButton`: gold/orange premium treatment with loading, disabled, and pressed states.
+- `SecondaryButton`: outlined/quiet action on dark surface.
+- `AppCard`: consistent dark surface, restrained gold-toned border, and padding.
 - `StatusChip`: icon + label for Online, In Game, DND, Offline, Reconnecting, Verified.
 - `PlayerAvatar`: avatar with optional frame and semantic label.
 - `CoinBalance`: virtual-only coin count; never represents cash value.
@@ -243,17 +249,18 @@ Keep tap targets at least 48 logical pixels where practical. Avoid color-only st
 
 ## 7. Implementation rules
 1. UI widgets consume theme tokens instead of hardcoding colors and spacing.
-2. Keep game rules and network calls out of presentation widgets.
-3. Do not add backend secrets or service-role keys to Flutter assets/config.
-4. Keep the official logo as a fixed asset and reference it from the branding assets directory when its actual file is available.
-5. Add widget tests for shared components and theme behavior.
-6. Use Flutter/Material components for app chrome; use Flame for the interactive board renderer.
-7. Run formatter, analyzer, and tests in a real Flutter environment before treating this as implemented.
+2. The eight approved hex codes are fixed and must match the uploaded reference exactly.
+3. Keep game rules and network calls out of presentation widgets.
+4. Do not add backend secrets or service-role keys to Flutter assets/config.
+5. Keep the official logo as a fixed asset and reference it from the branding assets directory when its actual file is available.
+6. Add widget tests for shared components and theme behavior.
+7. Use Flutter/Material components for app chrome; use Flame for the interactive board renderer.
+8. Run formatter, analyzer, and tests in a real Flutter environment before treating this as implemented.
 
 ## 8. Acceptance checklist
 - [ ] Design tokens exist in the planned Flutter files.
-- [ ] Brand colors match the approved hex values exactly.
-- [ ] Supporting colors have contrast checked.
+- [ ] Brand colors match all eight approved hex values exactly.
+- [ ] Supporting colors preserve the reference's black/gold/cream premium look.
 - [ ] Buttons and inputs use shared theme styling.
 - [ ] Layout remains usable with text scaling and small screens.
 - [ ] Shared widgets have tests.
