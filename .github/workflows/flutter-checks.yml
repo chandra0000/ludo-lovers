@@ -1,0 +1,43 @@
+name: Flutter checks
+
+on:
+  push:
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/flutter-checks.yml"
+  pull_request:
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/flutter-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Analyze Dart and Flutter code
+        run: flutter analyze
+
+      - name: Run automated tests
+        run: flutter test
