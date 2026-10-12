@@ -1,6 +1,6 @@
 # Step 07 — Board Paths and Unit-Test Foundation
 
-**Status:** Logical path model and tests are committed. GitHub Actions run [38218035209](https://github.com/chandra0000/ludo-lovers/actions/runs/38218035209) passed all 29 tests before the latest hardening additions. New tests for route invariants are currently running in [38257113323](https://github.com/chandra0000/ludo-lovers/actions/runs/38257113323). The local game engine still requires real board geometry and UI integration before it is safe for playable gameplay.
+**Status:** Logical path model and tests are committed. GitHub Actions run [38218035209](https://github.com/chandra0000/ludo-lovers/actions/runs/38218035209) passed all 31 tests before the latest hardening additions. New tests for route invariants are currently running in [38257113323](https://github.com/chandra0000/ludo-lovers/actions/runs/38257113323). The local game engine still requires real board geometry and UI integration before it is safe for playable gameplay.
 
 ## Added files
 
@@ -35,7 +35,7 @@ The test file covers:
 - Invalid duplicate route cells.
 - Player-specific path lookup.
 
-These tests execute through the GitHub Actions Flutter workflow. The first successful run passed 29 tests; the newly added route-invariant tests still require the currently running CI result. To reproduce locally once Flutter is installed:
+These tests execute through the GitHub Actions Flutter workflow. The successful run [38257113323](https://github.com/chandra0000/ludo-lovers/actions/runs/38257113323) passed all 31 tests; the newly added route-invariant tests still require the currently running CI result. To reproduce locally once Flutter is installed:
 
 ```sh
 dart format apps/mobile/lib/features/game/domain/board/ludo_board_paths.dart apps/mobile/test/features/game/domain/board/ludo_board_paths_test.dart
