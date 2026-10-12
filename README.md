@@ -120,7 +120,7 @@ Directories will be added as implementation begins.
 
 ## Current next step
 
-**Step 03 — Project Setup:** the initial Flutter package, app entry point, branded landing screen, theme, and GitHub Actions analysis/test workflow have been committed. They still need cloud CI results and a real Flutter build; the game engine is not yet integrated into the screen.
+**Step 03 — Project Setup:** the initial Flutter package, app entry point, branded landing screen, theme, lint configuration, widget smoke test, and GitHub Actions analysis/test workflow have been committed. CI results and a real Android build still need verification; the game engine is not yet integrated into the screen.
 
 ---
 
