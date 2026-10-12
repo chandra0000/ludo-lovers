@@ -325,4 +325,84 @@ void main() {
     );
   });
 
+
+  test('rejects a second roll while a move is pending', () {
+    final rolled = engine.roll(
+      initial,
+      playerId: 'orange',
+      expectedVersion: initial.version,
+      value: 6,
+    );
+    expect(
+      () => engine.roll(
+        rolled.state,
+        playerId: 'orange',
+        expectedVersion: rolled.state.version,
+        value: 2,
+      ),
+      throwsA(
+        isA<LocalGameException>().having(
+          (error) => error.error,
+          'error',
+          LocalActionError.rollAlreadyPending,
+        ),
+      ),
+    );
+  });
+
+  test('rejects an invalid pawn move without consuming the roll', () {
+    final rolled = engine.roll(
+      initial,
+      playerId: 'orange',
+      expectedVersion: initial.version,
+      value: 2,
+    );
+    expect(
+      () => engine.move(
+        rolled.state,
+        playerId: 'orange',
+        expectedVersion: rolled.state.version,
+        pawnId: 'o1',
+      ),
+      throwsA(
+        isA<LocalGameException>().having(
+          (error) => error.error,
+          'error',
+          LocalActionError.illegalMove,
+        ),
+      ),
+    );
+    expect(rolled.state.pendingRoll, 2);
+  });
+
+  test('rejects malformed player and pawn identity state', () {
+    expect(
+      () => LocalGameState(
+        players: const <String>['orange', 'orange'],
+        pawns: initial.pawns,
+        currentPlayerIndex: 0,
+      ),
+      throwsArgumentError,
+    );
+    expect(
+      () => LocalGameState(
+        players: const <String>['orange', 'blue'],
+        pawns: <LocalPawn>[
+          const LocalPawn(
+            id: 'same',
+            playerId: 'orange',
+            position: PawnRoutePosition(section: PawnRouteSection.yard),
+          ),
+          const LocalPawn(
+            id: 'same',
+            playerId: 'blue',
+            position: PawnRoutePosition(section: PawnRouteSection.yard),
+          ),
+        ],
+        currentPlayerIndex: 0,
+      ),
+      throwsArgumentError,
+    );
+  });
+
 }
