@@ -1,20 +1,18 @@
+import 'package:flutter/material.dart';
+
 /// Normalized rendering coordinates for a logical Ludo board.
 ///
-/// This model intentionally does not invent the final 52-cell route. The
-/// approved board fixture supplies coordinates keyed by logical cell ID; the
-/// renderer converts normalized coordinates to pixels for the current canvas.
+/// The approved board fixture supplies coordinates keyed by logical cell ID.
+/// This model converts normalized positions to pixels and contains no game rules.
 class BoardPoint {
   const BoardPoint({required this.x, required this.y});
 
-  /// Normalized horizontal position in the inclusive range 0..1.
   final double x;
-
-  /// Normalized vertical position in the inclusive range 0..1.
   final double y;
 
-  bool get isValid => x.isFinite && y.isFinite && x >= 0 && x <= 1 && y >= 0 && y <= 1;
+  bool get isValid =>
+      x.isFinite && y.isFinite && x >= 0 && x <= 1 && y >= 0 && y <= 1;
 
-  /// Converts this point to pixels inside the given board size.
   BoardPixelPoint toPixels({required double width, required double height}) {
     if (!isValid) {
       throw StateError('Cannot convert an invalid normalized board point.');
@@ -33,7 +31,7 @@ class BoardPixelPoint {
   final double y;
 }
 
-/// Pixel coordinates derived from a normalized board coordinate.
+/// Maps logical cell IDs to normalized positions, independent of screen size.
 class BoardCoordinateLayout {
   BoardCoordinateLayout(Map<int, BoardPoint> points)
       : pointsByCell = Map<int, BoardPoint>.unmodifiable(points) {
@@ -45,7 +43,9 @@ class BoardCoordinateLayout {
         throw ArgumentError('Logical cell IDs must be non-negative.');
       }
       if (!entry.value.isValid) {
-        throw ArgumentError('Cell ${entry.key} has an invalid normalized coordinate.');
+        throw ArgumentError(
+          'Cell ${entry.key} has an invalid normalized coordinate.',
+        );
       }
     }
   }
@@ -66,4 +66,25 @@ class BoardCoordinateLayout {
     required double height,
   }) =>
       forCell(cellId).toPixels(width: width, height: height);
+}
+
+/// The fixed Ludo Lovers palette. Keep all game rendering tied to these values.
+class LudoBoardPalette {
+  const LudoBoardPalette._();
+
+  static const Color orange = Color(0xFFFF8928);
+  static const Color green = Color(0xFF33FF28);
+  static const Color blue = Color(0xFF289EFF);
+  static const Color magenta = Color(0xFFF428FF);
+  static const Color gold = Color(0xFFFFD700);
+  static const Color red = Color(0xFFFF3830);
+  static const Color black = Color(0xFF080B0B);
+  static const Color cream = Color(0xFFFFF8E1);
+
+  static const List<Color> playerColors = <Color>[
+    orange,
+    green,
+    blue,
+    magenta,
+  ];
 }
