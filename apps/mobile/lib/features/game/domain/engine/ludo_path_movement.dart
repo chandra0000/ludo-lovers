@@ -3,6 +3,8 @@
 /// These helpers are deliberately independent of Flutter/Flame. The game state
 /// should store player-relative progress; the renderer maps returned logical
 /// cells to board coordinates.
+library;
+
 import '../board/ludo_board_paths.dart';
 
 enum PawnRouteSection { yard, mainTrack, homeLane, finished }
