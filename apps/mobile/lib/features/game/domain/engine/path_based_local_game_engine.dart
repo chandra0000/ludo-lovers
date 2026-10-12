@@ -35,7 +35,37 @@ class LocalGameState {
     this.winnerPlayerId,
     this.version = 0,
   }) : pawns = List<LocalPawn>.unmodifiable(pawns),
-       players = List<String>.unmodifiable(players);
+       players = List<String>.unmodifiable(players) {
+    if (this.players.length < 2 || this.players.length > 4) {
+      throw ArgumentError('A local game requires 2 to 4 players.');
+    }
+    if (this.players.any((player) => player.trim().isEmpty) ||
+        this.players.toSet().length != this.players.length) {
+      throw ArgumentError('Player IDs must be non-empty and unique.');
+    }
+    if (currentPlayerIndex < 0 || currentPlayerIndex >= this.players.length) {
+      throw ArgumentError.value(currentPlayerIndex, 'currentPlayerIndex');
+    }
+    if (this.pawns.any((pawn) => !this.players.contains(pawn.playerId))) {
+      throw ArgumentError('Every pawn must belong to a player in this game.');
+    }
+    if (this.pawns.any((pawn) => pawn.id.trim().isEmpty) ||
+        this.pawns.map((pawn) => pawn.id).toSet().length != this.pawns.length) {
+      throw ArgumentError('Pawn IDs must be non-empty and unique.');
+    }
+    if (pendingRoll != null && (pendingRoll < 1 || pendingRoll > 6)) {
+      throw ArgumentError.value(pendingRoll, 'pendingRoll');
+    }
+    if (consecutiveSixes < 0 || version < 0) {
+      throw ArgumentError('consecutiveSixes and version cannot be negative.');
+    }
+    if (completed && winnerPlayerId == null) {
+      throw ArgumentError('A completed game must identify its winner.');
+    }
+    if (winnerPlayerId != null && !this.players.contains(winnerPlayerId)) {
+      throw ArgumentError('Winner must be a player in this game.');
+    }
+  }
 
   final List<String> players;
   final List<LocalPawn> pawns;
@@ -327,8 +357,11 @@ class PathBasedLocalGameEngine {
     if (version != state.version) {
       throw const LocalGameException(LocalActionError.staleVersion);
     }
-    if (state.players.isEmpty || state.currentPlayerId != playerId) {
+    if (state.currentPlayerId != playerId) {
       throw const LocalGameException(LocalActionError.wrongPlayer);
+    }
+    if (maxConsecutiveSixes < 1) {
+      throw StateError('maxConsecutiveSixes must be at least 1.');
     }
   }
 
