@@ -128,4 +128,201 @@ void main() {
     expect(result.state.pendingRoll, isNull);
     expect(result.events.map((event) => event.type), contains('TurnEnded'));
   });
+
+  test('captures a single opponent pawn on a non-safe destination', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 1,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 6,
+          ),
+        ),
+      ],
+    );
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns.first.position.progress, 2);
+    expect(moved.state.pawns[2].position.section, PawnRouteSection.yard);
+    expect(moved.events.map((event) => event.type), contains('PawnCaptured'));
+    expect(moved.state.currentPlayerId, 'orange',
+        reason: 'A capture grants the configured bonus roll.');
+  });
+
+  test('does not capture an opponent on a safe cell', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 3,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 0,
+          ),
+        ),
+      ],
+    );
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns[1].position.section, PawnRouteSection.mainTrack);
+    expect(moved.events.map((event) => event.type), isNot(contains('PawnCaptured')));
+    expect(moved.state.currentPlayerId, 'blue');
+  });
+
+  test('protects a stacked pair of opponent pawns under the default rule', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 1,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 6,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b2',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 6,
+          ),
+        ),
+      ],
+    );
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns[1].position.section, PawnRouteSection.mainTrack);
+    expect(moved.state.pawns[2].position.section, PawnRouteSection.mainTrack);
+    expect(moved.events.map((event) => event.type), isNot(contains('PawnCaptured')));
+    expect(moved.state.currentPlayerId, 'blue');
+  });
+
+  test('declares the winner when the last pawn reaches finish', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: 11,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: 10,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o2',
+    );
+
+    expect(moved.state.completed, isTrue);
+    expect(moved.state.winnerPlayerId, 'orange');
+    expect(moved.state.pendingRoll, isNull);
+    expect(moved.events.map((event) => event.type), contains('PawnFinished'));
+    expect(moved.events.map((event) => event.type), contains('GameCompleted'));
+    expect(
+      () => engine.roll(
+        moved.state,
+        playerId: 'orange',
+        expectedVersion: moved.state.version,
+        value: 1,
+      ),
+      throwsA(isA<LocalGameException>()),
+    );
+  });
+
 }
