@@ -1,6 +1,6 @@
 # Step 07 — Board Paths and Unit-Test Foundation
 
-**Status:** Logical path model and initial test source committed. Tests have not been executed because no Flutter/Dart runtime has been used in this workflow. The local game engine still requires integration with this path model before it is safe for playable gameplay.
+**Status:** Logical path model and tests are committed. GitHub Actions run [38218035209](https://github.com/chandra0000/ludo-lovers/actions/runs/38218035209) passed all 29 tests before the latest hardening additions. New tests for route invariants are currently running in [38257113323](https://github.com/chandra0000/ludo-lovers/actions/runs/38257113323). The local game engine still requires real board geometry and UI integration before it is safe for playable gameplay.
 
 ## Added files
 
@@ -15,6 +15,7 @@
 - Maps a player-relative progress value to a logical board cell.
 - Checks whether a proposed movement overshoots the route.
 - Validates route length, cell bounds, and duplicate main-track cells.
+- The board-path collection now rejects duplicate player routes, inconsistent shared-track cell sets, unequal home-lane lengths, and home-lane cells that overlap the shared track or another player's home lane.
 - Keeps logical geometry independent of Flutter widgets, Flame components, pixels, and animations.
 
 ## Important correctness boundary
@@ -34,7 +35,7 @@ The test file covers:
 - Invalid duplicate route cells.
 - Player-specific path lookup.
 
-These are **test cases written, not tests executed**. Run them in the Flutter project after its package metadata and SDK are configured:
+These tests execute through the GitHub Actions Flutter workflow. The first successful run passed 29 tests; the newly added route-invariant tests still require the currently running CI result. To reproduce locally once Flutter is installed:
 
 ```sh
 dart format apps/mobile/lib/features/game/domain/board/ludo_board_paths.dart apps/mobile/test/features/game/domain/board/ludo_board_paths_test.dart
@@ -46,7 +47,7 @@ The exact package import in the test assumes the Flutter package name is `ludo_l
 
 ## Next engineering tasks
 
-1. Confirm the final board layout and define four 52-cell player-relative routes (or the exact route length of the selected board rules).
+1. Confirm the final board layout and define four 52-cell player-relative routes (or the exact route length of the selected board rules). The current 8-cell routes are synthetic test fixtures only.
 2. Add a pawn-relative `pathProgress` field or equivalent route-position model; do not infer progress solely from a global cell index.
 3. Refactor legal-move calculation, home-lane transition, finish, and capture detection to use the path.
 4. Add test fixtures for all four player routes and test wrap-around and home-lane entry.
