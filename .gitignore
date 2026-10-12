@@ -1,0 +1,40 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Android / Gradle generated files
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/captures/
+**/android/.cxx/
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+
+# Signing material and local environment
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+
+# Test and coverage outputs
+coverage/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
