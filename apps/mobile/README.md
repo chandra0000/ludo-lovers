@@ -7,7 +7,8 @@ This directory is the initial Flutter application foundation for Ludo Lovers.
 - Flutter package metadata and a minimal app entry point have been added.
 - The landing screen and initial Material theme use the approved brand palette.
 - Game engine source is still a separate development slice and has not been integrated into this screen.
-- This foundation has **not yet been compiled, analyzed, or tested** in a Flutter SDK.
+- GitHub Actions has successfully run `flutter analyze` and the automated tests (29 tests passed in run [38218035209](https://github.com/chandra0000/ludo-lovers/actions/runs/38218035209)); later hardening tests are covered by subsequent CI runs.
+- The Android platform folder is not committed yet. CI now generates it temporarily and attempts a debug APK build, then uploads the APK as a short-lived artifact when successful.
 
 ## Run on a development computer
 
@@ -20,7 +21,7 @@ flutter test
 flutter run
 ```
 
-The GitHub Actions workflow at `.github/workflows/flutter-checks.yml` runs analysis and tests in a cloud runner when commits are pushed.
+The GitHub Actions workflow at `.github/workflows/flutter-checks.yml` generates the Android platform files in its runner, resolves dependencies, runs `flutter analyze` and `flutter test`, and builds a debug APK. If the build succeeds, download the `ludo-lovers-debug-apk` artifact from the workflow run page. The generated Android files currently exist only in CI and are not committed into this repository.
 
 ## Assets
 
