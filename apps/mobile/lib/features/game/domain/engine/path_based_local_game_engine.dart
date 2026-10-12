@@ -366,21 +366,30 @@ class PathBasedLocalGameEngine {
   }
 
   LocalGameState _advance(LocalGameState state) {
-    var nextIndex = state.currentPlayerIndex;
-    for (var i = 0; i < state.players.length; i++) {
-      nextIndex = (nextIndex + 1) % state.players.length;
-      final nextPlayer = state.players[nextIndex];
-      final playerPawns = state.pawns.where((pawn) => pawn.playerId == nextPlayer);
-      if (playerPawns.isNotEmpty &&
-          !playerPawns.every((pawn) => pawn.position.section == PawnRouteSection.finished)) {
-        break;
+    // Search each other player at most once. Never silently leave the turn on
+    // a player whose pawns are all finished if no eligible player exists.
+    for (var offset = 1; offset <= state.players.length; offset++) {
+      final candidateIndex =
+          (state.currentPlayerIndex + offset) % state.players.length;
+      final candidateId = state.players[candidateIndex];
+      final candidatePawns =
+          state.pawns.where((pawn) => pawn.playerId == candidateId).toList();
+      final hasUnfinishedPawn = candidatePawns.any(
+        (pawn) => pawn.position.section != PawnRouteSection.finished,
+      );
+      if (candidatePawns.isNotEmpty && hasUnfinishedPawn) {
+        return state.copyWith(
+          currentPlayerIndex: candidateIndex,
+          clearPendingRoll: true,
+          consecutiveSixes: 0,
+          version: state.version + 1,
+        );
       }
     }
-    return state.copyWith(
-      currentPlayerIndex: nextIndex,
-      clearPendingRoll: true,
-      consecutiveSixes: 0,
-      version: state.version + 1,
+
+    throw StateError(
+      'Cannot advance turn: no player has an unfinished pawn. '
+      'The game state should have been completed before turn advancement.',
     );
   }
 }
