@@ -51,6 +51,9 @@ class LocalGameState {
     if (this.pawns.any((pawn) => !this.players.contains(pawn.playerId))) {
       throw ArgumentError('Every pawn must belong to a player in this game.');
     }
+    if (this.players.any((player) => !this.pawns.any((pawn) => pawn.playerId == player))) {
+      throw ArgumentError('Every player must have at least one pawn.');
+    }
     if (this.pawns.any((pawn) => pawn.id.trim().isEmpty) ||
         this.pawns.map((pawn) => pawn.id).toSet().length != this.pawns.length) {
       throw ArgumentError('Pawn IDs must be non-empty and unique.');
@@ -292,8 +295,14 @@ class PathBasedLocalGameEngine {
             other.position.section != PawnRouteSection.mainTrack) {
           continue;
         }
+        final otherProgress = other.position.progress;
+        if (otherProgress == null) {
+          throw StateError(
+            'Invalid game state: main-track pawn ${other.id} has no progress.',
+          );
+        }
         final otherCell = paths.forPlayer(other.playerId)
-            .cellAtProgress(other.position.progress!);
+            .cellAtProgress(otherProgress);
         if (otherCell == destination) opponentIndexes.add(i);
       }
 
