@@ -405,4 +405,77 @@ void main() {
     );
   });
 
+
+  test('skips a player whose pawns are all finished', () {
+    final state = LocalGameState(
+      players: const <String>['orange', 'blue', 'green'],
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: 11,
+          ),
+        ),
+        const LocalPawn(
+          id: 'g1',
+          playerId: 'green',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+
+    final result = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 3,
+    );
+
+    expect(result.state.currentPlayerId, 'green');
+    expect(result.state.pendingRoll, isNull);
+  });
+
+  test('fails loudly rather than selecting a player when nobody can continue', () {
+    final state = LocalGameState(
+      players: const <String>['orange', 'blue'],
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: 11,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: 11,
+          ),
+        ),
+      ],
+    );
+
+    expect(
+      () => engine.roll(
+        state,
+        playerId: 'orange',
+        expectedVersion: state.version,
+        value: 3,
+      ),
+      throwsA(isA<StateError>()),
+    );
+  });
+
 }
