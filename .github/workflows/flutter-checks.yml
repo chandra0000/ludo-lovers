@@ -38,7 +38,10 @@ jobs:
         run: flutter --version
 
       - name: Generate Android platform scaffold
-        run: flutter create --platforms=android --org com.ludolovers --project-name ludo_lovers .
+        run: |
+          flutter create --platforms=android --org com.ludolovers --project-name ludo_lovers .
+          # Flutter create adds a template test for MyApp; this project uses LudoLoversApp.
+          rm -f test/widget_test.dart
 
       - name: Resolve dependencies
         run: flutter pub get
