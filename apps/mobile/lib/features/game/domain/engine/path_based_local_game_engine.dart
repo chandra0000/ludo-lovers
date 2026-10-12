@@ -118,6 +118,7 @@ class PathBasedLocalGameEngine {
     this.maxConsecutiveSixes = 3,
     this.thirdSixEndsTurnWithoutMove = true,
     this.finishEndsMatchImmediately = true,
+    this.captureOnlySingleOpponentPawn = true,
   });
 
   final LudoBoardPaths paths;
@@ -131,6 +132,11 @@ class PathBasedLocalGameEngine {
   final int maxConsecutiveSixes;
   final bool thirdSixEndsTurnWithoutMove;
   final bool finishEndsMatchImmediately;
+
+  /// When true, a destination occupied by two or more opponent pawns is treated
+  /// as a stack and none of them are captured. This is a configurable local-MVP
+  /// rule; confirm it against the final published rules before release.
+  final bool captureOnlySingleOpponentPawn;
 
   LocalGameTransition roll(
     LocalGameState state, {
@@ -245,6 +251,7 @@ class PathBasedLocalGameEngine {
     var captured = false;
     final destination = result.resolution!.destinationCell;
     if (destination != null && !safeCellIndexes.contains(destination)) {
+      final opponentIndexes = <int>[];
       for (var i = 0; i < pawns.length; i++) {
         if (i == index) continue;
         final other = pawns[i];
@@ -254,8 +261,14 @@ class PathBasedLocalGameEngine {
         }
         final otherCell = paths.forPlayer(other.playerId)
             .cellAtProgress(other.position.progress!);
-        if (otherCell == destination) {
-          pawns[i] = other.copyWith(
+        if (otherCell == destination) opponentIndexes.add(i);
+      }
+
+      // A stacked pair is protected under the default MVP rule. Keep this
+      // explicit and configurable because Ludo variants differ on block rules.
+      if (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1) {
+        for (final opponentIndex in opponentIndexes) {
+          pawns[opponentIndex] = pawns[opponentIndex].copyWith(
             position: const PawnRoutePosition(section: PawnRouteSection.yard),
           );
           captured = true;
