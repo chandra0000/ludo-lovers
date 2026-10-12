@@ -360,7 +360,7 @@ void main() {
           playerId: 'orange',
           position: PawnRoutePosition(
             section: PawnRouteSection.homeLane,
-            progress: 2,
+            progress: 10,
           ),
         ),
         const LocalPawn(
