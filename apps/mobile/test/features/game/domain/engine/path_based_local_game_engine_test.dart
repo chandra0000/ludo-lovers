@@ -351,12 +351,41 @@ void main() {
   });
 
   test('rejects an invalid pawn move without consuming the roll', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: 2,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 1,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
     final rolled = engine.roll(
-      initial,
+      state,
       playerId: 'orange',
-      expectedVersion: initial.version,
+      expectedVersion: state.version,
       value: 2,
     );
+    expect(rolled.state.pendingRoll, 2);
+    expect(rolled.state.currentPlayerId, 'orange');
     expect(
       () => engine.move(
         rolled.state,
