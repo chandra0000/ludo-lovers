@@ -1,0 +1,83 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ludo_lovers/features/game/domain/board/board_coordinate_layout.dart';
+
+void main() {
+  group('BoardPoint', () {
+    test('converts normalized coordinates to the available board size', () {
+      const point = BoardPoint(x: 0.25, y: 0.75);
+      final pixels = point.toPixels(width: 400, height: 600);
+
+      expect(pixels.x, 100);
+      expect(pixels.y, 450);
+    });
+
+    test('rejects non-positive board dimensions', () {
+      expect(
+        () => const BoardPoint(x: 0.5, y: 0.5).toPixels(width: 0, height: 200),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects invalid normalized coordinates during conversion', () {
+      const point = BoardPoint(x: 1.2, y: 0.5);
+      expect(point.isValid, isFalse);
+      expect(
+        () => point.toPixels(width: 100, height: 100),
+        throwsStateError,
+      );
+    });
+  });
+
+  group('BoardCoordinateLayout', () {
+    test('stores an immutable copy of coordinate mappings', () {
+      final input = <int, BoardPoint>{
+        0: const BoardPoint(x: 0, y: 0),
+        1: const BoardPoint(x: 1, y: 1),
+      };
+      final layout = BoardCoordinateLayout(input);
+      input.clear();
+
+      expect(layout.forCell(0).x, 0);
+      expect(layout.forCell(1).y, 1);
+      expect(() => layout.pointsByCell[2] = const BoardPoint(x: 0, y: 0),
+          throwsUnsupportedError);
+    });
+
+    test('converts a logical cell to pixels', () {
+      final layout = BoardCoordinateLayout(<int, BoardPoint>{
+        12: const BoardPoint(x: 0.5, y: 0.25),
+      });
+
+      final result = layout.pixelForCell(cellId: 12, width: 300, height: 200);
+
+      expect(result.x, 150);
+      expect(result.y, 50);
+    });
+
+    test('rejects negative logical cell IDs', () {
+      expect(
+        () => BoardCoordinateLayout(<int, BoardPoint>{
+          -1: const BoardPoint(x: 0.5, y: 0.5),
+        }),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects invalid normalized coordinates', () {
+      expect(
+        () => BoardCoordinateLayout(<int, BoardPoint>{
+          0: const BoardPoint(x: double.nan, y: 0.5),
+        }),
+        throwsArgumentError,
+      );
+    });
+
+    test('throws when a logical cell has no coordinate', () {
+      final layout = BoardCoordinateLayout(<int, BoardPoint>{
+        0: const BoardPoint(x: 0.5, y: 0.5),
+      });
+
+      expect(() => layout.forCell(7), throwsArgumentError);
+    });
+  });
+}
