@@ -85,12 +85,49 @@ class LudoPlayerPath {
 /// geometry: callers must provide routes taken from the final board layout.
 class LudoBoardPaths {
   LudoBoardPaths(Iterable<LudoPlayerPath> paths)
-      : pathsByPlayer = Map<String, LudoPlayerPath>.unmodifiable({
-          for (final path in paths) path.playerId: path,
-        }) {
+      : pathsByPlayer = _indexPaths(paths) {
     if (pathsByPlayer.length < 2 || pathsByPlayer.length > 4) {
       throw ArgumentError('Board must define paths for 2 to 4 players.');
     }
+
+    final routes = pathsByPlayer.values.toList(growable: false);
+    final reference = routes.first;
+    final sharedCells = reference.mainTrackCells.toSet();
+    final homeCells = <int>{};
+
+    for (final route in routes) {
+      if (route.trackLength != reference.trackLength ||
+          route.mainTrackCells.toSet().length != sharedCells.length ||
+          !route.mainTrackCells.toSet().containsAll(sharedCells)) {
+        throw ArgumentError(
+          'Every player route must describe the same shared-track cells.',
+        );
+      }
+      if (route.homeLaneLength != reference.homeLaneLength) {
+        throw ArgumentError('Every player route must have the same home-lane length.');
+      }
+      if (route.homeLaneCells.any(sharedCells.contains)) {
+        throw ArgumentError('Home-lane cells must not overlap the shared track.');
+      }
+      for (final cell in route.homeLaneCells) {
+        if (!homeCells.add(cell)) {
+          throw ArgumentError('Home-lane cells must be unique across players.');
+        }
+      }
+    }
+  }
+
+  static Map<String, LudoPlayerPath> _indexPaths(
+    Iterable<LudoPlayerPath> paths,
+  ) {
+    final indexed = <String, LudoPlayerPath>{};
+    for (final path in paths) {
+      if (indexed.containsKey(path.playerId)) {
+        throw ArgumentError('Duplicate route for player ${path.playerId}.');
+      }
+      indexed[path.playerId] = path;
+    }
+    return Map<String, LudoPlayerPath>.unmodifiable(indexed);
   }
 
   final Map<String, LudoPlayerPath> pathsByPlayer;
