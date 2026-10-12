@@ -87,7 +87,7 @@ class _FoundationNotice extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF17191B),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF289EFF).withValues(alpha: 0.7)),
+        border: Border.all(color: const Color(0xFF289EFF).withOpacity(0.7)),
       ),
       child: const Text(
         'Project foundation is being prepared. Game modes and multiplayer will be added after the local game engine is validated.',
