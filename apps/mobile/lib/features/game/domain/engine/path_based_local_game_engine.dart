@@ -3,6 +3,8 @@
 /// This is an integration layer for the path model and movement resolver. It is
 /// deliberately separate from the original LudoEngine until the project is
 /// configured and both APIs can be migrated with executable tests.
+library;
+
 import '../board/ludo_board_paths.dart';
 import 'ludo_path_movement.dart';
 
@@ -26,7 +28,7 @@ class LocalPawn {
 
 class LocalGameState {
   LocalGameState({
-    required this.players,
+    required List<String> players,
     required List<LocalPawn> pawns,
     required this.currentPlayerIndex,
     this.pendingRoll,
@@ -53,8 +55,9 @@ class LocalGameState {
         this.pawns.map((pawn) => pawn.id).toSet().length != this.pawns.length) {
       throw ArgumentError('Pawn IDs must be non-empty and unique.');
     }
-    if (pendingRoll != null && (pendingRoll < 1 || pendingRoll > 6)) {
-      throw ArgumentError.value(pendingRoll, 'pendingRoll');
+    final roll = pendingRoll;
+    if (roll != null && (roll < 1 || roll > 6)) {
+      throw ArgumentError.value(roll, 'pendingRoll');
     }
     if (consecutiveSixes < 0 || version < 0) {
       throw ArgumentError('consecutiveSixes and version cannot be negative.');
