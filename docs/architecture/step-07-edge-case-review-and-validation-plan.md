@@ -1,10 +1,12 @@
 # Step 07 — Edge-case review and validation plan
 
-**Status: source review in progress. Not verified by Dart/Flutter execution.**
+**Status: validation in progress. `flutter analyze` passed in GitHub Actions; the latest full test run found one failing test setup, which has been corrected and is awaiting a rerun. Step 07 is not complete.**
 
 ## Repository readiness finding
 
-The current default branch does not contain `apps/mobile/pubspec.yaml` or `apps/mobile/lib/main.dart`. The game-domain source and Flutter-style tests are present, but there is not yet a runnable Flutter app at the expected path. Therefore a GitHub Actions workflow that runs `flutter pub get`, `flutter analyze`, and `flutter test` would fail before checking the engine. Do not treat source files or test cases as passing tests.
+The Flutter package foundation now exists at `apps/mobile/pubspec.yaml` and `apps/mobile/lib/main.dart`, with a temporary branded landing screen, theme, widget smoke test, and GitHub Actions workflow. The first completed CI run resolved dependencies and passed `flutter analyze`. Its test run reported 28 passing tests and one failure: the illegal-move test accidentally rolled a 2 while all pawns were in the yard, so the engine correctly ended the turn before the test attempted a move. The test fixture was corrected to keep a legal move available while selecting a pawn whose move overshoots; the rerun is pending.
+
+There is still no generated `apps/mobile/android/` platform scaffold, so this does not yet prove that an Android APK can be built or launched. The local game engine also remains domain-only and is not integrated into the UI. Do not describe the app as playable or Step 07 as complete until the relevant checks and integration work pass.
 
 ## Review findings
 
@@ -18,7 +20,7 @@ The current default branch does not contain `apps/mobile/pubspec.yaml` or `apps/
 
 ## Required next work
 
-- Create the actual Flutter project shell (including `pubspec.yaml` and `lib/main.dart`) before adding a Flutter CI workflow.
+- Keep the Flutter shell and CI workflow; confirm the rerun passes, then generate the Android platform scaffold before claiming an Android build.
 - Add invariant tests for finished-player skipping, malformed route positions, six/capture/finish bonus combinations, and no-eligible-player states.
 - Build realistic route fixtures from the approved board design and validate every player's shared-track order and home lane.
 - Decide whether the engine uses one version increment per command; then make tests assert the policy.
