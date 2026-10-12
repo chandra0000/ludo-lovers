@@ -37,6 +37,9 @@ jobs:
       - name: Show Flutter version
         run: flutter --version
 
+      - name: Generate Android platform scaffold
+        run: flutter create --platforms=android --org com.ludolovers --project-name ludo_lovers .
+
       - name: Resolve dependencies
         run: flutter pub get
 
@@ -45,3 +48,14 @@ jobs:
 
       - name: Run automated tests
         run: flutter test
+
+      - name: Build Android debug APK
+        run: flutter build apk --debug
+
+      - name: Upload Android debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ludo-lovers-debug-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
