@@ -47,11 +47,6 @@ class AppTheme {
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
-      cardTheme: const CardThemeData(
-        color: Color(0xFF17191B),
-        elevation: 0,
-        margin: EdgeInsets.zero,
-      ),
     );
   }
 }
