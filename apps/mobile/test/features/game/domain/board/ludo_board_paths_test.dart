@@ -65,6 +65,61 @@ void main() {
     });
   });
 
+
+  test('rejects duplicate player routes instead of silently replacing one', () {
+    final route = LudoPlayerPath(
+      playerId: 'orange',
+      mainTrackCells: List<int>.generate(8, (i) => i),
+      homeLaneCells: <int>[100, 101],
+      trackLength: 8,
+    );
+    expect(
+      () => LudoBoardPaths(<LudoPlayerPath>[
+        route,
+        LudoPlayerPath(
+          playerId: 'orange',
+          mainTrackCells: List<int>.generate(8, (i) => (i + 1) % 8),
+          homeLaneCells: <int>[110, 111],
+          trackLength: 8,
+        ),
+      ]),
+      throwsArgumentError,
+    );
+  });
+
+  test('rejects home lanes that overlap the shared track or each other', () {
+    final orange = LudoPlayerPath(
+      playerId: 'orange',
+      mainTrackCells: List<int>.generate(8, (i) => i),
+      homeLaneCells: <int>[100, 101],
+      trackLength: 8,
+    );
+    expect(
+      () => LudoBoardPaths(<LudoPlayerPath>[
+        orange,
+        LudoPlayerPath(
+          playerId: 'blue',
+          mainTrackCells: List<int>.generate(8, (i) => (i + 2) % 8),
+          homeLaneCells: <int>[100, 111],
+          trackLength: 8,
+        ),
+      ]),
+      throwsArgumentError,
+    );
+    expect(
+      () => LudoBoardPaths(<LudoPlayerPath>[
+        orange,
+        LudoPlayerPath(
+          playerId: 'blue',
+          mainTrackCells: List<int>.generate(8, (i) => (i + 2) % 8),
+          homeLaneCells: <int>[2, 111],
+          trackLength: 8,
+        ),
+      ]),
+      throwsArgumentError,
+    );
+  });
+
   test('LudoBoardPaths looks up each player route', () {
     final paths = LudoBoardPaths(<LudoPlayerPath>[
       LudoPlayerPath(
