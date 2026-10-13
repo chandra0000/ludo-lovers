@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixture.dart';
-import 'package:ludo_lovers/features/game/domain/board/ludo_board_paths.dart';
 
 void main() {
   group('ClassicLudoBoardFixture', () {
@@ -60,38 +59,17 @@ void main() {
       expect(path.cellAtProgress(57), 215);
       expect(path.cellAtProgress(58), isNull);
     });
-  });
 
-  group('LudoBoardPaths', () {
-    test('rejects mismatched shared-track routes', () {
+    test('rotates player-relative routes over the same shared track', () {
+      final board = ClassicLudoBoardFixture.create();
+
       expect(
-        () => LudoBoardPaths(<LudoPlayerPath>[
-          LudoPlayerPath(
-            playerId: 'orange',
-            mainTrackCells: List<int>.generate(52, (index) => index),
-            homeLaneCells: List<int>.generate(6, (index) => 200 + index),
-            trackLength: 52,
-          ),
-          LudoPlayerPath(
-            playerId: 'blue',
-            mainTrackCells: List<int>.generate(52, (index) => (index + 2) % 52),
-            homeLaneCells: List<int>.generate(6, (index) => 210 + index),
-            trackLength: 52,
-          ),
-          LudoPlayerPath(
-            playerId: 'green',
-            mainTrackCells: List<int>.generate(52, (index) => (index + 26) % 52),
-            homeLaneCells: List<int>.generate(6, (index) => 220 + index),
-            trackLength: 52,
-          ),
-          LudoPlayerPath(
-            playerId: 'magenta',
-            mainTrackCells: List<int>.generate(52, (index) => (index + 39) % 52),
-            homeLaneCells: List<int>.generate(6, (index) => 230 + index),
-            trackLength: 52,
-          ),
-        ]),
-        throwsArgumentError,
+        board.forPlayer('orange').entryCell,
+        isNot(board.forPlayer('blue').entryCell),
+      );
+      expect(
+        board.forPlayer('orange').mainTrackCells.toSet(),
+        board.forPlayer('blue').mainTrackCells.toSet(),
       );
     });
   });
