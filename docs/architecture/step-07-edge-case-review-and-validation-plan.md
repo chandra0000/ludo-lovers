@@ -1,12 +1,12 @@
 # Step 07 — Edge-case review and validation plan
 
-**Status: validation in progress. GitHub Actions run [38218035209](https://github.com/chandra0000/ludo-lovers/actions/runs/38218035209) passed `flutter analyze` and all 29 tests. Additional edge-case guards and tests have since been committed and are awaiting their CI run. Step 07 is not complete.**
+**Status: validation baseline passed; engine consolidation remains in progress.** GitHub Actions run [38258802589](https://github.com/chandra0000/ludo-lovers/actions/runs/38258802589) passed `flutter analyze`, automated tests, and a CI-generated Android debug APK build for its tested revision. Step 07 is not complete.
 
 ## Repository readiness finding
 
 The Flutter package foundation now exists at `apps/mobile/pubspec.yaml` and `apps/mobile/lib/main.dart`, with a temporary branded landing screen, theme, widget smoke test, and GitHub Actions workflow. The first two CI runs exposed a test-fixture issue in the illegal-move test. The fixture was corrected to keep a legal move available while selecting a pawn whose move overshoots. The next run passed dependency resolution, `flutter analyze`, and all 29 tests. A subsequent hardening commit now requires every player to have at least one pawn and replaces a null-assertion in capture lookup with a clear `StateError`; two regression tests cover those cases, and their CI result is pending.
 
-There is still no generated `apps/mobile/android/` platform scaffold, so this does not yet prove that an Android APK can be built or launched. The local game engine also remains domain-only and is not integrated into the UI. Do not describe the app as playable or Step 07 as complete until the relevant checks and integration work pass.
+The workflow generates `apps/mobile/android/` temporarily in CI and successfully builds a debug APK artifact. The Android platform scaffold is not committed in the repository, and no physical-device install/run has been confirmed. The local game engine remains domain-only and is not integrated into the UI. Do not describe the app as playable or Step 07 as complete until the rule/route consolidation and integration work pass.
 
 ## Review findings
 
@@ -24,8 +24,12 @@ There is still no generated `apps/mobile/android/` platform scaffold, so this do
 - Keep expanding invariant tests for malformed route positions, six/capture/finish bonus combinations, and no-eligible-player states; finished-player skipping and no-eligible-player handling already have regression tests.
 - Build realistic route fixtures from the approved board design and validate every player's shared-track order and home lane.
 - Decide whether the engine uses one version increment per command; then make tests assert the policy.
-- Consolidate `ludo_engine.dart` and `PathBasedLocalGameEngine` only after executable tests cover the behavior; do not merge APIs blindly.
+- Follow the canonical migration decision in [step-07-canonical-engine-consolidation-decision.md](step-07-canonical-engine-consolidation-decision.md): use the path-based model as the migration target, preserve behavior with tests, and retire/adapt the legacy engine only after reference checks.
 - Run `flutter analyze` and `flutter test` in CI or on a development machine before marking Step 07 complete.
+
+## Canonical engine decision
+
+The consolidation approach and quality gates are recorded in [step-07-canonical-engine-consolidation-decision.md](step-07-canonical-engine-consolidation-decision.md). It is a decision record, not proof that the migration has already happened.
 
 ## Exit criteria for Step 07
 
