@@ -2,6 +2,8 @@ name: Flutter checks
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "apps/mobile/**"
       - ".github/workflows/flutter-checks.yml"
@@ -19,11 +21,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  analyze-and-test:
+  validate:
+    name: Analyze, test, and build Android debug APK
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: apps/mobile
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -32,16 +37,21 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: "3.24.0"
           cache: true
 
       - name: Show Flutter version
         run: flutter --version
 
-      - name: Generate Android platform scaffold
+      - name: Generate Android platform scaffold if needed
         run: |
-          flutter create --platforms=android --org com.ludolovers --project-name ludo_lovers .
-          # Flutter create adds a template test for MyApp; this project uses LudoLoversApp.
+          if [ ! -d android ]; then
+            flutter create --platforms=android --org com.ludolovers --project-name ludo_lovers .
+          fi
           rm -f test/widget_test.dart
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
 
       - name: Resolve dependencies
         run: flutter pub get
@@ -56,9 +66,10 @@ jobs:
         run: flutter build apk --debug
 
       - name: Upload Android debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ludo-lovers-debug-apk
-          path: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 7
