@@ -2,11 +2,11 @@
 
 **Ludo Lovers** is an Android-first social Ludo game concept combining classic board-game fun with friends, family, personalization, and a romance-inspired **Love Mode**.
 
-> **Project status:** Planning and foundation stage. The brand direction and UI concept are defined; implementation is not yet complete.
+> **Project status:** Foundation is now in place with a documented rules profile, canonical board route fixture, route validation tests, and a clearer implementation roadmap. The app is not yet a complete released game, but the project has moved beyond raw planning into active engine and board validation.
 
 ## Vision
 
-Create a polished, welcoming Ludo experience that feels like playing together in the same room—or enjoying a little date night—with an emphasis on smooth gameplay, social connection, customization, privacy, and transparent fair-play systems.
+Create a polished, welcoming Ludo experience that feels like playing together in the same room—or enjoying a little date night—with an emphasis on smooth gameplay, social connection, customization, and fair rules.
 
 ## Product principles
 
@@ -62,7 +62,7 @@ Technology choices may be refined as the prototype is validated.
 
 ## Development roadmap
 
-Tasks will be discussed by number so progress is easy to track:
+Tasks are tracked by step number so progress is easy to follow:
 
 1. Brand identity and UI concept
 2. Project setup and repository structure
@@ -75,6 +75,15 @@ Tasks will be discussed by number so progress is easy to track:
 9. Online multiplayer, reconnection, and fair-dice verification
 10. Virtual coins, customization, and social features
 11. Love Mode, progression, accessibility, testing, beta, and release
+
+## Current implementation status
+
+This repository now contains a foundation layer that is intentionally engineering-driven:
+
+- A canonical four-player Ludo route fixture with a 52-cell shared track and six-cell home lane exists for each player in `apps/mobile/lib/features/game/domain/board/classic_ludo_board_fixture.dart`.
+- Engine tests cover the standard board route invariants in `apps/mobile/test/features/game/domain/board/classic_ludo_board_fixture_test.dart`.
+- The path-based local engine remains the active rules contract, while old overlapping implementations should be migrated before broader feature work.
+- Rendering and board art remain separate from the rules engine; the geometry is now explicit and testable before UI integration.
 
 ## Initial alpha target
 
@@ -120,13 +129,14 @@ Directories will be added as implementation begins.
 
 ## Current next step
 
-**Step 07 — Canonical engine consolidation, followed by Step 08 board geometry.** GitHub Actions run [38258802589](https://github.com/chandra0000/ludo-lovers/actions/runs/38258802589) passed Flutter analysis, automated tests, and a CI-generated Android debug APK build. The APK is a CI artifact, not evidence of a physical-device installation test. The local engine is still not connected to the app screen, the current engine fixtures use synthetic routes, and the legacy and path-based engines are not yet consolidated. See [the engine consolidation decision](docs/architecture/step-07-canonical-engine-consolidation-decision.md), [Step 07 validation plan](docs/architecture/step-07-edge-case-review-and-validation-plan.md), and [Step 08 board geometry plan](docs/architecture/step-08-board-geometry-and-rendering-plan.md).
+**Step 07/08 foundation consolidation:** canonical board paths and route validation are now implemented as explicit fixtures, and the remaining work is to complete the full path-based engine consolidation, safe-cell validation against final board art, and UI integration on top of a stable rules contract.
 
 ## Engineering decision records
 
-- [Canonical game engine consolidation](docs/architecture/step-07-canonical-engine-consolidation-decision.md) — source of truth for engine migration, rules/profile requirements, immutable state, typed events, versioning, and acceptance gates.
+- [Canonical game engine consolidation](docs/architecture/step-07-canonical-engine-consolidation-decision.md) — source of truth for engine migration, rules/profile requirements, immutable state, and the final rules boundary.
 - [Step 07 validation plan](docs/architecture/step-07-edge-case-review-and-validation-plan.md) — known edge cases and engine exit criteria.
 - [Step 08 board geometry and rendering](docs/architecture/step-08-board-geometry-and-rendering-plan.md) — route geometry, coordinate mapping, rendering separation, and brand constraints.
+- [Classic board fixture](apps/mobile/lib/features/game/domain/board/classic_ludo_board_fixture.dart) — explicit canonical route data used to validate board invariants.
 
 ---
 
