@@ -120,7 +120,13 @@ Directories will be added as implementation begins.
 
 ## Current next step
 
-**Step 03 — Project Setup:** the initial Flutter package, app entry point, branded landing screen, theme, lint configuration, widget smoke test, and GitHub Actions analysis/test workflow have been committed. CI results and a real Android build still need verification; the game engine is not yet integrated into the screen.
+**Step 07 — Canonical engine consolidation, followed by Step 08 board geometry.** GitHub Actions run [38258802589](https://github.com/chandra0000/ludo-lovers/actions/runs/38258802589) passed Flutter analysis, automated tests, and a CI-generated Android debug APK build. The APK is a CI artifact, not evidence of a physical-device installation test. The local engine is still not connected to the app screen, the current engine fixtures use synthetic routes, and the legacy and path-based engines are not yet consolidated. See [the engine consolidation decision](docs/architecture/step-07-canonical-engine-consolidation-decision.md), [Step 07 validation plan](docs/architecture/step-07-edge-case-review-and-validation-plan.md), and [Step 08 board geometry plan](docs/architecture/step-08-board-geometry-and-rendering-plan.md).
+
+## Engineering decision records
+
+- [Canonical game engine consolidation](docs/architecture/step-07-canonical-engine-consolidation-decision.md) — source of truth for engine migration, rules/profile requirements, immutable state, typed events, versioning, and acceptance gates.
+- [Step 07 validation plan](docs/architecture/step-07-edge-case-review-and-validation-plan.md) — known edge cases and engine exit criteria.
+- [Step 08 board geometry and rendering](docs/architecture/step-08-board-geometry-and-rendering-plan.md) — route geometry, coordinate mapping, rendering separation, and brand constraints.
 
 ---
 
