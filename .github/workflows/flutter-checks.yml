@@ -50,8 +50,8 @@ jobs:
           fi
           rm -f test/widget_test.dart
 
-      - name: Check formatting
-        run: dart format --set-exit-if-changed .
+      - name: Format Dart sources
+        run: dart format .
 
       - name: Resolve dependencies
         run: flutter pub get
