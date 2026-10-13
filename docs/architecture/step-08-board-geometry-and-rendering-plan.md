@@ -1,6 +1,6 @@
 # Step 08 — Board Geometry and Rendering Plan
 
-**Status:** Board-coordinate foundation added; final route coordinates and Flame renderer are not implemented yet. The coordinate model and unit tests are committed, and CI validation is pending for these latest changes.
+**Status:** Board-coordinate foundation added and validated by GitHub Actions run [38258802589](https://github.com/chandra0000/ludo-lovers/actions/runs/38258802589), which passed analysis, automated tests, and a CI-generated Android debug APK build. Final route coordinates and the Flame renderer are not implemented yet.
 
 ## Goal
 
