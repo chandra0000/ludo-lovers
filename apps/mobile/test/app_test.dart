@@ -7,9 +7,16 @@ void main() {
 
     expect(find.text('LUDO LOVERS'), findsOneWidget);
     expect(find.text('Play together. Stay connected.'), findsOneWidget);
-    expect(
-      find.textContaining('Project foundation is being prepared.'),
-      findsOneWidget,
-    );
+    expect(find.text('Preview Ludo Board'), findsOneWidget);
+  });
+
+  testWidgets('opens the board preview', (tester) async {
+    await tester.pumpWidget(const LudoLoversApp());
+
+    await tester.tap(find.byKey(const ValueKey('preview_board_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Classic Board'), findsOneWidget);
+    expect(find.textContaining('turns, pawn movement and online play'), findsOneWidget);
   });
 }
