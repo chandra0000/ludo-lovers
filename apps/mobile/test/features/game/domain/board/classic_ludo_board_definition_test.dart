@@ -34,7 +34,7 @@ void main() {
     });
 
     test('defines four unique in-bounds visual anchors', () {
-      final seats = ClassicLudoBoardDefinition.seats;
+      const seats = ClassicLudoBoardDefinition.seats;
       expect(
         seats.map((seat) => seat.provisionalTrackEntryIndex).toSet(),
         hasLength(4),
