@@ -13,7 +13,7 @@ class ClassicLudoBoardPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     ClassicLudoBoardDefinition.validate();
-    final grid = ClassicLudoBoardDefinition.gridSize;
+    const grid = ClassicLudoBoardDefinition.gridSize;
     final cell = size.shortestSide / grid;
     final left = (size.width - cell * grid) / 2;
     final top = (size.height - cell * grid) / 2;
