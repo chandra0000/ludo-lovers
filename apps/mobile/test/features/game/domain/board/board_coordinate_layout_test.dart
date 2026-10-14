@@ -54,6 +54,61 @@ void main() {
       expect(result.y, 50);
     });
 
+    test('hit-tests the nearest logical cell within the touch radius', () {
+      final layout = BoardCoordinateLayout(<int, BoardPoint>{
+        4: const BoardPoint(x: 0.25, y: 0.25),
+        9: const BoardPoint(x: 0.75, y: 0.75),
+      });
+
+      expect(
+        layout.hitTest(
+          x: 102,
+          y: 98,
+          width: 400,
+          height: 400,
+          maxDistance: 10,
+        ),
+        4,
+      );
+      expect(
+        layout.hitTest(
+          x: 200,
+          y: 200,
+          width: 400,
+          height: 400,
+          maxDistance: 10,
+        ),
+        isNull,
+      );
+    });
+
+    test('rejects invalid hit-test arguments', () {
+      final layout = BoardCoordinateLayout(<int, BoardPoint>{
+        0: const BoardPoint(x: 0.5, y: 0.5),
+      });
+
+      expect(
+        () => layout.hitTest(
+          x: double.nan,
+          y: 1,
+          width: 100,
+          height: 100,
+          maxDistance: 10,
+        ),
+        throwsArgumentError,
+      );
+      expect(
+        () => layout.hitTest(
+          x: 1,
+          y: 1,
+          width: 100,
+          height: 100,
+          maxDistance: -1,
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('rejects negative logical cell IDs', () {
       expect(
         () => BoardCoordinateLayout(<int, BoardPoint>{
