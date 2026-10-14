@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
 
+import 'classic_ludo_board_definition.dart';
 import 'board_coordinate_layout.dart';
 
-/// Logical 15x15 board presentation. This is visual geometry only; it does not
-/// decide legal moves or map game-engine progress to cells.
+/// Visual board prototype driven by the shared seat definition.
+///
+/// The renderer still uses provisional anchors; logical track IDs are not yet
+/// mapped to every displayed cell and this painter does not implement gameplay.
 class ClassicLudoBoardPainter extends CustomPainter {
   const ClassicLudoBoardPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cell = size.shortestSide / 15;
-    final left = (size.width - cell * 15) / 2;
-    final top = (size.height - cell * 15) / 2;
-    final boardRect = Rect.fromLTWH(left, top, cell * 15, cell * 15);
+    ClassicLudoBoardDefinition.validate();
+    final grid = ClassicLudoBoardDefinition.gridSize;
+    final cell = size.shortestSide / grid;
+    final left = (size.width - cell * grid) / 2;
+    final top = (size.height - cell * grid) / 2;
+    final boardRect = Rect.fromLTWH(left, top, cell * grid, cell * grid);
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(boardRect, Radius.circular(cell * 0.45)),
       Paint()..color = LudoBoardPalette.black,
     );
 
-    _drawHome(canvas, left, top, cell, 0, 0, LudoBoardPalette.orange);
-    _drawHome(canvas, left, top, cell, 9, 0, LudoBoardPalette.green);
-    _drawHome(canvas, left, top, cell, 0, 9, LudoBoardPalette.blue);
-    _drawHome(canvas, left, top, cell, 9, 9, LudoBoardPalette.magenta);
+    for (final seat in ClassicLudoBoardDefinition.seats) {
+      _drawHome(canvas, left, top, cell, seat.yardColumn, seat.yardRow, seat.color);
+    }
 
     final trackPaint = Paint()..color = LudoBoardPalette.cream;
     final linePaint = Paint()
@@ -30,8 +34,8 @@ class ClassicLudoBoardPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.65;
 
-    for (var row = 0; row < 15; row++) {
-      for (var col = 0; col < 15; col++) {
+    for (var row = 0; row < grid; row++) {
+      for (var col = 0; col < grid; col++) {
         final inCentralCross = (row >= 6 && row <= 8) ||
             (col >= 6 && col <= 8);
         if (!inCentralCross) continue;
@@ -46,14 +50,14 @@ class ClassicLudoBoardPainter extends CustomPainter {
       }
     }
 
-    _drawLane(canvas, left, top, cell, const Offset(7, 1), const Offset(7, 5),
-        LudoBoardPalette.orange);
-    _drawLane(canvas, left, top, cell, const Offset(13, 7), const Offset(9, 7),
-        LudoBoardPalette.green);
-    _drawLane(canvas, left, top, cell, const Offset(7, 13), const Offset(7, 9),
-        LudoBoardPalette.blue);
-    _drawLane(canvas, left, top, cell, const Offset(1, 7), const Offset(5, 7),
-        LudoBoardPalette.magenta);
+    for (final seat in ClassicLudoBoardDefinition.seats) {
+      _drawLane(
+        canvas, left, top, cell,
+        Offset(seat.laneStart.column.toDouble(), seat.laneStart.row.toDouble()),
+        Offset(seat.laneEnd.column.toDouble(), seat.laneEnd.row.toDouble()),
+        seat.color,
+      );
+    }
 
     final center = Offset(left + 7.5 * cell, top + 7.5 * cell);
     final centerPath = Path()
@@ -65,14 +69,18 @@ class ClassicLudoBoardPainter extends CustomPainter {
     canvas.drawPath(centerPath, Paint()..color = LudoBoardPalette.gold);
     canvas.drawPath(centerPath, linePaint);
 
-    _drawStart(canvas, left, top, cell, 6, 1, LudoBoardPalette.orange);
-    _drawStart(canvas, left, top, cell, 13, 6, LudoBoardPalette.green);
-    _drawStart(canvas, left, top, cell, 8, 13, LudoBoardPalette.blue);
-    _drawStart(canvas, left, top, cell, 1, 8, LudoBoardPalette.magenta);
+    for (final seat in ClassicLudoBoardDefinition.seats) {
+      _drawStart(
+        canvas, left, top, cell,
+        seat.startMarker.column, seat.startMarker.row, seat.color,
+      );
+    }
   }
 
-  void _drawHome(Canvas canvas, double left, double top, double cell,
-      int col, int row, Color color) {
+  void _drawHome(
+    Canvas canvas, double left, double top, double cell,
+    int col, int row, Color color,
+  ) {
     final rect = Rect.fromLTWH(
       left + col * cell, top + row * cell, cell * 6, cell * 6,
     );
@@ -108,8 +116,10 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
   }
 
-  void _drawLane(Canvas canvas, double left, double top, double cell,
-      Offset start, Offset end, Color color) {
+  void _drawLane(
+    Canvas canvas, double left, double top, double cell,
+    Offset start, Offset end, Color color,
+  ) {
     final delta = end - start;
     final steps = delta.dx.abs() + delta.dy.abs();
     final paint = Paint()..color = color.withValues(alpha: 0.8);
@@ -123,13 +133,17 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
   }
 
-  void _drawStart(Canvas canvas, double left, double top, double cell,
-      int col, int row, Color color) {
+  void _drawStart(
+    Canvas canvas, double left, double top, double cell,
+    int col, int row, Color color,
+  ) {
     final rect = Rect.fromLTWH(
       left + col * cell, top + row * cell, cell, cell,
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect.deflate(cell * 0.12), Radius.circular(cell * 0.2)),
+      RRect.fromRectAndRadius(
+        rect.deflate(cell * 0.12), Radius.circular(cell * 0.2),
+      ),
       Paint()..color = color,
     );
   }
