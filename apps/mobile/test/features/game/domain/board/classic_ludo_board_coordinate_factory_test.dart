@@ -23,6 +23,23 @@ void main() {
       }
     });
 
+    test('seat start markers align with their physical shared-track indexes', () {
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final routeCell =
+            ClassicLudoBoardCoordinateFactory.sharedTrack[seat.provisionalTrackEntryIndex];
+        expect(
+          seat.startMarker.column,
+          routeCell.column,
+          reason: '${seat.id} start column',
+        );
+        expect(
+          seat.startMarker.row,
+          routeCell.row,
+          reason: '${seat.id} start row',
+        );
+      }
+    });
+
     test('builds normalized coordinates for track and all private lanes', () {
       final layout = ClassicLudoBoardCoordinateFactory.create();
       expect(layout.pointsByCell, hasLength(52 + 4 * 6));
