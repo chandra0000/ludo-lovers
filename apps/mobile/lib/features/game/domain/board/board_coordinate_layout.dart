@@ -66,6 +66,47 @@ class BoardCoordinateLayout {
     required double height,
   }) =>
       forCell(cellId).toPixels(width: width, height: height);
+
+  /// Returns the nearest logical cell whose center is within [maxDistance].
+  ///
+  /// Coordinates are measured in pixels relative to the board's own canvas.
+  /// A null result means the touch is too far from every registered cell.
+  /// This helper does not decide whether a pawn may move to the selected cell.
+  int? hitTest({
+    required double x,
+    required double y,
+    required double width,
+    required double height,
+    required double maxDistance,
+  }) {
+    if (!x.isFinite || !y.isFinite) {
+      throw ArgumentError('Touch coordinates must be finite.');
+    }
+    if (!width.isFinite || !height.isFinite || width <= 0 || height <= 0) {
+      throw ArgumentError('Board width and height must be finite and positive.');
+    }
+    if (!maxDistance.isFinite || maxDistance < 0) {
+      throw ArgumentError('Hit-test distance must be finite and non-negative.');
+    }
+
+    final maxDistanceSquared = maxDistance * maxDistance;
+    int? nearestCellId;
+    var nearestDistanceSquared = double.infinity;
+
+    for (final entry in pointsByCell.entries) {
+      final pixel = entry.value.toPixels(width: width, height: height);
+      final dx = pixel.x - x;
+      final dy = pixel.y - y;
+      final distanceSquared = dx * dx + dy * dy;
+      if (distanceSquared < nearestDistanceSquared) {
+        nearestDistanceSquared = distanceSquared;
+        nearestCellId = entry.key;
+      }
+    }
+
+    if (nearestDistanceSquared > maxDistanceSquared) return null;
+    return nearestCellId;
+  }
 }
 
 /// The fixed Ludo Lovers palette. Keep all game rendering tied to these values.
