@@ -10,7 +10,7 @@ class ClassicLudoBoardGeometryAudit {
 
   static List<String> inspect() {
     final issues = <String>[];
-    final track = ClassicLudoBoardCoordinateFactory.sharedTrack;
+    const track = ClassicLudoBoardCoordinateFactory.sharedTrack;
 
     if (track.length != ClassicLudoBoardDefinition.sharedTrackLength) {
       issues.add('Shared track must contain exactly 52 cells.');
