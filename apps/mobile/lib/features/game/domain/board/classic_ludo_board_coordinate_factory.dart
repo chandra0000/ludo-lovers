@@ -64,6 +64,32 @@ class ClassicLudoBoardCoordinateFactory {
     BoardGridCell(column: 0, row: 6),
   ];
 
+  /// Indexes whose next route cell is diagonal rather than orthogonally adjacent.
+  ///
+  /// A non-empty result means this provisional route must not drive movement,
+  /// hit-testing, or capture rules yet.
+  static List<int> get nonOrthogonalTransitionIndexes {
+    final indexes = <int>[];
+    for (var index = 0; index < sharedTrack.length; index++) {
+      final current = sharedTrack[index];
+      final next = sharedTrack[(index + 1) % sharedTrack.length];
+      final dx = (current.column - next.column).abs();
+      final dy = (current.row - next.row).abs();
+      if (dx + dy != 1) indexes.add(index);
+    }
+    return List<int>.unmodifiable(indexes);
+  }
+
+  /// Conservative release gate for consuming this geometry in game rules.
+  ///
+  /// This deliberately remains false while the route contains diagonal jumps.
+  /// The final route must be reconciled with a reviewed board-cell diagram.
+  static bool get isGameplayReady =>
+      sharedTrack.length == ClassicLudoBoardDefinition.sharedTrackLength &&
+      sharedTrack.toSet().length == sharedTrack.length &&
+      sharedTrack.every((cell) => cell.isInsideBoard) &&
+      nonOrthogonalTransitionIndexes.isEmpty;
+
   static BoardCoordinateLayout create() {
     if (sharedTrack.length != ClassicLudoBoardDefinition.sharedTrackLength) {
       throw StateError('The shared route must contain exactly 52 cells.');
