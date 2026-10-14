@@ -28,6 +28,7 @@ class ClassicLudoSeat {
     required this.yardRow,
     required this.laneStart,
     required this.laneEnd,
+    required this.homeLaneCells,
     required this.startMarker,
     required this.provisionalTrackEntryIndex,
   });
@@ -45,6 +46,8 @@ class ClassicLudoSeat {
   /// These are presentation anchors, not yet a validated movement route.
   final BoardGridCell laneStart;
   final BoardGridCell laneEnd;
+  /// Six physical grid cells ordered from the track edge toward the center.
+  final List<BoardGridCell> homeLaneCells;
   final BoardGridCell startMarker;
 
   /// Provisional player-relative entry offset; do not use for online rules.
@@ -78,7 +81,15 @@ class ClassicLudoBoardDefinition {
       yardColumn: 0,
       yardRow: 0,
       laneStart: BoardGridCell(column: 1, row: 7),
-      laneEnd: BoardGridCell(column: 5, row: 7),
+      laneEnd: BoardGridCell(column: 6, row: 7),
+      homeLaneCells: <BoardGridCell>[
+        BoardGridCell(column: 1, row: 7),
+        BoardGridCell(column: 2, row: 7),
+        BoardGridCell(column: 3, row: 7),
+        BoardGridCell(column: 4, row: 7),
+        BoardGridCell(column: 5, row: 7),
+        BoardGridCell(column: 6, row: 7),
+      ],
       startMarker: BoardGridCell(column: 1, row: 6),
       provisionalTrackEntryIndex: 0,
     ),
@@ -90,7 +101,15 @@ class ClassicLudoBoardDefinition {
       yardColumn: 9,
       yardRow: 0,
       laneStart: BoardGridCell(column: 7, row: 1),
-      laneEnd: BoardGridCell(column: 7, row: 5),
+      laneEnd: BoardGridCell(column: 7, row: 6),
+      homeLaneCells: <BoardGridCell>[
+        BoardGridCell(column: 7, row: 1),
+        BoardGridCell(column: 7, row: 2),
+        BoardGridCell(column: 7, row: 3),
+        BoardGridCell(column: 7, row: 4),
+        BoardGridCell(column: 7, row: 5),
+        BoardGridCell(column: 7, row: 6),
+      ],
       startMarker: BoardGridCell(column: 8, row: 1),
       provisionalTrackEntryIndex: 13,
     ),
@@ -102,7 +121,15 @@ class ClassicLudoBoardDefinition {
       yardColumn: 0,
       yardRow: 9,
       laneStart: BoardGridCell(column: 7, row: 13),
-      laneEnd: BoardGridCell(column: 7, row: 9),
+      laneEnd: BoardGridCell(column: 7, row: 8),
+      homeLaneCells: <BoardGridCell>[
+        BoardGridCell(column: 7, row: 13),
+        BoardGridCell(column: 7, row: 12),
+        BoardGridCell(column: 7, row: 11),
+        BoardGridCell(column: 7, row: 10),
+        BoardGridCell(column: 7, row: 9),
+        BoardGridCell(column: 7, row: 8),
+      ],
       startMarker: BoardGridCell(column: 6, row: 13),
       provisionalTrackEntryIndex: 39,
     ),
@@ -114,7 +141,15 @@ class ClassicLudoBoardDefinition {
       yardColumn: 9,
       yardRow: 9,
       laneStart: BoardGridCell(column: 13, row: 7),
-      laneEnd: BoardGridCell(column: 9, row: 7),
+      laneEnd: BoardGridCell(column: 8, row: 7),
+      homeLaneCells: <BoardGridCell>[
+        BoardGridCell(column: 13, row: 7),
+        BoardGridCell(column: 12, row: 7),
+        BoardGridCell(column: 11, row: 7),
+        BoardGridCell(column: 10, row: 7),
+        BoardGridCell(column: 9, row: 7),
+        BoardGridCell(column: 8, row: 7),
+      ],
       startMarker: BoardGridCell(column: 13, row: 8),
       provisionalTrackEntryIndex: 26,
     ),
@@ -151,7 +186,9 @@ class ClassicLudoBoardDefinition {
           !seat.startMarker.isInsideBoard) {
         throw StateError('Visual anchors for ${seat.id} are outside the board.');
       }
-      if (seat.homeLaneCellIds.length != homeLaneLength) {
+      if (seat.homeLaneCellIds.length != homeLaneLength ||
+          seat.homeLaneCells.length != homeLaneLength ||
+          seat.homeLaneCells.any((cell) => !cell.isInsideBoard)) {
         throw StateError('Home lane for ${seat.id} must contain six cells.');
       }
       if (seat.provisionalTrackEntryIndex < 0 ||
@@ -163,6 +200,9 @@ class ClassicLudoBoardDefinition {
         if (!laneIds.add(id)) {
           throw StateError('Home-lane cell ID $id is assigned more than once.');
         }
+      }
+      if (seat.homeLaneCells.toSet().length != homeLaneLength) {
+        throw StateError('Home-lane coordinates for ${seat.id} must be unique.');
       }
     }
     if (!provisionalSafeTrackCellIds.every(
