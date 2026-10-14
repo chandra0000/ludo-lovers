@@ -1,6 +1,6 @@
 # Step 09B — Route Orientation Reconciliation
 
-**Status:** Provisional shared route and explicit home-lane coordinate map implemented; CI validation, visual/rules approval and engine migration remain outstanding.
+**Status:** Provisional shared route and explicit home-lane coordinate map implemented. A strict readiness guard now blocks gameplay use because four transitions are diagonal; visual/rules approval and engine migration remain outstanding.
 
 ## Implemented in this increment
 
@@ -12,8 +12,12 @@
 - Added value equality for grid cells so uniqueness and overlap tests compare coordinates rather than object identity.
 - Added tests for home-lane bounds, unique cells and separation from the shared track.
 - Reconciled the provisional physical start markers with route indexes: Orange 0, Green 13, Magenta 26, Blue 39. This mapping is still provisional pending visual/rules review.
-- Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs.
+- Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs. The route audit explicitly identifies diagonal transitions at indexes 4, 17, 30 and 43; these are now a tested gameplay-readiness blocker.
 - Kept safe-cell IDs and player entry offsets explicitly provisional; they are not approved online gameplay rules.
+
+## Route audit finding — do not migrate to gameplay yet
+
+The 52-cell route has four diagonal jumps at transition indexes 4, 17, 30 and 43. The existing adjacency test only proves that cells touch, not that a pawn follows orthogonal cell-to-cell movement. `ClassicLudoBoardCoordinateFactory.isGameplayReady` therefore remains false. This is intentional: do not wire this route into the local game engine, hit-testing, capture rules, or online rules until a reviewed 52-cell orthogonal route replaces it and the tests are updated.
 
 ## Why the canonical coordinate route is still a separate task
 
