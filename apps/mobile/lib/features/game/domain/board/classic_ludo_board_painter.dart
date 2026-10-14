@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'classic_ludo_board_definition.dart';
+import 'classic_ludo_board_coordinate_factory.dart';
 import 'board_coordinate_layout.dart';
 
 /// Visual board prototype driven by the shared seat definition.
@@ -48,6 +49,22 @@ class ClassicLudoBoardPainter extends CustomPainter {
         canvas.drawRect(rect, trackPaint);
         canvas.drawRect(rect, linePaint);
       }
+    }
+
+    final layout = ClassicLudoBoardCoordinateFactory.create();
+    for (var trackId = 0; trackId < ClassicLudoBoardDefinition.sharedTrackLength; trackId++) {
+      final point = layout.forCell(trackId);
+      final center = Offset(
+        left + point.x * cell * grid,
+        top + point.y * cell * grid,
+      );
+      final rect = Rect.fromCenter(
+        center: center,
+        width: cell,
+        height: cell,
+      );
+      canvas.drawRect(rect, trackPaint);
+      canvas.drawRect(rect, linePaint);
     }
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
