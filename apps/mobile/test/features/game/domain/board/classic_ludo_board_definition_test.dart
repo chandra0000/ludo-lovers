@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
-import 'package:ludo_lovers/features/game/domain/board/board_coordinate_layout.dart';
 
 void main() {
   group('ClassicLudoBoardDefinition', () {
