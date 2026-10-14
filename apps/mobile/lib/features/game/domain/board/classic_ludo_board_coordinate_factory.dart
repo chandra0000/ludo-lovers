@@ -82,16 +82,12 @@ class ClassicLudoBoardCoordinateFactory {
     }
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
-      final dx = seat.laneEnd.column - seat.laneStart.column;
-      final dy = seat.laneEnd.row - seat.laneStart.row;
-      for (var index = 0; index < ClassicLudoBoardDefinition.homeLaneLength; index++) {
-        final fraction = (index + 1) / ClassicLudoBoardDefinition.homeLaneLength;
+      for (var index = 0; index < seat.homeLaneCells.length; index++) {
+        final cell = seat.homeLaneCells[index];
         final cellId = seat.homeLaneStartCellId + index;
         points[cellId] = BoardPoint(
-          x: (seat.laneStart.column + dx * fraction + 0.5) /
-              ClassicLudoBoardDefinition.gridSize,
-          y: (seat.laneStart.row + dy * fraction + 0.5) /
-              ClassicLudoBoardDefinition.gridSize,
+          x: (cell.column + 0.5) / ClassicLudoBoardDefinition.gridSize,
+          y: (cell.row + 0.5) / ClassicLudoBoardDefinition.gridSize,
         );
       }
     }
