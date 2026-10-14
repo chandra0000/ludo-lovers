@@ -11,6 +11,16 @@ void main() {
       for (final cell in route) { expect(cell.isInsideBoard, isTrue); }
     });
 
+    test('reports the provisional diagonal transitions as a gameplay blocker', () {
+      // This is an explicit guard, not approval of the route. The four diagonal
+      // transitions must be corrected before movement/hit-testing uses it.
+      expect(
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
+        <int>[4, 17, 30, 43],
+      );
+      expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
+    });
+
     test('keeps consecutive route cells adjacent including wraparound', () {
       const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
       for (var index = 0; index < route.length; index++) {
