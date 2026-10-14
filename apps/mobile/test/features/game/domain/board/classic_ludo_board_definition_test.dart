@@ -6,7 +6,7 @@ void main() {
   group('ClassicLudoBoardDefinition', () {
     test('preserves the approved quadrant order and exact brand colors', () {
       ClassicLudoBoardDefinition.validate();
-      final seats = ClassicLudoBoardDefinition.seats;
+      const seats = ClassicLudoBoardDefinition.seats;
       expect(seats.map((seat) => seat.id).toList(),
           <String>['orange', 'green', 'blue', 'magenta']);
       expect(seats.map((seat) => seat.quadrant).toList(), <BoardQuadrant>[
