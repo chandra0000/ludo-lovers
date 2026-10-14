@@ -15,6 +15,15 @@ class BoardGridCell {
   bool get isInsideBoard =>
       column >= 0 && column < ClassicLudoBoardDefinition.gridSize &&
       row >= 0 && row < ClassicLudoBoardDefinition.gridSize;
+
+  @override
+  bool operator ==(Object other) =>
+      other is BoardGridCell &&
+      other.column == column &&
+      other.row == row;
+
+  @override
+  int get hashCode => Object.hash(column, row);
 }
 
 /// Immutable identity and presentation metadata for one board seat.
