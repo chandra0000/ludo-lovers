@@ -11,7 +11,9 @@
 - Updated `ClassicLudoBoardPainter` to render shared-track and home-lane cells from the same coordinate map.
 - Added value equality for grid cells so uniqueness and overlap tests compare coordinates rather than object identity.
 - Added tests for home-lane bounds, unique cells and separation from the shared track.
-- Added `ClassicLudoBoardGeometryAudit` to check internal consistency of track length, uniqueness/bounds, distinct player entry indexes, start-marker alignment, home-lane bounds/overlap, unique logical lane IDs and provisional safe-cell ranges.
+- Added `ClassicLudoBoardGeometryAudit` to check track length, uniqueness/bounds, connected neighboring coordinates (touching cells), distinct entry indexes, start-marker alignment, home-lane ordering/continuity, home-lane bounds/overlap, unique logical lane IDs and provisional safe-cell ranges.
+- Added `BoardPawnPositionResolver`, an adapter from the existing local-engine `PawnRoutePosition` plus `LudoBoardPaths` to the renderer's logical cell IDs. It validates section/progress consistency and confirms that a coordinate exists; it does not determine move legality or make the provisional route gameplay-ready.
+- Added resolver tests for player-relative track offsets, home-lane mapping, yard/finished positions and invalid progress.
 - Reconciled the provisional physical start markers with route indexes: Orange 0, Green 13, Magenta 26, Blue 39. This mapping is still provisional pending visual/rules review.
 - Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs. The route audit explicitly identifies diagonal transitions at indexes 4, 17, 30 and 43; these are now a tested gameplay-readiness blocker.
 - Kept safe-cell IDs and player entry offsets explicitly provisional; they are not approved online gameplay rules.
@@ -30,7 +32,7 @@ The supplied composite reference is a visual/style reference, not a clean cell-b
 
 ## Next implementation increment
 
-Next, validate the provisional route against a clean board reference and then migrate the local-game fixture to this shared source. The structural audit now catches internal inconsistencies automatically, but it cannot prove visual fidelity or decide the intended rules. Keep these concepts separate:
+Next, validate the provisional route against a clean board reference and then migrate the local-game fixture to this shared source. The structural audit and pawn-position adapter are now implemented, but the adapter should only be used with routes whose geometry has been reviewed. The structural audit catches internal inconsistencies automatically, but it cannot prove visual fidelity or decide the intended rules. Keep these concepts separate:
 
 1. **Visual seat:** quadrant, yard, color and home-lane direction.
 2. **Shared physical track:** coordinate IDs 0–51.
