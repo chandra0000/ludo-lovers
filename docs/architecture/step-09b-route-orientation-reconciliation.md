@@ -1,6 +1,6 @@
 # Step 09B — Route Orientation Reconciliation
 
-**Status:** Provisional shared route and explicit home-lane coordinate map implemented. A strict readiness guard now blocks gameplay use because four transitions are diagonal; visual/rules approval and engine migration remain outstanding.
+**Status:** Provisional shared route, explicit home-lane coordinate map, structural geometry audit, and reusable hit-testing implemented. Gameplay remains blocked until the route is reviewed against the approved board-cell topology and rules.
 
 ## Implemented in this increment
 
@@ -11,6 +11,7 @@
 - Updated `ClassicLudoBoardPainter` to render shared-track and home-lane cells from the same coordinate map.
 - Added value equality for grid cells so uniqueness and overlap tests compare coordinates rather than object identity.
 - Added tests for home-lane bounds, unique cells and separation from the shared track.
+- Added `ClassicLudoBoardGeometryAudit` to check internal consistency of track length, uniqueness/bounds, distinct player entry indexes, start-marker alignment, home-lane bounds/overlap, unique logical lane IDs and provisional safe-cell ranges.
 - Reconciled the provisional physical start markers with route indexes: Orange 0, Green 13, Magenta 26, Blue 39. This mapping is still provisional pending visual/rules review.
 - Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs. The route audit explicitly identifies diagonal transitions at indexes 4, 17, 30 and 43; these are now a tested gameplay-readiness blocker.
 - Kept safe-cell IDs and player entry offsets explicitly provisional; they are not approved online gameplay rules.
@@ -21,7 +22,7 @@
 
 ## Route audit finding — do not migrate to gameplay yet
 
-The 52-cell route has four diagonal jumps at transition indexes 4, 17, 30 and 43. The existing adjacency test only proves that cells touch, not that a pawn follows orthogonal cell-to-cell movement. `ClassicLudoBoardCoordinateFactory.isGameplayReady` therefore remains false. This is intentional: do not wire this route into the local game engine, hit-testing, capture rules, or online rules until a reviewed 52-cell orthogonal route replaces it and the tests are updated.
+The 52-cell route has four diagonal transitions at indexes 4, 17, 30 and 43. Existing adjacency tests prove only that consecutive grid positions touch; they do not establish that this is the correct physical path for the approved board. `ClassicLudoBoardCoordinateFactory.isGameplayReady` therefore remains false. Do not wire this route into pawn movement, capture rules, or online rules until the transitions are reconciled with a reviewed board-cell diagram. The final topology should follow the actual approved board design rather than assuming a diagonal is automatically invalid.
 
 ## Why the canonical coordinate route is still a separate task
 
@@ -29,7 +30,7 @@ The supplied composite reference is a visual/style reference, not a clean cell-b
 
 ## Next implementation increment
 
-Next, validate the provisional route against a clean board reference and then migrate the local-game fixture to this shared source. Keep these concepts separate:
+Next, validate the provisional route against a clean board reference and then migrate the local-game fixture to this shared source. The structural audit now catches internal inconsistencies automatically, but it cannot prove visual fidelity or decide the intended rules. Keep these concepts separate:
 
 1. **Visual seat:** quadrant, yard, color and home-lane direction.
 2. **Shared physical track:** coordinate IDs 0–51.
@@ -51,4 +52,4 @@ When the route is approved, update the local-game fixture and movement tests tog
 
 ## CI context
 
-The latest previously confirmed run #40 passed analysis, automated tests and Android debug APK build. New code commits trigger fresh validation. A passing CI build does not represent physical-device installation or visual approval.
+The latest previously confirmed run #40 passed analysis, automated tests and Android debug APK build. New code commits trigger fresh validation. Run #60 passed the Flutter checks and automated tests, Android debug APK build, and artifact upload for its commit. The structural-audit commits that follow will trigger a new CI run. A passing CI build does not represent physical-device installation or visual approval.
