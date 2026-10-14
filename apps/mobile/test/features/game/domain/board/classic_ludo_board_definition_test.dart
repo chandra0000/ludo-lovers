@@ -33,6 +33,20 @@ void main() {
           <int>[200, 201, 202, 203, 204, 205]);
     });
 
+    test('defines four unique in-bounds visual anchors', () {
+      final seats = ClassicLudoBoardDefinition.seats;
+      expect(
+        seats.map((seat) => seat.provisionalTrackEntryIndex).toSet(),
+        hasLength(4),
+      );
+      for (final seat in seats) {
+        expect(seat.laneStart.isInsideBoard, isTrue, reason: seat.id);
+        expect(seat.laneEnd.isInsideBoard, isTrue, reason: seat.id);
+        expect(seat.startMarker.isInsideBoard, isTrue, reason: seat.id);
+      }
+      expect(seats.map((seat) => seat.startMarker).toSet(), hasLength(4));
+    });
+
     test('keeps safe cells explicitly provisional', () {
       expect(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds, hasLength(8));
       expect(
