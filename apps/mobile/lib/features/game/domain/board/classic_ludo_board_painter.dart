@@ -68,12 +68,20 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
-      _drawLane(
-        canvas, left, top, cell,
-        Offset(seat.laneStart.column.toDouble(), seat.laneStart.row.toDouble()),
-        Offset(seat.laneEnd.column.toDouble(), seat.laneEnd.row.toDouble()),
-        seat.color,
-      );
+      for (final cellId in seat.homeLaneCellIds) {
+        final point = layout.forCell(cellId);
+        final center = Offset(
+          left + point.x * cell * grid,
+          top + point.y * cell * grid,
+        );
+        final rect = Rect.fromCenter(
+          center: center,
+          width: cell,
+          height: cell,
+        );
+        canvas.drawRect(rect, Paint()..color = seat.color.withValues(alpha: 0.82));
+        canvas.drawRect(rect, linePaint);
+      }
     }
 
     final center = Offset(left + 7.5 * cell, top + 7.5 * cell);
@@ -133,22 +141,6 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
   }
 
-  void _drawLane(
-    Canvas canvas, double left, double top, double cell,
-    Offset start, Offset end, Color color,
-  ) {
-    final delta = end - start;
-    final steps = delta.dx.abs() + delta.dy.abs();
-    final paint = Paint()..color = color.withValues(alpha: 0.8);
-    for (var i = 0; i <= steps; i++) {
-      final col = start.dx + (steps == 0 ? 0 : delta.dx * i / steps);
-      final row = start.dy + (steps == 0 ? 0 : delta.dy * i / steps);
-      canvas.drawRect(
-        Rect.fromLTWH(left + col * cell, top + row * cell, cell, cell),
-        paint,
-      );
-    }
-  }
 
   void _drawStart(
     Canvas canvas, double left, double top, double cell,
