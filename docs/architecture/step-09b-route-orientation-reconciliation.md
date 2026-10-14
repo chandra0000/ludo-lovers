@@ -15,6 +15,10 @@
 - Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs. The route audit explicitly identifies diagonal transitions at indexes 4, 17, 30 and 43; these are now a tested gameplay-readiness blocker.
 - Kept safe-cell IDs and player entry offsets explicitly provisional; they are not approved online gameplay rules.
 
+## Next reusable capability — coordinate hit-testing
+
+`BoardCoordinateLayout.hitTest` now finds the nearest registered logical cell within a caller-supplied pixel radius. It validates input dimensions and touch values and returns null when the tap is outside the configured radius. This is a geometry utility only: it does not validate legal pawn moves or enable gameplay while the route remains provisional.
+
 ## Route audit finding — do not migrate to gameplay yet
 
 The 52-cell route has four diagonal jumps at transition indexes 4, 17, 30 and 43. The existing adjacency test only proves that cells touch, not that a pawn follows orthogonal cell-to-cell movement. `ClassicLudoBoardCoordinateFactory.isGameplayReady` therefore remains false. This is intentional: do not wire this route into the local game engine, hit-testing, capture rules, or online rules until a reviewed 52-cell orthogonal route replaces it and the tests are updated.
