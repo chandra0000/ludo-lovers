@@ -1,13 +1,16 @@
 # Step 09B — Route Orientation Reconciliation
 
-**Status:** Provisional route and shared coordinate map implemented; visual/rules approval and engine migration remain outstanding.
+**Status:** Provisional shared route and explicit home-lane coordinate map implemented; CI validation, visual/rules approval and engine migration remain outstanding.
 
 ## Implemented in this increment
 
 - Extended `ClassicLudoBoardDefinition` with immutable grid-cell anchors for each player's home lane and start marker.
 - Preserved the approved quadrant/color order: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
-- Added `ClassicLudoBoardCoordinateFactory` with 52 unique 15×15 shared-track cells and normalized coordinates for the private lanes.
-- Updated `ClassicLudoBoardPainter` to render the shared-track cells from the same coordinate map.
+- Added `ClassicLudoBoardCoordinateFactory` with 52 provisional 15×15 shared-track cells and normalized coordinates for the private lanes.
+- Defined each six-cell home lane explicitly as grid-cell centers rather than interpolating between endpoints.
+- Updated `ClassicLudoBoardPainter` to render shared-track and home-lane cells from the same coordinate map.
+- Added value equality for grid cells so uniqueness and overlap tests compare coordinates rather than object identity.
+- Added tests for home-lane bounds, unique cells and separation from the shared track.
 - Reconciled the provisional physical start markers with route indexes: Orange 0, Green 13, Magenta 26, Blue 39. This mapping is still provisional pending visual/rules review.
 - Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs.
 - Kept safe-cell IDs and player entry offsets explicitly provisional; they are not approved online gameplay rules.
