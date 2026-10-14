@@ -25,6 +25,15 @@ class ClassicLudoBoardGeometryAudit {
     }
 
     final trackCells = track.toSet();
+    for (var index = 0; index < track.length; index++) {
+      final current = track[index];
+      final next = track[(index + 1) % track.length];
+      final dx = (current.column - next.column).abs();
+      final dy = (current.row - next.row).abs();
+      if (dx > 1 || dy > 1 || dx + dy == 0) {
+        issues.add('Track transition $index to ${(index + 1) % track.length} is disconnected.');
+      }
+    }
     final laneCells = <BoardGridCell>{};
     final laneIds = <int>{};
     final entryIndexes = <int>{};
@@ -49,6 +58,23 @@ class ClassicLudoBoardGeometryAudit {
       }
       if (seat.homeLaneCells.toSet().length != seat.homeLaneCells.length) {
         issues.add('${seat.id} has duplicate home-lane coordinates.');
+      }
+      if (seat.homeLaneCells.isNotEmpty) {
+        if (seat.homeLaneCells.first != seat.laneStart) {
+          issues.add('${seat.id} laneStart does not match the first home-lane cell.');
+        }
+        if (seat.homeLaneCells.last != seat.laneEnd) {
+          issues.add('${seat.id} laneEnd does not match the last home-lane cell.');
+        }
+      }
+      for (var index = 0; index + 1 < seat.homeLaneCells.length; index++) {
+        final current = seat.homeLaneCells[index];
+        final next = seat.homeLaneCells[index + 1];
+        final distance = (current.column - next.column).abs() +
+            (current.row - next.row).abs();
+        if (distance != 1) {
+          issues.add('${seat.id} home-lane cells are not orthogonally consecutive at index $index.');
+        }
       }
 
       for (var index = 0; index < seat.homeLaneCells.length; index++) {
