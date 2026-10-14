@@ -1,22 +1,24 @@
 # Step 09B — Route Orientation Reconciliation
 
-**Status:** In progress — shared visual anchors are centralized; canonical 52-cell route mapping remains outstanding.
+**Status:** Provisional route and shared coordinate map implemented; visual/rules approval and engine migration remain outstanding.
 
 ## Implemented in this increment
 
 - Extended `ClassicLudoBoardDefinition` with immutable grid-cell anchors for each player's home lane and start marker.
 - Preserved the approved quadrant/color order: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
-- Changed `ClassicLudoBoardPainter` to draw yards, home lanes and start markers from the shared seat definition instead of maintaining its own duplicate coordinates.
-- Added tests for seat ordering/colors, unique home-lane IDs, unique provisional entry offsets and in-bounds visual anchors.
+- Added `ClassicLudoBoardCoordinateFactory` with 52 unique 15×15 shared-track cells and normalized coordinates for the private lanes.
+- Updated `ClassicLudoBoardPainter` to render the shared-track cells from the same coordinate map.
+- Reconciled the provisional physical start markers with route indexes: Orange 0, Green 13, Magenta 26, Blue 39. This mapping is still provisional pending visual/rules review.
+- Added tests for route length/uniqueness/bounds, route adjacency and wraparound, normalized coordinate coverage, responsive pixel scaling, start-marker alignment, seat colors and lane IDs.
 - Kept safe-cell IDs and player entry offsets explicitly provisional; they are not approved online gameplay rules.
 
 ## Why the canonical coordinate route is still a separate task
 
-The supplied composite reference is a visual/style reference, not a clean cell-by-cell board diagram. The existing preview has illustrative lane/start anchors, and the local-game fixture uses offsets Orange 0, Blue 13, Green 26, Magenta 39. Those offsets have not yet been reconciled against a confirmed physical track. Inventing 52 coordinates and declaring them production-ready would risk mismatching pawn movement with the visible board.
+The supplied composite reference is a visual/style reference, not a clean cell-by-cell board diagram. A conventional 52-cell route has now been added as a provisional coordinate source so the renderer and tests can share one mapping. It has not yet been visually approved against the reference, and the local-game engine fixture still needs migration/reconciliation before the route can be treated as production gameplay geometry.
 
 ## Next implementation increment
 
-Create one canonical clockwise 52-cell coordinate route, then explicitly map each seat to its physical start cell. Keep these concepts separate:
+Next, validate the provisional route against a clean board reference and then migrate the local-game fixture to this shared source. Keep these concepts separate:
 
 1. **Visual seat:** quadrant, yard, color and home-lane direction.
 2. **Shared physical track:** coordinate IDs 0–51.
@@ -32,7 +34,7 @@ When the route is approved, update the local-game fixture and movement tests tog
 - Four start cells are distinct and align with the four visual quadrants.
 - Each player's six-cell home lane points inward to the central finish.
 - Safe cells and start-cell safety are explicit, tested rules metadata.
-- Painter consumes the canonical coordinate map; it has no duplicate start/lane anchors.
+- Painter consumes the shared track coordinate map; lane anchors are centralized in the seat definition.
 - Existing movement tests remain green after fixture migration.
 - Visual comparison against the supplied reference is recorded as a manual review; CI alone cannot prove visual fidelity.
 
