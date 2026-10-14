@@ -54,6 +54,22 @@ void main() {
       }
     });
 
+    test('home lanes use six distinct in-bounds physical cells per seat', () {
+      final track = ClassicLudoBoardCoordinateFactory.sharedTrack.toSet();
+      final allLaneCells = <BoardGridCell>{};
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(seat.homeLaneCells, hasLength(6));
+        expect(seat.homeLaneCells.toSet(), hasLength(6));
+        for (final cell in seat.homeLaneCells) {
+          expect(cell.isInsideBoard, isTrue, reason: seat.id);
+          expect(track.contains(cell), isFalse,
+              reason: '${seat.id} home lane must not overlap the shared track');
+          expect(allLaneCells.add(cell), isTrue,
+              reason: 'Home-lane cells must not overlap between seats');
+        }
+      }
+    });
+
     test('maps track cell centers consistently across pixel sizes', () {
       final layout = ClassicLudoBoardCoordinateFactory.create();
       final small = layout.pixelForCell(cellId: 0, width: 300, height: 300);
