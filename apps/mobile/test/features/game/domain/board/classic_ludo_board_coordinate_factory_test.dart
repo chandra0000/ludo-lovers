@@ -5,14 +5,14 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_defini
 void main() {
   group('ClassicLudoBoardCoordinateFactory', () {
     test('provides 52 unique in-bounds shared-track cells', () {
-      final route = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
       expect(route, hasLength(52));
       expect(route.toSet(), hasLength(52));
       for (final cell in route) { expect(cell.isInsideBoard, isTrue); }
     });
 
     test('keeps consecutive route cells adjacent including wraparound', () {
-      final route = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
       for (var index = 0; index < route.length; index++) {
         final current = route[index];
         final next = route[(index + 1) % route.length];
