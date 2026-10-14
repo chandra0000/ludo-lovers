@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'board_coordinate_layout.dart';
 
-/// Visual seat positions are independent from turn order and path offsets.
+/// Display quadrant is deliberately independent from turn order.
 enum BoardQuadrant { topLeft, topRight, bottomLeft, bottomRight }
+
+/// Grid coordinate for a visual board marker, using column then row.
+class BoardGridCell {
+  const BoardGridCell({required this.column, required this.row});
+
+  final int column;
+  final int row;
+
+  bool get isInsideBoard =>
+      column >= 0 && column < ClassicLudoBoardDefinition.gridSize &&
+      row >= 0 && row < ClassicLudoBoardDefinition.gridSize;
+}
 
 /// Immutable identity and presentation metadata for one board seat.
 class ClassicLudoSeat {
@@ -14,6 +26,10 @@ class ClassicLudoSeat {
     required this.homeLaneStartCellId,
     required this.yardColumn,
     required this.yardRow,
+    required this.laneStart,
+    required this.laneEnd,
+    required this.startMarker,
+    required this.provisionalTrackEntryIndex,
   });
 
   final String id;
@@ -25,15 +41,27 @@ class ClassicLudoSeat {
   final int yardColumn;
   final int yardRow;
 
+  /// Visual lane endpoints and start marker on the 15x15 display grid.
+  /// These are presentation anchors, not yet a validated movement route.
+  final BoardGridCell laneStart;
+  final BoardGridCell laneEnd;
+  final BoardGridCell startMarker;
+
+  /// Provisional player-relative entry offset; do not use for online rules.
+  final int provisionalTrackEntryIndex;
+
   List<int> get homeLaneCellIds => List<int>.unmodifiable(
-        List<int>.generate(6, (i) => homeLaneStartCellId + i),
+        List<int>.generate(
+          ClassicLudoBoardDefinition.homeLaneLength,
+          (i) => homeLaneStartCellId + i,
+        ),
       );
 }
 
-/// The single source of truth for fixed board identity and visual seat placement.
+/// Shared source for seat colors, visual anchors and logical lane identifiers.
 ///
-/// This deliberately does not invent pixel coordinates or claim that the
-/// provisional safe-cell rules have been visually approved.
+/// The marker/entry metadata is provisional until it is reconciled with a
+/// clean, approved board-cell diagram. Online rules must not consume it.
 class ClassicLudoBoardDefinition {
   const ClassicLudoBoardDefinition._();
 
@@ -49,6 +77,10 @@ class ClassicLudoBoardDefinition {
       homeLaneStartCellId: 200,
       yardColumn: 0,
       yardRow: 0,
+      laneStart: BoardGridCell(column: 7, row: 1),
+      laneEnd: BoardGridCell(column: 7, row: 5),
+      startMarker: BoardGridCell(column: 6, row: 1),
+      provisionalTrackEntryIndex: 0,
     ),
     ClassicLudoSeat(
       id: 'green',
@@ -57,6 +89,10 @@ class ClassicLudoBoardDefinition {
       homeLaneStartCellId: 220,
       yardColumn: 9,
       yardRow: 0,
+      laneStart: BoardGridCell(column: 13, row: 7),
+      laneEnd: BoardGridCell(column: 9, row: 7),
+      startMarker: BoardGridCell(column: 13, row: 6),
+      provisionalTrackEntryIndex: 13,
     ),
     ClassicLudoSeat(
       id: 'blue',
@@ -65,6 +101,10 @@ class ClassicLudoBoardDefinition {
       homeLaneStartCellId: 210,
       yardColumn: 0,
       yardRow: 9,
+      laneStart: BoardGridCell(column: 7, row: 13),
+      laneEnd: BoardGridCell(column: 7, row: 9),
+      startMarker: BoardGridCell(column: 8, row: 13),
+      provisionalTrackEntryIndex: 26,
     ),
     ClassicLudoSeat(
       id: 'magenta',
@@ -73,9 +113,14 @@ class ClassicLudoBoardDefinition {
       homeLaneStartCellId: 230,
       yardColumn: 9,
       yardRow: 9,
+      laneStart: BoardGridCell(column: 1, row: 7),
+      laneEnd: BoardGridCell(column: 5, row: 7),
+      startMarker: BoardGridCell(column: 1, row: 8),
+      provisionalTrackEntryIndex: 39,
     ),
   ];
 
+  /// These are provisional rules metadata, not yet visually approved.
   static const Set<int> provisionalSafeTrackCellIds = <int>{
     0, 8, 13, 21, 26, 34, 39, 47,
   };
@@ -93,6 +138,7 @@ class ClassicLudoBoardDefinition {
       throw StateError('The classic board must define four unique player seats.');
     }
     final laneIds = <int>{};
+    final starts = <int>{};
     for (final seat in seats) {
       if (seat.yardColumn < 0 ||
           seat.yardRow < 0 ||
@@ -100,8 +146,18 @@ class ClassicLudoBoardDefinition {
           seat.yardRow + 6 > gridSize) {
         throw StateError('Yard zone for ${seat.id} is outside the board grid.');
       }
+      if (!seat.laneStart.isInsideBoard ||
+          !seat.laneEnd.isInsideBoard ||
+          !seat.startMarker.isInsideBoard) {
+        throw StateError('Visual anchors for ${seat.id} are outside the board.');
+      }
       if (seat.homeLaneCellIds.length != homeLaneLength) {
         throw StateError('Home lane for ${seat.id} must contain six cells.');
+      }
+      if (seat.provisionalTrackEntryIndex < 0 ||
+          seat.provisionalTrackEntryIndex >= sharedTrackLength ||
+          !starts.add(seat.provisionalTrackEntryIndex)) {
+        throw StateError('Track entry offsets must be unique valid indexes.');
       }
       for (final id in seat.homeLaneCellIds) {
         if (!laneIds.add(id)) {
