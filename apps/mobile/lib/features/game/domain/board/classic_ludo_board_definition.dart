@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'board_coordinate_layout.dart';
 
 /// Visual seat positions are independent from turn order and path offsets.
@@ -23,8 +25,9 @@ class ClassicLudoSeat {
   final int yardColumn;
   final int yardRow;
 
-  List<int> get homeLaneCellIds =>
-      List<int>.unmodifiable(List<int>.generate(6, (i) => homeLaneStartCellId + i));
+  List<int> get homeLaneCellIds => List<int>.unmodifiable(
+        List<int>.generate(6, (i) => homeLaneStartCellId + i),
+      );
 }
 
 /// The single source of truth for fixed board identity and visual seat placement.
@@ -80,7 +83,8 @@ class ClassicLudoBoardDefinition {
   static ClassicLudoSeat seatFor(String playerId) {
     return seats.firstWhere(
       (seat) => seat.id == playerId,
-      orElse: () => throw ArgumentError.value(playerId, 'playerId', 'Unknown board seat'),
+      orElse: () =>
+          throw ArgumentError.value(playerId, 'playerId', 'Unknown board seat'),
     );
   }
 
