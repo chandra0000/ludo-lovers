@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
+import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/classic_ludo_pawn_layer.dart';
 
 class BoardPreviewScreen extends StatelessWidget {
