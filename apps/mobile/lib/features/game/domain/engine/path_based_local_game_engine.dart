@@ -125,16 +125,71 @@ class LocalGameException implements Exception {
   String toString() => 'LocalGameException($error)';
 }
 
+enum LocalGameEventKind {
+  diceRolled,
+  turnEnded,
+  noLegalMove,
+  extraRollGranted,
+  pawnMoved,
+  pawnCaptured,
+  pawnFinished,
+  gameCompleted,
+}
+
 class LocalGameEvent {
-  const LocalGameEvent(this.type, {this.playerId, this.pawnId, this.value});
+  const LocalGameEvent(
+    this.type, {
+    this.playerId,
+    this.pawnId,
+    this.value,
+    this.stateVersion,
+    this.sequence,
+  });
+
+  /// Kept as a readable compatibility label for the development UI.
   final String type;
   final String? playerId;
   final String? pawnId;
   final int? value;
+  final int? stateVersion;
+  final int? sequence;
+
+  LocalGameEventKind get kind => switch (type) {
+        'DiceRolled' => LocalGameEventKind.diceRolled,
+        'TurnEnded' => LocalGameEventKind.turnEnded,
+        'NoLegalMove' => LocalGameEventKind.noLegalMove,
+        'ExtraRollGranted' => LocalGameEventKind.extraRollGranted,
+        'PawnMoved' => LocalGameEventKind.pawnMoved,
+        'PawnCaptured' => LocalGameEventKind.pawnCaptured,
+        'PawnFinished' => LocalGameEventKind.pawnFinished,
+        'GameCompleted' => LocalGameEventKind.gameCompleted,
+        _ => throw StateError('Unrecognized local game event type: $type'),
+      };
+
+  LocalGameEvent forTransition({required int version, required int order}) =>
+      LocalGameEvent(
+        type,
+        playerId: playerId,
+        pawnId: pawnId,
+        value: value,
+        stateVersion: version,
+        sequence: order,
+      );
 }
 
 class LocalGameTransition {
-  const LocalGameTransition(this.state, this.events);
+  LocalGameTransition(this.state, List<LocalGameEvent> events)
+      : events = List<LocalGameEvent>.unmodifiable(
+          List<LocalGameEvent>.generate(
+            events.length,
+            (index) => events[index].forTransition(
+              version: state.version,
+              order: index,
+            ),
+            growable: false,
+          ),
+        );
+
   final LocalGameState state;
   final List<LocalGameEvent> events;
 }
@@ -210,7 +265,7 @@ class PathBasedLocalGameEngine {
     if (legal.isEmpty) {
       if (value == 6 && extraRollOnSix) {
         return LocalGameTransition(
-          rolled.copyWith(clearPendingRoll: true, version: rolled.version + 1),
+          rolled.copyWith(clearPendingRoll: true, version: state.version + 1),
           <LocalGameEvent>[
             LocalGameEvent('DiceRolled', playerId: playerId, value: value),
             LocalGameEvent('NoLegalMove', playerId: playerId),
@@ -222,7 +277,7 @@ class PathBasedLocalGameEngine {
         _advance(rolled.copyWith(
           clearPendingRoll: true,
           consecutiveSixes: 0,
-          version: rolled.version + 1,
+          version: state.version + 1,
         )),
         <LocalGameEvent>[
           LocalGameEvent('DiceRolled', playerId: playerId, value: value),
@@ -347,7 +402,7 @@ class PathBasedLocalGameEngine {
       next = next.copyWith(
         completed: true,
         winnerPlayerId: playerId,
-        version: next.version + 1,
+        version: next.version,
       );
       events.add(LocalGameEvent('GameCompleted', playerId: playerId));
       return LocalGameTransition(next, events);
@@ -359,7 +414,7 @@ class PathBasedLocalGameEngine {
     if (bonus) {
       next = next.copyWith(
         consecutiveSixes: rollValue == 6 ? state.consecutiveSixes : 0,
-        version: next.version + 1,
+        version: next.version,
       );
       events.add(LocalGameEvent('ExtraRollGranted', playerId: playerId));
     } else {
@@ -401,7 +456,7 @@ class PathBasedLocalGameEngine {
           currentPlayerIndex: candidateIndex,
           clearPendingRoll: true,
           consecutiveSixes: 0,
-          version: state.version + 1,
+          version: state.version,
         );
       }
     }
