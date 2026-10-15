@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/game/presentation/screens/board_preview_screen.dart';
+import '../features/game/presentation/screens/local_game_screen.dart';
 import 'theme/app_theme.dart';
 
 class LudoLoversApp extends StatelessWidget {
@@ -79,6 +80,20 @@ class AppFoundationScreen extends StatelessWidget {
                         ),
                         icon: const Icon(Icons.grid_view_rounded),
                         label: const Text('Preview Ludo Board'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        key: const ValueKey('local_game_lab_button'),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const LocalGameScreen(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.casino_rounded),
+                        label: const Text('Open Local Game Lab'),
                       ),
                     ),
                     const SizedBox(height: 12),
