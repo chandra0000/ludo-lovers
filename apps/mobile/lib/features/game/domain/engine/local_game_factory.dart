@@ -1,0 +1,71 @@
+/// Creates a fresh local game state for the four-seat Classic Ludo mode.
+///
+/// This factory initializes domain state only. It does not make the provisional
+/// board route production-ready; use it for deterministic engine integration
+/// and tests until the board topology has been approved.
+library;
+
+import '../board/classic_ludo_board_fixture.dart';
+import '../board/ludo_board_paths.dart';
+import 'ludo_path_movement.dart';
+import 'path_based_local_game_engine.dart';
+
+class LocalGameSetup {
+  const LocalGameSetup({
+    required this.paths,
+    required this.engine,
+    required this.initialState,
+  });
+
+  final LudoBoardPaths paths;
+  final PathBasedLocalGameEngine engine;
+  final LocalGameState initialState;
+}
+
+class LocalGameFactory {
+  const LocalGameFactory._();
+
+  static const List<String> playerIds = <String>[
+    'orange',
+    'green',
+    'blue',
+    'magenta',
+  ];
+
+  static LocalGameSetup create({
+    Set<int> safeCellIndexes = const <int>{},
+    bool allowProvisionalRoutes = false,
+  }) {
+    if (!allowProvisionalRoutes) {
+      throw StateError(
+        'Classic board routes are provisional. Explicitly opt in only for '
+        'development and tests; do not ship gameplay until topology is approved.',
+      );
+    }
+
+    final paths = ClassicLudoBoardFixture.create();
+    final engine = PathBasedLocalGameEngine(
+      paths: paths,
+      safeCellIndexes: safeCellIndexes,
+    );
+    final pawns = <LocalPawn>[
+      for (final playerId in playerIds)
+        for (var index = 0; index < 4; index++)
+          LocalPawn(
+            id: '${playerId}_pawn_${index + 1}',
+            playerId: playerId,
+            position: const PawnRoutePosition(section: PawnRouteSection.yard),
+          ),
+    ];
+
+    return LocalGameSetup(
+      paths: paths,
+      engine: engine,
+      initialState: LocalGameState(
+        players: playerIds,
+        pawns: pawns,
+        currentPlayerIndex: 0,
+      ),
+    );
+  }
+}
