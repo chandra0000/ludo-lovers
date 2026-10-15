@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/board/classic_ludo_board_painter.dart';
+import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
+import '../../domain/board/classic_ludo_board_definition.dart';
+import '../../domain/board/classic_ludo_pawn_layer.dart';
 
 class BoardPreviewScreen extends StatelessWidget {
   const BoardPreviewScreen({super.key});
@@ -49,11 +52,44 @@ class BoardPreviewScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: CustomPaint(
-                          painter: ClassicLudoBoardPainter(),
-                          child: SizedBox.expand(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            const CustomPaint(
+                              painter: ClassicLudoBoardPainter(),
+                            ),
+                            IgnorePointer(
+                              child: CustomPaint(
+                                painter: ClassicLudoPawnLayer(
+                                  layout: ClassicLudoBoardCoordinateFactory.create(),
+                                  pawns: <BoardPawnMarker>[
+                                    BoardPawnMarker(
+                                      pawnId: 'preview-orange',
+                                      cellId: ClassicLudoBoardDefinition.seats[0].provisionalTrackEntryIndex,
+                                      color: LudoBoardPalette.orange,
+                                    ),
+                                    BoardPawnMarker(
+                                      pawnId: 'preview-green',
+                                      cellId: ClassicLudoBoardDefinition.seats[1].provisionalTrackEntryIndex,
+                                      color: LudoBoardPalette.green,
+                                    ),
+                                    BoardPawnMarker(
+                                      pawnId: 'preview-blue',
+                                      cellId: ClassicLudoBoardDefinition.seats[2].provisionalTrackEntryIndex,
+                                      color: LudoBoardPalette.blue,
+                                    ),
+                                    BoardPawnMarker(
+                                      pawnId: 'preview-magenta',
+                                      cellId: ClassicLudoBoardDefinition.seats[3].provisionalTrackEntryIndex,
+                                      color: LudoBoardPalette.magenta,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
