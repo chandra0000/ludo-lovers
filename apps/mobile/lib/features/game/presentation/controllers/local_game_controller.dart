@@ -78,9 +78,9 @@ class LocalGameController extends ChangeNotifier {
       case PawnRouteSection.yard:
         return 'Yard';
       case PawnRouteSection.mainTrack:
-        return 'Track ' + pawn.position.progress.toString();
+  return 'Track ${pawn.position.progress}';
       case PawnRouteSection.homeLane:
-        return 'Home ' + pawn.position.progress.toString();
+  return 'Home ${pawn.position.progress}';
       case PawnRouteSection.finished:
         return 'Finished';
     }
