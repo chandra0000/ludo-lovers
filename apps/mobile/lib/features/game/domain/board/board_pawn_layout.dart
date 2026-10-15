@@ -76,7 +76,7 @@ class BoardPawnLayout {
         if (progress == null || progress < 0) {
           throw ArgumentError('On-board pawns require non-negative progress.');
         }
-        final trackLength = ClassicLudoBoardDefinition.sharedTrackLength;
+        const trackLength = ClassicLudoBoardDefinition.sharedTrackLength;
         if (position.section == PawnRouteSection.mainTrack &&
             progress >= trackLength) {
           throw ArgumentError('Main-track progress is outside the shared track.');
