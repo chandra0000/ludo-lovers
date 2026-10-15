@@ -131,7 +131,6 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                               constraints.maxHeight,
                             );
                             return GestureDetector(
-                              key: const ValueKey('interactive_board'),
                               behavior: HitTestBehavior.opaque,
                               onTapDown: (details) =>
                                   _handleBoardTap(details, boardSize),
