@@ -225,6 +225,10 @@ class LudoTransition {
   final List<LudoEvent> events;
 }
 
+@Deprecated(
+  'Legacy rules engine. Use PathBasedLocalGameEngine for all new work; '
+  'this API is retained temporarily for migration reference only.',
+)
 class LudoEngine {
   const LudoEngine();
 
