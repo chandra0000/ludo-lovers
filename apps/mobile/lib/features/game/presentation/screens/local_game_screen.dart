@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/local_game_controller.dart';
-import '../../domain/engine/path_based_local_game_engine.dart';
 
 /// Development screen for exercising local game state transitions.
 /// The rendered board is not connected until board geometry is approved.
