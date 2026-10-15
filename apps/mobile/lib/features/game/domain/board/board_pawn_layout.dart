@@ -1,7 +1,7 @@
 import '../board/board_coordinate_layout.dart';
 import '../board/classic_ludo_board_coordinate_factory.dart';
 import '../board/classic_ludo_board_definition.dart';
-import 'ludo_path_movement.dart';
+import '../engine/ludo_path_movement.dart';
 
 /// Presentation-only location for a pawn. It contains no move legality rules.
 class BoardPawnVisualPosition {
