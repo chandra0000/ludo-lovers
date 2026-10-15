@@ -59,6 +59,10 @@ void main() {
       value: 6,
     );
     expect(rolled.state.pendingRoll, 6);
+    expect(rolled.state.version, initial.version + 1);
+    expect(rolled.events.single.kind, LocalGameEventKind.diceRolled);
+    expect(rolled.events.single.stateVersion, rolled.state.version);
+    expect(rolled.events.single.sequence, 0);
     expect(engine.legalPawnIds(rolled.state), contains('o1'));
 
     final moved = engine.move(
@@ -69,7 +73,17 @@ void main() {
     );
     expect(moved.state.pawns.first.position.section, PawnRouteSection.mainTrack);
     expect(moved.state.pawns.first.position.progress, 0);
+    expect(moved.state.version, rolled.state.version + 1);
     expect(moved.events.map((event) => event.type), contains('PawnMoved'));
+    expect(moved.events.every((event) => event.stateVersion == moved.state.version), isTrue);
+    expect(
+      moved.events.map((event) => event.sequence),
+      List<int>.generate(moved.events.length, (index) => index),
+    );
+    expect(
+      moved.events.singleWhere((event) => event.type == 'PawnMoved').kind,
+      LocalGameEventKind.pawnMoved,
+    );
   });
 
   test('rejects stale action version without mutating input state', () {
@@ -107,6 +121,8 @@ void main() {
     );
     expect(result.state.currentPlayerId, 'blue');
     expect(result.state.pendingRoll, isNull);
+    expect(result.state.version, initial.version + 1,
+        reason: 'A roll command advances the state version exactly once.');
     expect(result.events.map((event) => event.type), contains('NoLegalMove'));
   });
 
@@ -126,6 +142,9 @@ void main() {
     );
     expect(result.state.currentPlayerId, 'blue');
     expect(result.state.pendingRoll, isNull);
+    expect(result.state.version, state.version + 1,
+        reason: 'Third-six turn handling is still one accepted command.');
+    expect(result.events.every((event) => event.stateVersion == result.state.version), isTrue);
     expect(result.events.map((event) => event.type), contains('TurnEnded'));
   });
 
