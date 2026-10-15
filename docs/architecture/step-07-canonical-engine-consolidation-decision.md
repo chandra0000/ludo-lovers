@@ -1,6 +1,6 @@
 # Step 07 — Canonical Engine Consolidation Decision
 
-**Status:** Decision recorded; implementation is in progress. This document does not claim that the engine is production-ready or that a complete Ludo board is implemented.
+**Status:** Canonical-engine decision recorded; Phase A1 migration is underway. `PathBasedLocalGameEngine` is the only engine for new work. The legacy `LudoEngine` is deprecated and retained temporarily for migration reference; no in-repository imports or tests reference it as of 2026-10-16. This document does not claim that the engine is production-ready or that a complete Ludo board is implemented.
 
 ## Context gathered from the existing project notes
 
@@ -22,7 +22,7 @@ The project has two overlapping rule implementations today: `LudoEngine` in `lud
 
 1. **Canonical rules foundation:** retain the path-based model (`LudoBoardPaths` + `LudoPathMovement` + path-based transition behavior) as the migration target because it represents movement in player-relative progress and uses explicit route data.
 2. **Single public game-engine API:** migrate all callers and tests to one engine contract. Do not add new gameplay behavior to the legacy `LudoEngine` while consolidation is underway.
-3. **No blind deletion:** remove or adapt `ludo_engine.dart` only after a repository-wide reference check, compatibility migration, and CI pass. If no callers depend on it, remove it with tests proving the canonical API covers the required behavior.
+3. **Legacy status (2026-10-16):** repository tree/reference review found no imports or tests using `ludo_engine.dart`; `LudoEngine` is marked `@Deprecated` as a migration guard. Keep `PathBasedLocalGameEngine` canonical. Delete the legacy file in a separate cleanup commit after CI is green and a fresh content-wide search confirms no references.
 4. **One accepted command, one state-version increment:** an accepted command creates one transition with a single new state version. Events produced by that command share the resulting state version and receive deterministic per-transition sequence numbers. Rejected commands leave the input state unchanged.
 5. **Typed contracts:** replace string-only event names with a sealed/typed event model and represent player actions as typed commands. Keep errors typed. The presentation layer consumes events; it does not decide whether a move is legal.
 6. **Deep immutability:** copy and expose unmodifiable collections for players, pawns, routes, safe-cell sets, event lists, and rule-profile collections. Validate invariants when constructing a state/profile.
@@ -92,5 +92,5 @@ A step is complete only when all relevant gates pass:
 - Existing engine tests have used synthetic short routes.
 - Final board geometry and safe-cell mapping still require validation against the approved board design.
 - Rule defaults are provisional.
-- The legacy and path-based engines have not yet been fully consolidated.
+- The legacy `LudoEngine` is deprecated and has no in-repository callers/tests in the current tree; removal is a follow-up after this deprecation commit passes CI and a fresh repository-wide reference check.
 - Passing CI validates the current code and tests only; it does not establish production readiness or prove every game-rule combination correct.
