@@ -20,5 +20,10 @@ void main() {
     expect(find.text('Classic Board'), findsOneWidget);
     expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
     expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
+
+    final board = tester.getRect(find.byKey(const ValueKey('interactive_board')));
+    await tester.tapAt(Offset(board.left + board.width * (1.5 / 15), board.top + board.height * (6.5 / 15)));
+    await tester.pump();
+    expect(find.text('Sample pawn selected on cell 0.'), findsOneWidget);
   });
 }
