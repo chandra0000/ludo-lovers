@@ -172,7 +172,13 @@ void main() {
 
     expect(moved.state.pawns.first.position.progress, 2);
     expect(moved.state.pawns[2].position.section, PawnRouteSection.yard);
-    expect(moved.events.map((event) => event.type), contains('PawnCaptured'));
+    final captureEvents = moved.events
+        .where((event) => event.type == 'PawnCaptured')
+        .toList(growable: false);
+    expect(captureEvents, hasLength(1));
+    expect(captureEvents.single.playerId, 'orange');
+    expect(captureEvents.single.pawnId, 'b1',
+        reason: 'Capture payload must identify the captured opponent, not mover o1.');
     expect(moved.state.currentPlayerId, 'orange',
         reason: 'A capture grants the configured bonus roll.');
   });
