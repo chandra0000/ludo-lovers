@@ -3,7 +3,7 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixtur
 
 void main() {
   group('ClassicLudoBoardFixture', () {
-    test('defines a standard four-player route with 52 shared-track cells', () {
+    test('defines four routes with 52 shared-track cells and six home cells', () {
       final board = ClassicLudoBoardFixture.create();
 
       expect(board.pathsByPlayer.length, 4);
@@ -16,57 +16,59 @@ void main() {
       }
     });
 
-    test('ensures each player route starts from the expected entry offset', () {
+    test('aligns provisional route entries with the board seat markers', () {
       final board = ClassicLudoBoardFixture.create();
 
       expect(board.forPlayer('orange').entryCell, 0);
-      expect(board.forPlayer('blue').entryCell, 13);
-      expect(board.forPlayer('green').entryCell, 26);
-      expect(board.forPlayer('magenta').entryCell, 39);
+      expect(board.forPlayer('green').entryCell, 13);
+      expect(board.forPlayer('magenta').entryCell, 26);
+      expect(board.forPlayer('blue').entryCell, 39);
     });
 
-    test('keeps shared-track cells consistent across player routes', () {
+    test('keeps the same physical shared track across all player routes', () {
       final board = ClassicLudoBoardFixture.create();
       final reference = board.forPlayer('orange').mainTrackCells.toSet();
 
-      for (final playerId in <String>['blue', 'green', 'magenta']) {
-        final route = board.forPlayer(playerId).mainTrackCells.toSet();
-        expect(route, reference);
+      for (final playerId in <String>['green', 'magenta', 'blue']) {
+        expect(board.forPlayer(playerId).mainTrackCells.toSet(), reference);
       }
     });
 
-    test('places home-lane cells outside the shared track and keeps them unique', () {
+    test('keeps home-lane IDs outside the shared track and unique', () {
       final board = ClassicLudoBoardFixture.create();
       final shared = board.forPlayer('orange').mainTrackCells.toSet();
       final allHomeCells = <int>{};
 
-      for (final entry in board.pathsByPlayer.values) {
-        expect(entry.homeLaneCells.any(shared.contains), isFalse);
-        for (final cell in entry.homeLaneCells) {
+      for (final route in board.pathsByPlayer.values) {
+        expect(route.homeLaneCells.any(shared.contains), isFalse);
+        for (final cell in route.homeLaneCells) {
           expect(allHomeCells.add(cell), isTrue);
         }
       }
     });
 
-    test('allows progress checks using route length and private lane mapping', () {
+    test('maps progress through the provisional entry and home lane', () {
       final board = ClassicLudoBoardFixture.create();
-      final path = board.forPlayer('blue');
+      final green = board.forPlayer('green');
+      final blue = board.forPlayer('blue');
 
-      expect(path.finishProgress, 58);
-      expect(path.cellAtProgress(0), 13);
-      expect(path.cellAtProgress(51), 12);
-      expect(path.cellAtProgress(52), 210);
-      expect(path.cellAtProgress(57), 215);
-      expect(path.cellAtProgress(58), isNull);
+      expect(green.finishProgress, 58);
+      expect(green.cellAtProgress(0), 13);
+      expect(green.cellAtProgress(51), 12);
+      expect(green.cellAtProgress(52), 220);
+      expect(green.cellAtProgress(57), 225);
+      expect(green.cellAtProgress(58), isNull);
+
+      expect(blue.cellAtProgress(0), 39);
+      expect(blue.cellAtProgress(51), 38);
+      expect(blue.cellAtProgress(52), 210);
     });
 
-    test('rotates player-relative routes over the same shared track', () {
+    test('all four entries are distinct rotations of the same shared track', () {
       final board = ClassicLudoBoardFixture.create();
+      final entries = board.pathsByPlayer.values.map((path) => path.entryCell).toSet();
 
-      expect(
-        board.forPlayer('orange').entryCell,
-        isNot(board.forPlayer('blue').entryCell),
-      );
+      expect(entries, <int>{0, 13, 26, 39});
       expect(
         board.forPlayer('orange').mainTrackCells.toSet(),
         board.forPlayer('blue').mainTrackCells.toSet(),
