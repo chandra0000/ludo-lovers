@@ -18,6 +18,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Classic Board'), findsOneWidget);
-    expect(find.textContaining('turns, pawn movement and online play'), findsOneWidget);
+    expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
+    expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
   });
 }
