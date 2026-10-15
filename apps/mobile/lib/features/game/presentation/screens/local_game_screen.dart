@@ -71,14 +71,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Current turn: ' + current.toUpperCase(),
+                      Text('Current turn: $ {current.toUpperCase()}',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 color: _colors[current],
                                 fontWeight: FontWeight.bold,
                               )),
                       const SizedBox(height: 8),
-                      Text('Players: ' + state.players.length.toString() +
-                          ' · Pawns: ' + state.pawns.length.toString()),
+                      Text('Players: $ { state.players.length } 
+                            · Pawns:  $ { state.pawns.length } ',
                       Text('State version: ' + state.version.toString()),
                       Text(state.completed
                           ? 'Winner: ' + (state.winnerPlayerId ?? 'Unknown')
