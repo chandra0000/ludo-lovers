@@ -69,6 +69,31 @@ void main() {
       expect(controller.lastError, isNull);
     });
 
+    test('notifies listeners after a successful state transition', () {
+      final controller = LocalGameController(nextDiceValue: () => 6);
+      addTearDown(controller.dispose);
+      var notifications = 0;
+      controller.addListener(() => notifications++);
+
+      controller.rollDice();
+
+      expect(notifications, 1);
+      expect(controller.state.pendingRoll, 6);
+    });
+
+    test('rejects an invalid dice source value without changing the game', () {
+      final controller = LocalGameController(nextDiceValue: () => 7);
+      addTearDown(controller.dispose);
+      final before = controller.state;
+
+      controller.rollDice();
+
+      expect(controller.state.version, before.version);
+      expect(controller.state.pendingRoll, isNull);
+      expect(controller.lastError, isNotNull);
+      expect(controller.lastMessage, contains('invalidRoll'));
+    });
+
     test('keeps the pending roll when an illegal pawn is selected', () {
       final controller = LocalGameController(nextDiceValue: () => 6);
       addTearDown(controller.dispose);
