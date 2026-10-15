@@ -109,6 +109,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               Expanded(
                 child: Center(
                   child: AspectRatio(
+                    key: const ValueKey('interactive_board'),
                     aspectRatio: 1,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
