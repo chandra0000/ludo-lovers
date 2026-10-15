@@ -114,4 +114,63 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('maps the final shared-track step before entering the home lane', () {
+    expect(
+      resolver.cellIdFor(
+        playerId: 'orange',
+        position: const PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 51,
+        ),
+      ),
+      51,
+    );
+    expect(
+      resolver.cellIdFor(
+        playerId: 'green',
+        position: const PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 51,
+        ),
+      ),
+      12,
+    );
+  });
+
+  test('rejects missing and negative progress for numbered route positions', () {
+    expect(
+      () => resolver.cellIdFor(
+        playerId: 'orange',
+        position: const PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+        ),
+      ),
+      throwsArgumentError,
+    );
+    expect(
+      () => resolver.cellIdFor(
+        playerId: 'orange',
+        position: const PawnRoutePosition(
+          section: PawnRouteSection.homeLane,
+          progress: -1,
+        ),
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('rejects player IDs without a configured route', () {
+    expect(
+      () => resolver.cellIdFor(
+        playerId: 'purple',
+        position: const PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 0,
+        ),
+      ),
+      throwsArgumentError,
+    );
+  });
+
 }
