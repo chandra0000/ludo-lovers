@@ -62,3 +62,23 @@ The latest previously confirmed run #40 passed analysis, automated tests and And
 Added `BoardPawnLayout` as a presentation adapter for the next rendering increment. It maps player-relative main-track progress to the seat's provisional physical track entry, maps home-lane progress to the player's logical lane IDs, assigns four distinct yard slots, and places finished pawns at the center. It preserves a stack index for later multi-pawn offsets and validates malformed positions.
 
 Automated tests cover orange/green track entries, home-lane mapping, four distinct yard slots, center finish, invalid inputs, and the gameplay-readiness guard. This is still a **presentation scaffold**, not a connected live pawn renderer. Because the 52-cell route remains provisional, do not use this layout for release gameplay until the board topology is visually reviewed and the local-engine route fixture is reconciled.
+
+
+## Current status update — 2026-10-15
+
+- Pipeline #84 passed for commit `1875c35b8f15eb19a05093edf1be737d45446620`.
+- Confirmed CI steps: dependency resolution, Dart/Flutter analysis, automated tests, Android debug APK build, and artifact upload all succeeded.
+- The board-preview widget-finder regression is resolved by placing the stable test key on the square board container.
+- This CI result does not remove the geometry blocker: the route still has diagonal transitions at indexes 4, 17, 30 and 43, and `isGameplayReady` remains false.
+- Do not connect the provisional route to the local-game engine simply because CI is green.
+
+## Next implementation gate — approve route before engine migration
+
+Before changing movement rules, obtain or create a clean, straight-on board-cell reference with these visible:
+1. The complete 52-cell shared track.
+2. The four start cells and direction of travel.
+3. The six home-lane cells for each color.
+4. Safe cells and the entry-to-home transition.
+5. The existing quadrant mapping: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
+
+Then reconcile the cell IDs against the reference, update the coordinate fixture and seat entry metadata together, and add tests for the approved transitions and start positions. Only after those checks pass should the local engine's route fixture be migrated. The board's current composite style reference is not enough to infer every cell-level rule safely.
