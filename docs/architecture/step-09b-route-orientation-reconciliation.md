@@ -55,3 +55,10 @@ When the route is approved, update the local-game fixture and movement tests tog
 ## CI context
 
 The latest previously confirmed run #40 passed analysis, automated tests and Android debug APK build. New code commits trigger fresh validation. Run #60 passed the Flutter checks and automated tests, Android debug APK build, and artifact upload for its commit. The structural-audit commits that follow will trigger a new CI run. A passing CI build does not represent physical-device installation or visual approval.
+
+
+## Pawn presentation layout scaffold
+
+Added `BoardPawnLayout` as a presentation adapter for the next rendering increment. It maps player-relative main-track progress to the seat's provisional physical track entry, maps home-lane progress to the player's logical lane IDs, assigns four distinct yard slots, and places finished pawns at the center. It preserves a stack index for later multi-pawn offsets and validates malformed positions.
+
+Automated tests cover orange/green track entries, home-lane mapping, four distinct yard slots, center finish, invalid inputs, and the gameplay-readiness guard. This is still a **presentation scaffold**, not a connected live pawn renderer. Because the 52-cell route remains provisional, do not use this layout for release gameplay until the board topology is visually reviewed and the local-engine route fixture is reconciled.
