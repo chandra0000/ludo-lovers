@@ -1,8 +1,12 @@
-/// Canonical board fixture for a classic four-player Ludo board.
+/// Canonical logical route fixture for a classic four-player Ludo board.
 ///
-/// This keeps the route model explicit and deterministic so the rules engine
-/// can validate player movement against a shared 52-cell board plus six-cell
-/// private home lanes without inventing geometry at runtime.
+/// The physical shared-track IDs are 0..51. Player-relative routes are rotated
+/// to match the current board-definition start markers:
+/// Orange 0, Green 13, Magenta 26, Blue 39.
+///
+/// IMPORTANT: the display geometry remains provisional. These offsets align
+/// the engine fixture with the current seat metadata, but do not approve the
+/// route topology or enable production gameplay.
 library;
 
 import 'ludo_board_paths.dart';
@@ -13,41 +17,39 @@ class ClassicLudoBoardFixture {
   static const int sharedTrackLength = 52;
   static const int homeLaneLength = 6;
 
+  static const Map<String, int> provisionalEntryCellByPlayer =
+      <String, int>{
+    'orange': 0,
+    'green': 13,
+    'magenta': 26,
+    'blue': 39,
+  };
+
   static LudoBoardPaths create() {
     return LudoBoardPaths(<LudoPlayerPath>[
-      LudoPlayerPath(
-        playerId: 'orange',
-        mainTrackCells: List<int>.generate(sharedTrackLength, (index) => index),
-        homeLaneCells: List<int>.generate(homeLaneLength, (index) => 200 + index),
-        trackLength: sharedTrackLength,
-      ),
-      LudoPlayerPath(
-        playerId: 'blue',
-        mainTrackCells: List<int>.generate(
-          sharedTrackLength,
-          (index) => (index + 13) % sharedTrackLength,
-        ),
-        homeLaneCells: List<int>.generate(homeLaneLength, (index) => 210 + index),
-        trackLength: sharedTrackLength,
-      ),
-      LudoPlayerPath(
-        playerId: 'green',
-        mainTrackCells: List<int>.generate(
-          sharedTrackLength,
-          (index) => (index + 26) % sharedTrackLength,
-        ),
-        homeLaneCells: List<int>.generate(homeLaneLength, (index) => 220 + index),
-        trackLength: sharedTrackLength,
-      ),
-      LudoPlayerPath(
-        playerId: 'magenta',
-        mainTrackCells: List<int>.generate(
-          sharedTrackLength,
-          (index) => (index + 39) % sharedTrackLength,
-        ),
-        homeLaneCells: List<int>.generate(homeLaneLength, (index) => 230 + index),
-        trackLength: sharedTrackLength,
-      ),
+      _createPlayerPath('orange', 200),
+      _createPlayerPath('green', 220),
+      _createPlayerPath('magenta', 230),
+      _createPlayerPath('blue', 210),
     ]);
+  }
+
+  static LudoPlayerPath _createPlayerPath(String playerId, int homeLaneBase) {
+    final entry = provisionalEntryCellByPlayer[playerId];
+    if (entry == null) {
+      throw ArgumentError.value(playerId, 'playerId', 'Unknown board seat');
+    }
+    return LudoPlayerPath(
+      playerId: playerId,
+      mainTrackCells: List<int>.generate(
+        sharedTrackLength,
+        (index) => (index + entry) % sharedTrackLength,
+      ),
+      homeLaneCells: List<int>.generate(
+        homeLaneLength,
+        (index) => homeLaneBase + index,
+      ),
+      trackLength: sharedTrackLength,
+    );
   }
 }
