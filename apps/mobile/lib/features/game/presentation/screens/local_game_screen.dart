@@ -49,6 +49,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           final currentPawns = state.pawns
               .where((pawn) => pawn.playerId == current)
               .toList(growable: false);
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: <Widget>[
@@ -71,27 +72,33 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Current turn: $ {current.toUpperCase()}',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: _colors[current],
-                                fontWeight: FontWeight.bold,
-                              )),
+                      Text(
+                        'Current turn: ${current.toUpperCase()}',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: _colors[current],
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
                       const SizedBox(height: 8),
-                      Text('Players: $ { state.players.length } 
-                            · Pawns:  $ { state.pawns.length } ',
-                      Text('State version: ' + state.version.toString()),
-                      Text(state.completed
-                          ? 'Winner: ' + (state.winnerPlayerId ?? 'Unknown')
-                          : state.pendingRoll == null
-                              ? 'Roll the dice to begin your turn.'
-                              : 'Dice result: ' + state.pendingRoll.toString()),
+                      Text(
+                        'Players: ${state.players.length} · Pawns: ${state.pawns.length}',
+                      ),
+                      Text('State version: ${state.version}'),
+                      Text(
+                        state.completed
+                            ? 'Winner: ${state.winnerPlayerId ?? 'Unknown'}'
+                            : state.pendingRoll == null
+                                ? 'Roll the dice to begin your turn.'
+                                : 'Dice result: ${state.pendingRoll}',
+                      ),
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed: state.completed || state.pendingRoll != null
-                              ? null
-                              : _controller.rollDice,
+                          onPressed:
+                              state.completed || state.pendingRoll != null
+                                  ? null
+                                  : _controller.rollDice,
                           icon: const Icon(Icons.casino_rounded),
                           label: const Text('Roll Dice'),
                         ),
@@ -101,19 +108,25 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              Text('Pawns for ' + current.toUpperCase(),
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Pawns for ${current.toUpperCase()}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               for (final pawn in currentPawns)
                 Card(
                   child: ListTile(
-                    leading: Icon(Icons.favorite_rounded,
-                        color: _colors[pawn.playerId]),
+                    leading: Icon(
+                      Icons.favorite_rounded,
+                      color: _colors[pawn.playerId],
+                    ),
                     title: Text(pawn.id),
                     subtitle: Text(_controller.pawnLabel(pawn)),
                     trailing: legal.contains(pawn.id)
-                        ? const Icon(Icons.touch_app_rounded,
-                            color: Color(0xFFFFD700))
+                        ? const Icon(
+                            Icons.touch_app_rounded,
+                            color: Color(0xFFFFD700),
+                          )
                         : const Icon(Icons.lock_outline_rounded),
                     onTap: legal.contains(pawn.id)
                         ? () => _controller.movePawn(pawn.id)
@@ -122,12 +135,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 ),
               if (_controller.lastMessage != null) ...<Widget>[
                 const SizedBox(height: 8),
-                Text('Last action: ' + _controller.lastMessage!,
-                    style: const TextStyle(color: Color(0xFFB8B8B8))),
+                Text(
+                  'Last action: ${_controller.lastMessage!}',
+                  style: const TextStyle(color: Color(0xFFB8B8B8)),
+                ),
               ],
               if (_controller.lastError != null)
-                Text('Action rejected: ' + _controller.lastError!.error.name,
-                    style: const TextStyle(color: Color(0xFFFF3830))),
+                Text(
+                  'Action rejected: ${_controller.lastError!.error.name}',
+                  style: const TextStyle(color: Color(0xFFFF3830)),
+                ),
               const SizedBox(height: 16),
               const Text(
                 'Known limitation: board coordinates, safe-cell mapping and visual pawn positions are not yet approved. Do not use this development screen as evidence that board gameplay is complete.',
