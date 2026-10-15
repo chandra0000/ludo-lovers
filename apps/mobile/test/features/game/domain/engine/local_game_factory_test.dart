@@ -5,7 +5,7 @@ import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart'
 void main() {
   group('LocalGameFactory', () {
     test('requires explicit opt-in while board route is provisional', () {
-      expect(LocalGameFactory.create, throwsA(isA<StateError>()));
+      expect(() => LocalGameFactory.create(), throwsA(isA<StateError>()));
     });
 
     test('creates four players and sixteen unique pawns for development', () {
