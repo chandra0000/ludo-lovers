@@ -22,7 +22,14 @@ void main() {
     expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
 
     final board = tester.getRect(find.byKey(const ValueKey('interactive_board')));
-    await tester.tapAt(Offset(board.left + board.width * (1.5 / 15), board.top + board.height * (6.5 / 15)));
+    // The keyed square includes an 8 px decorative inset around the board.
+    const inset = 8.0;
+    final boardWidth = board.width - inset * 2;
+    final boardHeight = board.height - inset * 2;
+    await tester.tapAt(Offset(
+      board.left + inset + boardWidth * (1.5 / 15),
+      board.top + inset + boardHeight * (6.5 / 15),
+    ));
     await tester.pump();
     expect(find.text('Sample pawn selected on cell 0.'), findsOneWidget);
   });
