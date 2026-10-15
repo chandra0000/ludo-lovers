@@ -21,7 +21,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
   static const double _touchRadiusInCells = 0.48;
 
   List<BoardPawnMarker> get _previewPawns {
-    final seats = ClassicLudoBoardDefinition.seats;
+    const seats = ClassicLudoBoardDefinition.seats;
     return <BoardPawnMarker>[
       BoardPawnMarker(
         pawnId: 'preview-orange',
