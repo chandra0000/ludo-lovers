@@ -284,7 +284,7 @@ class PathBasedLocalGameEngine {
 
     final pawns = List<LocalPawn>.of(state.pawns);
     pawns[index] = pawn.copyWith(position: result.resolution!.position);
-    var captured = false;
+    final capturedPawnIds = <String>[];
     final destination = result.resolution!.destinationCell;
     if (destination != null && !safeCellIndexes.contains(destination)) {
       final opponentIndexes = <int>[];
@@ -313,7 +313,7 @@ class PathBasedLocalGameEngine {
           pawns[opponentIndex] = pawns[opponentIndex].copyWith(
             position: const PawnRoutePosition(section: PawnRouteSection.yard),
           );
-          captured = true;
+          capturedPawnIds.add(pawns[opponentIndex].id);
         }
       }
     }
@@ -321,9 +321,16 @@ class PathBasedLocalGameEngine {
     final events = <LocalGameEvent>[
       LocalGameEvent('PawnMoved', playerId: playerId, pawnId: pawnId, value: rollValue),
     ];
-    if (captured) {
-      events.add(LocalGameEvent('PawnCaptured', playerId: playerId, pawnId: pawnId));
+    for (final capturedPawnId in capturedPawnIds) {
+      events.add(
+        LocalGameEvent(
+          'PawnCaptured',
+          playerId: playerId,
+          pawnId: capturedPawnId,
+        ),
+      );
     }
+    final captured = capturedPawnIds.isNotEmpty;
     if (result.resolution!.finishes) {
       events.add(LocalGameEvent('PawnFinished', playerId: playerId, pawnId: pawnId));
     }
