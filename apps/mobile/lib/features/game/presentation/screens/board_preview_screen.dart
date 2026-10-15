@@ -1,13 +1,71 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/board/classic_ludo_board_painter.dart';
+import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
-import '../../domain/board/board_coordinate_layout.dart';
+import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/board/classic_ludo_pawn_layer.dart';
 
-class BoardPreviewScreen extends StatelessWidget {
+class BoardPreviewScreen extends StatefulWidget {
   const BoardPreviewScreen({super.key});
+
+  @override
+  State<BoardPreviewScreen> createState() => _BoardPreviewScreenState();
+}
+
+class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
+  late final BoardCoordinateLayout _layout =
+      ClassicLudoBoardCoordinateFactory.create();
+  int? _selectedCell;
+
+  static const double _touchRadiusInCells = 0.48;
+
+  List<BoardPawnMarker> get _previewPawns {
+    final seats = ClassicLudoBoardDefinition.seats;
+    return <BoardPawnMarker>[
+      BoardPawnMarker(
+        pawnId: 'preview-orange',
+        cellId: seats[0].provisionalTrackEntryIndex,
+        color: LudoBoardPalette.orange,
+        selected: _selectedCell == seats[0].provisionalTrackEntryIndex,
+      ),
+      BoardPawnMarker(
+        pawnId: 'preview-green',
+        cellId: seats[1].provisionalTrackEntryIndex,
+        color: LudoBoardPalette.green,
+        selected: _selectedCell == seats[1].provisionalTrackEntryIndex,
+      ),
+      BoardPawnMarker(
+        pawnId: 'preview-blue',
+        cellId: seats[2].provisionalTrackEntryIndex,
+        color: LudoBoardPalette.blue,
+        selected: _selectedCell == seats[2].provisionalTrackEntryIndex,
+      ),
+      BoardPawnMarker(
+        pawnId: 'preview-magenta',
+        cellId: seats[3].provisionalTrackEntryIndex,
+        color: LudoBoardPalette.magenta,
+        selected: _selectedCell == seats[3].provisionalTrackEntryIndex,
+      ),
+    ];
+  }
+
+  void _handleBoardTap(TapDownDetails details, Size boardSize) {
+    final cellSize = boardSize.shortestSide /
+        ClassicLudoBoardDefinition.gridSize;
+    final cellId = _layout.hitTest(
+      x: details.localPosition.dx,
+      y: details.localPosition.dy,
+      width: boardSize.width,
+      height: boardSize.height,
+      maxDistance: cellSize * _touchRadiusInCells,
+    );
+    final selectableCells = _previewPawns.map((pawn) => pawn.cellId).toSet();
+    setState(() {
+      _selectedCell =
+          cellId != null && selectableCells.contains(cellId) ? cellId : null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +89,21 @@ class BoardPreviewScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Board rendering preview — turns, pawn movement and online play are not connected yet.',
+              Text(
+                _selectedCell == null
+                    ? 'Tap a sample pawn to preview its selection highlight.'
+                    : 'Sample pawn selected on cell $_selectedCell.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFFFFF8E1), height: 1.4),
+                style: const TextStyle(
+                  color: Color(0xFFFFF8E1),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Preview only: legal moves, turns and online play are not connected. Board route is provisional.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 11, color: Color(0xFFB8B8B8)),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -55,42 +124,34 @@ class BoardPreviewScreen extends StatelessWidget {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: <Widget>[
-                            const CustomPaint(
-                              painter: ClassicLudoBoardPainter(),
-                            ),
-                            IgnorePointer(
-                              child: CustomPaint(
-                                painter: ClassicLudoPawnLayer(
-                                  layout: ClassicLudoBoardCoordinateFactory.create(),
-                                  pawns: <BoardPawnMarker>[
-                                    BoardPawnMarker(
-                                      pawnId: 'preview-orange',
-                                      cellId: ClassicLudoBoardDefinition.seats[0].provisionalTrackEntryIndex,
-                                      color: LudoBoardPalette.orange,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final boardSize = Size(
+                              constraints.maxWidth,
+                              constraints.maxHeight,
+                            );
+                            return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTapDown: (details) =>
+                                  _handleBoardTap(details, boardSize),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: <Widget>[
+                                  const CustomPaint(
+                                    painter: ClassicLudoBoardPainter(),
+                                  ),
+                                  IgnorePointer(
+                                    child: CustomPaint(
+                                      painter: ClassicLudoPawnLayer(
+                                        layout: _layout,
+                                        pawns: _previewPawns,
+                                      ),
                                     ),
-                                    BoardPawnMarker(
-                                      pawnId: 'preview-green',
-                                      cellId: ClassicLudoBoardDefinition.seats[1].provisionalTrackEntryIndex,
-                                      color: LudoBoardPalette.green,
-                                    ),
-                                    BoardPawnMarker(
-                                      pawnId: 'preview-blue',
-                                      cellId: ClassicLudoBoardDefinition.seats[2].provisionalTrackEntryIndex,
-                                      color: LudoBoardPalette.blue,
-                                    ),
-                                    BoardPawnMarker(
-                                      pawnId: 'preview-magenta',
-                                      cellId: ClassicLudoBoardDefinition.seats[3].provisionalTrackEntryIndex,
-                                      color: LudoBoardPalette.magenta,
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
                     ),
