@@ -58,7 +58,7 @@ void main() {
       expect(controller.lastMessage, 'New local game');
     });
 
-    test('records a rejected move rather than crashing the screen', () {
+    test('records a no-legal-move turn without crashing the screen', () {
       final controller = LocalGameController(nextDiceValue: () => 3);
       addTearDown(controller.dispose);
 
@@ -67,6 +67,20 @@ void main() {
       expect(controller.state.currentPlayerId, 'green');
       expect(controller.lastMessage, contains('NoLegalMove'));
       expect(controller.lastError, isNull);
+    });
+
+    test('keeps the pending roll when an illegal pawn is selected', () {
+      final controller = LocalGameController(nextDiceValue: () => 6);
+      addTearDown(controller.dispose);
+
+      controller.rollDice();
+      final versionAfterRoll = controller.state.version;
+      controller.movePawn('not_a_real_pawn');
+
+      expect(controller.state.pendingRoll, 6);
+      expect(controller.state.version, versionAfterRoll);
+      expect(controller.lastError, isNotNull);
+      expect(controller.lastMessage, isNotNull);
     });
   });
 }
