@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/board_coordinate_layout.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
@@ -18,8 +19,11 @@ void main() {
     });
 
     test('brand colors stay assigned to the intended board quadrants', () {
+      final seatColors = ClassicLudoBoardDefinition.seats.map(
+        (seat) => (seat.id, seat.quadrant, seat.color),
+      );
       expect(
-        ClassicLudoBoardDefinition.seats.map((seat) => (seat.id, seat.quadrant, seat.color)),
+        seatColors,
         containsAll(<(String, BoardQuadrant, Color)>[
           ('orange', BoardQuadrant.topLeft, LudoBoardPalette.orange),
           ('green', BoardQuadrant.topRight, LudoBoardPalette.green),
@@ -50,7 +54,10 @@ void main() {
         expect(path.homeLaneCells, hasLength(6), reason: seat.id);
         expect(path.entryCell, seat.provisionalTrackEntryIndex, reason: seat.id);
         expect(path.cellAtProgress(0), seat.provisionalTrackEntryIndex);
-        expect(path.cellAtProgress(51), (seat.provisionalTrackEntryIndex + 51) % 52);
+        expect(
+          path.cellAtProgress(51),
+          (seat.provisionalTrackEntryIndex + 51) % 52,
+        );
         expect(path.cellAtProgress(52), seat.homeLaneStartCellId);
         expect(path.cellAtProgress(57), seat.homeLaneStartCellId + 5);
         expect(path.cellAtProgress(58), isNull);
