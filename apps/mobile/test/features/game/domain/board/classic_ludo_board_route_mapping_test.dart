@@ -8,14 +8,14 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordi
 void main() {
   group('Classic Ludo route mapping', () {
     test('Ludo Lovers brand palette stays exact', () {
-      expect(LudoBoardPalette.orange, const Color(0xFFF15206));
-      expect(LudoBoardPalette.green, const Color(0xFF2DF732));
-      expect(LudoBoardPalette.blue, const Color(0xFF35930F));
-      expect(LudoBoardPalette.magenta, const Color(0xFFF42227));
-      expect(LudoBoardPalette.gold, const Color(0xFFFF7300));
-      expect(LudoBoardPalette.red, const Color(0xFF377530));
-      expect(LudoBoardPalette.black, const Color(0xFF000600));
-      expect(LudoBoardPalette.cream, const Color(0xFFF75821));
+      expect(LudoBoardPalette.orange, const Color(0xFFFF8928));
+      expect(LudoBoardPalette.green, const Color(0xFF33FF28));
+      expect(LudoBoardPalette.blue, const Color(0xFF289EFF));
+      expect(LudoBoardPalette.magenta, const Color(0xFFF428FF));
+      expect(LudoBoardPalette.gold, const Color(0xFFFFD700));
+      expect(LudoBoardPalette.red, const Color(0xFFFF3830));
+      expect(LudoBoardPalette.black, const Color(0xFF080B0B));
+      expect(LudoBoardPalette.cream, const Color(0xFFFFF8E1));
     });
 
     test('brand colors stay assigned to the intended board quadrants', () {
@@ -68,7 +68,7 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.sharedTrack, hasLength(52));
       expect(
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
-        isNotEmpty,
+        <int>[4, 17, 30, 43],
       );
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });

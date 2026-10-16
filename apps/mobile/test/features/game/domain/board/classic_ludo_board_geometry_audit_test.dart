@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordinate_factory.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_geometry_audit.dart';
 
 void main() {
@@ -20,6 +21,14 @@ void main() {
       expect(
         ClassicLudoBoardGeometryAudit.isStructurallyConsistent,
         isTrue,
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.isGameplayReady,
+        isFalse,
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
+        <int>[4, 17, 30, 43],
       );
     });
   });

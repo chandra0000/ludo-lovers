@@ -33,15 +33,12 @@ These are product goals, not claims that the features are already implemented.
 
 | Color | Hex |
 | --- | --- |
-| Orange | `#F15206` |
-| Green | `#2DF732` |
-| Blue | `#35930F` |
-| Magenta | `#F42227` |
+| Orange | `#FF8928` |
+| Green | `#33FF28` |
+| Blue | `#289EFF` |
+| Magenta | `#F428FF` |
 
-| Gold | `#FF7300` |
-| Red | `#377530` |
-| Black background | `#000600` |
-| Cream accent | `#F75821` |
+The four values above are the locked brand colors. Gold, error red, black background, and readable text colors are supporting UI tokens and must not replace the brand palette.
 
 The existing Ludo Lovers logo is the fixed brand asset and should not be redesigned or recolored unless explicitly requested.
 

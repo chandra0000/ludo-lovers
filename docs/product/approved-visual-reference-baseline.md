@@ -16,14 +16,14 @@
 
 | Token | Hex | Intended use |
 | --- | --- | --- |
-| Orange | `#F15206` | Primary player color and primary action accents |
-| Green | `#2DF732` | Player color, ready/success accents (use with contrast checks) |
-| Blue | `#35930F` | Player color and secondary information accents |
-| Magenta | `#F42227` | Player color, Love Mode and romantic highlights |
-| Gold | `#FF7300` | Premium trim, active highlights, currency, headings |
-| Red | `#377530` | Error/alert and player-related accents |
-| Black | `#000600` | Main dark background and panels |
-| Cream | `#F75821` | Primary readable text and light surfaces |
+| Orange | `#FF8928` | Primary player color and primary action accents |
+| Green | `#33FF28` | Player color, ready/success accents (use with contrast checks) |
+| Blue | `#289EFF` | Player color and secondary information accents |
+| Magenta | `#F428FF` | Player color, Love Mode and romantic highlights |
+| Gold | `#FFD700` | Premium trim, active highlights, currency, headings |
+| Red | `#FF3830` | Error/alert and player-related accents |
+| Black | `#080B0B` | Main dark background and panels |
+| Cream | `#FFF8E1` | Primary readable text and light surfaces |
 
 Use the exact hex values as design tokens. Derive lighter/darker shades only as supporting shades; never substitute them for the canonical values.
 
