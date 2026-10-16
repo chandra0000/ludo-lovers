@@ -10,11 +10,11 @@ class AppTheme {
   static const Color magenta = Color(0xFFF428FF);
 
   // Supporting theme tokens; these do not replace the four brand colors.
-  static const Color gold = Color(0xFFFFD166);
-  static const Color red = Color(0xFFFF5252);
-  static const Color black = Color(0xFF000600);
-  static const Color cream = Color(0xFFFFF1D6);
-  static const Color readableText = Color(0xFFFFF1D6);
+  static const Color gold = Color(0xFFFFD700);
+  static const Color red = Color(0xFFFF3830);
+  static const Color black = Color(0xFF080B0B);
+  static const Color cream = Color(0xFFFFF8E1);
+  static const Color readableText = cream;
   static const Color mutedText = Color(0xFFB9A99F);
   static const Color panel = Color(0xFF15110F);
   static const Color panelRaised = Color(0xFF211713);
