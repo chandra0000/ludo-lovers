@@ -45,6 +45,9 @@ abstract final class AppColors {
 }
 ```
 
+### Palette transcription note
+These values are the product owner's latest explicit specification. Some hex values appear visually inconsistent with their semantic names; preserve the supplied values exactly until the owner confirms a correction.
+
 ## 2. app_spacing.dart
 ```dart
 abstract final class AppSpacing {
