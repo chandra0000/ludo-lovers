@@ -5,6 +5,7 @@
 /// and tests until the board topology has been approved.
 library;
 
+import '../board/classic_ludo_board_definition.dart';
 import '../board/classic_ludo_board_fixture.dart';
 import '../board/ludo_board_paths.dart';
 import 'ludo_path_movement.dart';
@@ -34,7 +35,7 @@ class LocalGameFactory {
   ];
 
   static LocalGameSetup create({
-    Set<int> safeCellIndexes = const <int>{},
+    Set<int>? safeCellIndexes,
     bool allowProvisionalRoutes = false,
   }) {
     if (!allowProvisionalRoutes) {
@@ -47,7 +48,10 @@ class LocalGameFactory {
     final paths = ClassicLudoBoardFixture.create();
     final engine = PathBasedLocalGameEngine(
       paths: paths,
-      profile: LudoRuleProfile(safeCellIndexes: safeCellIndexes),
+      profile: LudoRuleProfile(
+        safeCellIndexes: safeCellIndexes ??
+            ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
+      ),
     );
     final pawns = <LocalPawn>[
       for (final playerId in playerIds)
