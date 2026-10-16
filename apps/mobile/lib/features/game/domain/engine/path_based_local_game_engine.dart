@@ -212,9 +212,14 @@ final class DiceRolled extends LocalGameEvent {
   const DiceRolled({
     required String playerId,
     required int value,
-    super.stateVersion,
-    super.sequence,
-  }) : super(playerId: playerId, value: value);
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          value: value,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   int get rollValue => value!;
   @override
@@ -224,8 +229,15 @@ final class DiceRolled extends LocalGameEvent {
 }
 
 final class TurnEnded extends LocalGameEvent {
-  const TurnEnded({required String playerId, super.stateVersion, super.sequence})
-      : super(playerId: playerId);
+  const TurnEnded({
+    required String playerId,
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   @override
   String get type => 'TurnEnded';
@@ -234,8 +246,15 @@ final class TurnEnded extends LocalGameEvent {
 }
 
 final class NoLegalMove extends LocalGameEvent {
-  const NoLegalMove({required String playerId, super.stateVersion, super.sequence})
-      : super(playerId: playerId);
+  const NoLegalMove({
+    required String playerId,
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   @override
   String get type => 'NoLegalMove';
@@ -246,9 +265,13 @@ final class NoLegalMove extends LocalGameEvent {
 final class ExtraRollGranted extends LocalGameEvent {
   const ExtraRollGranted({
     required String playerId,
-    super.stateVersion,
-    super.sequence,
-  }) : super(playerId: playerId);
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   @override
   String get type => 'ExtraRollGranted';
@@ -261,9 +284,15 @@ final class PawnMoved extends LocalGameEvent {
     required String playerId,
     required String pawnId,
     required int value,
-    super.stateVersion,
-    super.sequence,
-  }) : super(playerId: playerId, pawnId: pawnId, value: value);
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          pawnId: pawnId,
+          value: value,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   @override
   String get type => 'PawnMoved';
@@ -275,9 +304,14 @@ final class PawnCaptured extends LocalGameEvent {
   const PawnCaptured({
     required String playerId,
     required String capturedPawnId,
-    super.stateVersion,
-    super.sequence,
-  }) : super(playerId: playerId, pawnId: capturedPawnId);
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          pawnId: capturedPawnId,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   String get capturedPawnId => pawnId!;
   @override
@@ -290,9 +324,14 @@ final class PawnFinished extends LocalGameEvent {
   const PawnFinished({
     required String playerId,
     required String pawnId,
-    super.stateVersion,
-    super.sequence,
-  }) : super(playerId: playerId, pawnId: pawnId);
+    int? stateVersion,
+    int? sequence,
+  }) : super(
+          playerId: playerId,
+          pawnId: pawnId,
+          stateVersion: stateVersion,
+          sequence: sequence,
+        );
 
   @override
   String get type => 'PawnFinished';
