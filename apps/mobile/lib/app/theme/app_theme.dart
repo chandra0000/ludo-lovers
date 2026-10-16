@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   const AppTheme._();
 
-  // Canonical brand values. Keep these hex codes unchanged.
+  // Locked product-owner palette. Never replace these base hex values.
   static const Color orange = Color(0xFFF15206);
   static const Color green = Color(0xFF2DF732);
   static const Color blue = Color(0xFF35930F);
@@ -13,20 +13,27 @@ class AppTheme {
   static const Color black = Color(0xFF000600);
   static const Color cream = Color(0xFFF75821);
 
+  // Supporting neutrals are not brand-token replacements. They keep body copy
+  // readable because the owner-approved Cream token is a saturated orange.
+  static const Color readableText = Color(0xFFFFF1D6);
+  static const Color mutedText = Color(0xFFB9A99F);
   static const Color panel = Color(0xFF15110F);
   static const Color panelRaised = Color(0xFF211713);
-  static const Color mutedText = Color(0xFFB9A99F);
+  static const Color panelHighlight = Color(0xFF2B1B14);
 
   static ThemeData get light {
     const scheme = ColorScheme.dark(
-      primary: orange,
+      primary: gold,
       onPrimary: black,
       secondary: magenta,
-      onSecondary: black,
+      onSecondary: readableText,
+      tertiary: orange,
+      onTertiary: readableText,
       error: red,
-      onError: cream,
+      onError: readableText,
       surface: panel,
-      onSurface: cream,
+      onSurface: readableText,
+      outline: gold,
     );
 
     return ThemeData(
@@ -36,16 +43,33 @@ class AppTheme {
       scaffoldBackgroundColor: black,
       canvasColor: black,
       cardColor: panel,
-      dividerColor: gold.withValues(alpha: 0.35),
+      dividerColor: gold.withValues(alpha: 0.30),
+      splashColor: gold.withValues(alpha: 0.12),
+      highlightColor: gold.withValues(alpha: 0.06),
       textTheme: ThemeData.dark().textTheme.apply(
-            bodyColor: cream,
-            displayColor: cream,
-          ),
+        bodyColor: readableText,
+        displayColor: readableText,
+      ).copyWith(
+        headlineMedium: ThemeData.dark().textTheme.headlineMedium?.copyWith(
+          color: readableText,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
+        titleLarge: ThemeData.dark().textTheme.titleLarge?.copyWith(
+          color: readableText,
+          fontWeight: FontWeight.w700,
+        ),
+        bodyMedium: ThemeData.dark().textTheme.bodyMedium?.copyWith(
+          color: readableText,
+          height: 1.45,
+        ),
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: black,
-        foregroundColor: cream,
+        foregroundColor: readableText,
         centerTitle: false,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       cardTheme: CardThemeData(
         color: panel,
@@ -53,14 +77,17 @@ class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: gold.withValues(alpha: 0.45)),
+          side: BorderSide(color: gold.withValues(alpha: 0.38)),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: gold,
           foregroundColor: black,
+          disabledBackgroundColor: panelHighlight,
+          disabledForegroundColor: mutedText,
           minimumSize: const Size(48, 52),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -72,12 +99,24 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: cream,
+          foregroundColor: readableText,
           minimumSize: const Size(48, 50),
-          side: BorderSide(color: gold.withValues(alpha: 0.75)),
+          side: BorderSide(color: gold.withValues(alpha: 0.65)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: gold,
+          minimumSize: const Size(48, 48),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: readableText,
+          minimumSize: const Size(48, 48),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -85,18 +124,24 @@ class AppTheme {
         fillColor: panelRaised,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: gold.withValues(alpha: 0.5)),
+          borderSide: BorderSide(color: gold.withValues(alpha: 0.45)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: gold.withValues(alpha: 0.35)),
+          borderSide: BorderSide(color: gold.withValues(alpha: 0.30)),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(14)),
           borderSide: BorderSide(color: gold, width: 1.5),
         ),
-        labelStyle: const TextStyle(color: cream),
+        labelStyle: const TextStyle(color: readableText),
         hintStyle: const TextStyle(color: mutedText),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: panelHighlight,
+        contentTextStyle: const TextStyle(color: readableText),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
