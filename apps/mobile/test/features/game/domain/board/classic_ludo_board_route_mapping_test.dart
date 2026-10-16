@@ -68,7 +68,7 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.sharedTrack, hasLength(52));
       expect(
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
-        isNotEmpty,
+        <int>[4, 17, 30, 43],
       );
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
