@@ -97,15 +97,24 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                     : 'Sample pawn selected on cell $_selectedCell.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFFFFF8E1),
+                  color: AppTheme.cream,
                   height: 1.4,
                 ),
               ),
+              if (_selectedCell != null) ...<Widget>[
+                const SizedBox(height: 2),
+                TextButton.icon(
+                  key: const ValueKey('clear_pawn_selection_button'),
+                  onPressed: () => setState(() => _selectedCell = null),
+                  icon: const Icon(Icons.close_rounded, size: 16),
+                  label: const Text('Clear selection'),
+                ),
+              ],
               const SizedBox(height: 4),
               const Text(
                 'Preview only: legal moves, turns and online play are not connected. Board route is provisional.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: Color(0xFFB8B8B8)),
+                style: TextStyle(fontSize: 11, color: AppTheme.mutedText),
               ),
               const SizedBox(height: 16),
               Expanded(
