@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/ludo_board_paths.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
+import 'package:ludo_lovers/features/game/domain/engine/ludo_rule_profile.dart';
 import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_engine.dart';
 
 void main() {
@@ -25,8 +26,10 @@ void main() {
     ]);
     engine = PathBasedLocalGameEngine(
       paths: paths,
-      safeCellIndexes: const <int>{0, 4},
-      maxConsecutiveSixes: 3,
+      profile: LudoRuleProfile(
+        safeCellIndexes: const <int>{0, 4},
+        maxConsecutiveSixes: 3,
+      ),
     );
     initial = LocalGameState(
       players: const <String>['orange', 'blue'],
