@@ -110,7 +110,7 @@ class AppFoundationScreen extends StatelessWidget {
                         border: Border.all(
                           color: AppTheme.gold.withValues(alpha: 0.65),
                         ),
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: <Color>[
