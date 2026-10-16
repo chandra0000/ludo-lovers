@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_geometry_audit.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordinate_factory.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 
 void main() {
   group('ClassicLudoBoardGeometryAudit', () {
@@ -18,6 +19,19 @@ void main() {
       );
       expect(issues, hasLength(4));
       expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isFalse);
+    });
+
+    test('every provisional player start is included in the safe-cell set', () {
+      final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+      expect(safeCells, hasLength(8));
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(
+          safeCells.contains(seat.provisionalTrackEntryIndex),
+          isTrue,
+          reason: '${seat.id} start cell must be protected from capture',
+        );
+      }
+      expect(safeCells.every((cell) => cell >= 0 && cell < 52), isTrue);
     });
 
     test('keeps gameplay readiness disabled until route geometry is approved', () {

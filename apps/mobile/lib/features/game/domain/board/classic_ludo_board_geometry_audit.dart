@@ -113,6 +113,19 @@ class ClassicLudoBoardGeometryAudit {
       }
     }
 
+    // Every player's entry square is protected under this provisional rules
+    // profile. This validates metadata consistency, not visual approval.
+    for (final seat in ClassicLudoBoardDefinition.seats) {
+      final entry = seat.provisionalTrackEntryIndex;
+      if (entry >= 0 &&
+          entry < track.length &&
+          !ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.contains(entry)) {
+        issues.add(
+          '${seat.id} start cell $entry is missing from provisional safe cells.',
+        );
+      }
+    }
+
     return List<String>.unmodifiable(issues);
   }
 

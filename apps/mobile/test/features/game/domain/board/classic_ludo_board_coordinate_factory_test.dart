@@ -73,6 +73,47 @@ void main() {
       }
     });
 
+    test('normalized coordinates match every physical grid-cell center', () {
+      final layout = ClassicLudoBoardCoordinateFactory.create();
+      const gridSize = ClassicLudoBoardDefinition.gridSize;
+
+      for (var index = 0;
+          index < ClassicLudoBoardCoordinateFactory.sharedTrack.length;
+          index++) {
+        final cell = ClassicLudoBoardCoordinateFactory.sharedTrack[index];
+        final point = layout.forCell(index);
+        expect(
+          point.x,
+          closeTo((cell.column + 0.5) / gridSize, 0.000001),
+          reason: 'Track cell $index x-coordinate',
+        );
+        expect(
+          point.y,
+          closeTo((cell.row + 0.5) / gridSize, 0.000001),
+          reason: 'Track cell $index y-coordinate',
+        );
+      }
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        for (var laneIndex = 0;
+            laneIndex < seat.homeLaneCells.length;
+            laneIndex++) {
+          final cell = seat.homeLaneCells[laneIndex];
+          final point = layout.forCell(seat.homeLaneStartCellId + laneIndex);
+          expect(
+            point.x,
+            closeTo((cell.column + 0.5) / gridSize, 0.000001),
+            reason: '${seat.id} home lane $laneIndex x-coordinate',
+          );
+          expect(
+            point.y,
+            closeTo((cell.row + 0.5) / gridSize, 0.000001),
+            reason: '${seat.id} home lane $laneIndex y-coordinate',
+          );
+        }
+      }
+    });
+
     test('home lanes use six distinct in-bounds physical cells per seat', () {
       final track = ClassicLudoBoardCoordinateFactory.sharedTrack.toSet();
       final allLaneCells = <BoardGridCell>{};
