@@ -7,7 +7,9 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
 
     expect(find.text('LUDO LOVERS'), findsOneWidget);
-    expect(find.text('Play together. Stay connected.'), findsOneWidget);
+    expect(find.text('PLAY • CONNECT • LOVE'), findsOneWidget);
+    expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
+    expect(find.text('Love Mode'), findsOneWidget);
     expect(find.text('Preview Ludo Board'), findsOneWidget);
     expect(find.text('Open Local Game Lab'), findsOneWidget);
   });
