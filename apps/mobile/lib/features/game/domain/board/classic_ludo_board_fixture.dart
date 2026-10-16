@@ -9,6 +9,7 @@
 /// route topology or enable production gameplay.
 library;
 
+import 'classic_ludo_board_definition.dart';
 import 'ludo_board_paths.dart';
 
 class ClassicLudoBoardFixture {
@@ -17,28 +18,30 @@ class ClassicLudoBoardFixture {
   static const int sharedTrackLength = 52;
   static const int homeLaneLength = 6;
 
-  static const Map<String, int> provisionalEntryCellByPlayer =
-      <String, int>{
-    'orange': 0,
-    'green': 13,
-    'magenta': 26,
-    'blue': 39,
-  };
+  /// Derived from the shared seat definition to avoid duplicate entry offsets.
+  static Map<String, int> get provisionalEntryCellByPlayer =>
+      Map<String, int>.unmodifiable({
+        for (final seat in ClassicLudoBoardDefinition.seats)
+          seat.id: seat.provisionalTrackEntryIndex,
+      });
 
   static LudoBoardPaths create() {
+    ClassicLudoBoardDefinition.validate();
     return LudoBoardPaths(<LudoPlayerPath>[
-      _createPlayerPath('orange', 200),
-      _createPlayerPath('green', 220),
-      _createPlayerPath('magenta', 230),
-      _createPlayerPath('blue', 210),
+      for (final seat in ClassicLudoBoardDefinition.seats)
+        _createPlayerPath(
+          seat.id,
+          seat.homeLaneStartCellId,
+          seat.provisionalTrackEntryIndex,
+        ),
     ]);
   }
 
-  static LudoPlayerPath _createPlayerPath(String playerId, int homeLaneBase) {
-    final entry = provisionalEntryCellByPlayer[playerId];
-    if (entry == null) {
-      throw ArgumentError.value(playerId, 'playerId', 'Unknown board seat');
-    }
+  static LudoPlayerPath _createPlayerPath(
+    String playerId,
+    int homeLaneBase,
+    int entry,
+  ) {
     return LudoPlayerPath(
       playerId: playerId,
       mainTrackCells: List<int>.generate(
