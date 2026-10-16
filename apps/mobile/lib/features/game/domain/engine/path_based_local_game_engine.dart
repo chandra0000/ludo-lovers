@@ -1,12 +1,12 @@
 /// Path-based local gameplay transition service for Ludo Lovers.
 ///
-/// This is an integration layer for the path model and movement resolver. It is
-/// deliberately separate from the original LudoEngine until the project is
-/// configured and both APIs can be migrated with executable tests.
+/// This engine is the canonical local transition service. Board-specific paths
+/// and provisional rules must be reviewed before production gameplay.
 library;
 
 import '../board/ludo_board_paths.dart';
 import 'ludo_path_movement.dart';
+import 'ludo_rule_profile.dart';
 
 class LocalPawn {
   const LocalPawn({
@@ -197,37 +197,26 @@ class LocalGameTransition {
 /// Small, deterministic engine service. Board-specific paths must be reviewed
 /// against the final board diagram before shipping.
 class PathBasedLocalGameEngine {
-  const PathBasedLocalGameEngine({
+  PathBasedLocalGameEngine({
     required this.paths,
     this.movement = const LudoPathMovement(),
-    this.safeCellIndexes = const <int>{},
-    this.sixRequiredToEnter = true,
-    this.extraRollOnSix = true,
-    this.extraRollOnCapture = true,
-    this.extraRollOnFinish = true,
-    this.requireExactFinishRoll = true,
-    this.maxConsecutiveSixes = 3,
-    this.thirdSixEndsTurnWithoutMove = true,
-    this.finishEndsMatchImmediately = true,
-    this.captureOnlySingleOpponentPawn = true,
-  });
+    LudoRuleProfile? profile,
+  }) : profile = profile ?? LudoRuleProfile();
 
   final LudoBoardPaths paths;
   final LudoPathMovement movement;
-  final Set<int> safeCellIndexes;
-  final bool sixRequiredToEnter;
-  final bool extraRollOnSix;
-  final bool extraRollOnCapture;
-  final bool extraRollOnFinish;
-  final bool requireExactFinishRoll;
-  final int maxConsecutiveSixes;
-  final bool thirdSixEndsTurnWithoutMove;
-  final bool finishEndsMatchImmediately;
+  final LudoRuleProfile profile;
 
-  /// When true, a destination occupied by two or more opponent pawns is treated
-  /// as a stack and none of them are captured. This is a configurable local-MVP
-  /// rule; confirm it against the final published rules before release.
-  final bool captureOnlySingleOpponentPawn;
+  Set<int> get safeCellIndexes => profile.safeCellIndexes;
+  bool get sixRequiredToEnter => profile.sixRequiredToEnter;
+  bool get extraRollOnSix => profile.extraRollOnSix;
+  bool get extraRollOnCapture => profile.extraRollOnCapture;
+  bool get extraRollOnFinish => profile.extraRollOnFinish;
+  bool get requireExactFinishRoll => profile.requireExactFinishRoll;
+  int get maxConsecutiveSixes => profile.maxConsecutiveSixes;
+  bool get thirdSixEndsTurnWithoutMove => profile.thirdSixEndsTurnWithoutMove;
+  bool get finishEndsMatchImmediately => profile.finishEndsMatchImmediately;
+  bool get captureOnlySingleOpponentPawn => profile.captureOnlySingleOpponentPawn;
 
   LocalGameTransition roll(
     LocalGameState state, {
