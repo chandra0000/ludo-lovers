@@ -281,13 +281,11 @@ final class PawnCaptured extends LocalGameEvent {
   const PawnCaptured({
     required String playerId,
     required String capturedPawnId,
-    int? stateVersion,
-    int? sequence,
+    super.stateVersion,
+    super.sequence,
   }) : super(
           playerId: playerId,
           pawnId: capturedPawnId,
-          stateVersion: stateVersion,
-          sequence: sequence,
         );
 
   String get capturedPawnId => pawnId!;
