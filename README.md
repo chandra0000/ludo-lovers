@@ -33,10 +33,15 @@ These are product goals, not claims that the features are already implemented.
 
 | Color | Hex |
 | --- | --- |
-| Orange | `#FF8928` |
-| Green | `#33FF28` |
-| Blue | `#289EFF` |
-| Magenta | `#F428FF` |
+| Orange | `#F15206` |
+| Green | `#2DF732` |
+| Blue | `#35930F` |
+| Magenta | `#F42227` |
+
+| Gold | `#FF7300` |
+| Red | `#377530` |
+| Black background | `#000600` |
+| Cream accent | `#F75821` |
 
 The existing Ludo Lovers logo is the fixed brand asset and should not be redesigned or recolored unless explicitly requested.
 
@@ -130,7 +135,7 @@ Directories will be added as implementation begins.
 
 ## Current next step
 
-**Board reference reviewed — topology still needs a clearer source.** The supplied composite visual-design sheet is now accepted for visual direction: keep the fixed Ludo Lovers logo, dark premium presentation with gold accents, and Orange/Green/Blue/Magenta seats in the shown quadrants. However, its small embedded board image does not reliably identify all 52 physical track cells, exact start cells, home-lane transitions, or safe-cell IDs. The current route has four non-orthogonal transitions, so do not enable gameplay from this thumbnail alone. Please supply a clean, straight-on crop of only the board with cells and safe markers legible, or confirm the exact standard layout and rules variant separately. Until then, keep `ClassicLudoBoardCoordinateFactory.isGameplayReady == false` and the Local Game Lab warning visible. After topology approval, connect engine state to board coordinates and add widget tests for roll → legal pawn highlights → move → capture/bonus/turn → win/rematch.
+**Board reference reviewed — topology still needs a clearer source.** The supplied composite visual-design sheet is now accepted for visual direction: keep the fixed Ludo Lovers logo, dark luxury presentation with glowing gold accents, and Orange/Green/Blue/Magenta seats in the shown quadrants. However, its small embedded board image does not reliably identify all 52 physical track cells, exact start cells, home-lane transitions, or safe-cell IDs. The current route has four non-orthogonal transitions, so do not enable gameplay from this thumbnail alone. Please supply a clean, straight-on crop of only the board with cells and safe markers legible, or confirm the exact standard layout and rules variant separately. Until then, keep `ClassicLudoBoardCoordinateFactory.isGameplayReady == false` and the Local Game Lab warning visible. After topology approval, connect engine state to board coordinates and add widget tests for roll → legal pawn highlights → move → capture/bonus/turn → win/rematch.
 
 ## Current engineering decision records
 
