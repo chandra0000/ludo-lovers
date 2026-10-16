@@ -63,6 +63,7 @@ void main() {
     );
     expect(rolled.state.pendingRoll, 6);
     expect(rolled.state.version, initial.version + 1);
+    expect(rolled.events.single, isA<DiceRolled>());
     expect(rolled.events.single.kind, LocalGameEventKind.diceRolled);
     expect(rolled.events.single.stateVersion, rolled.state.version);
     expect(rolled.events.single.sequence, 0);
@@ -198,9 +199,10 @@ void main() {
         .where((event) => event.type == 'PawnCaptured')
         .toList(growable: false);
     expect(captureEvents, hasLength(1));
-    expect(captureEvents.single.playerId, 'orange');
-    expect(captureEvents.single.pawnId, 'b1',
+    expect(captureEvents.single, isA<PawnCaptured>());
+    expect((captureEvents.single as PawnCaptured).capturedPawnId, 'b1',
         reason: 'Capture payload must identify the captured opponent, not mover o1.');
+    expect(captureEvents.single.playerId, 'orange');
     expect(moved.state.currentPlayerId, 'orange',
         reason: 'A capture grants the configured bonus roll.');
   });
