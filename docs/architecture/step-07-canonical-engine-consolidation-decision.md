@@ -1,6 +1,6 @@
 # Step 07 — Canonical Engine Consolidation Decision
 
-**Status:** Canonical-engine decision recorded; Phase A1 migration is underway. `PathBasedLocalGameEngine` is the only engine for new work. The legacy `LudoEngine` is deprecated and retained temporarily for migration reference; no in-repository imports or tests reference it as of 2026-10-16. This document does not claim that the engine is production-ready or that a complete Ludo board is implemented.
+**Status:** Phase A1 complete: the legacy `LudoEngine` source file was removed in commit `1c834dfc2c96a44a22c3aa229d93bfb4ed82ffd5`, and CI passed. `PathBasedLocalGameEngine` is the sole active engine. Phase A3 has begun: `LudoRuleProfile` now centralizes engine rule settings and defensively freezes safe-cell indexes. This does not mean the rules or board are production-ready.
 
 ## Context gathered from the existing project notes
 
@@ -16,7 +16,7 @@ This decision consolidates the requirements recorded in:
 - `flutter-design-system-foundation.md`
 - the repository README and current Flutter CI workflow
 
-The project has two overlapping rule implementations today: `LudoEngine` in `ludo_engine.dart` and `PathBasedLocalGameEngine` in `path_based_local_game_engine.dart`. The former contains placeholder distance-to-home logic and mutable-list risks; the latter uses the route model and movement resolver, but still has provisional rules, synthetic test paths, stringly typed events, and incomplete board-position invariants. They must not both remain independent sources of truth.
+Historically, the project had overlapping rule implementations. The legacy `ludo_engine.dart` has now been removed; its historical placeholder limitations are recorded here for context only. The active `PathBasedLocalGameEngine` uses the route model and movement resolver, but still has provisional rules, synthetic test paths, compatibility string labels for events, and incomplete board-position invariants.
 
 ## Decision
 
@@ -35,7 +35,8 @@ The project has two overlapping rule implementations today: `LudoEngine` in `lud
 ## Required implementation sequence
 
 ### A. Freeze and document the rule profile
-- Define the named classic rules version and list each rule as an explicit option.
+- Implemented foundation: `LudoRuleProfile` (`classic-v1-provisional`) centralizes the current engine flags and defensively copies safe-cell indexes. Profile defaults remain provisional.
+- Next: add explicit typed event payloads and typed commands; the current event `kind` is an enum derived from a compatibility string.
 - Record decisions for entering the track, safe cells, captures, stacks, bonus turns, consecutive sixes, home-lane entry, exact finishing, and match completion.
 - Keep undecided variations marked as open decisions rather than silently treating defaults as final.
 
@@ -92,5 +93,5 @@ A step is complete only when all relevant gates pass:
 - Existing engine tests have used synthetic short routes.
 - Final board geometry and safe-cell mapping still require validation against the approved board design.
 - Rule defaults are provisional.
-- The legacy `LudoEngine` is deprecated and has no in-repository callers/tests in the current tree; removal is a follow-up after this deprecation commit passes CI and a fresh repository-wide reference check.
+- The legacy `LudoEngine` source file is removed and CI passed on commit `1c834dfc2c96a44a22c3aa229d93bfb4ed82ffd5`. Historical documents may still mention the former file and should not be read as current implementation status.
 - Passing CI validates the current code and tests only; it does not establish production readiness or prove every game-rule combination correct.
