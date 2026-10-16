@@ -136,9 +136,12 @@ enum LocalGameEventKind {
   gameCompleted,
 }
 
-class LocalGameEvent {
-  const LocalGameEvent(
-    this.type, {
+/// Typed, immutable event emitted by one accepted local state transition.
+///
+/// The common fields remain available to the development UI, while the
+/// concrete subtype and its required payload make event handling exhaustive.
+sealed class LocalGameEvent {
+  const LocalGameEvent({
     this.playerId,
     this.pawnId,
     this.value,
@@ -146,35 +149,168 @@ class LocalGameEvent {
     this.sequence,
   });
 
-  /// Kept as a readable compatibility label for the development UI.
-  final String type;
   final String? playerId;
   final String? pawnId;
   final int? value;
   final int? stateVersion;
   final int? sequence;
 
-  LocalGameEventKind get kind => switch (type) {
-        'DiceRolled' => LocalGameEventKind.diceRolled,
-        'TurnEnded' => LocalGameEventKind.turnEnded,
-        'NoLegalMove' => LocalGameEventKind.noLegalMove,
-        'ExtraRollGranted' => LocalGameEventKind.extraRollGranted,
-        'PawnMoved' => LocalGameEventKind.pawnMoved,
-        'PawnCaptured' => LocalGameEventKind.pawnCaptured,
-        'PawnFinished' => LocalGameEventKind.pawnFinished,
-        'GameCompleted' => LocalGameEventKind.gameCompleted,
-        _ => throw StateError('Unrecognized local game event type: $type'),
-      };
+  String get type;
+  LocalGameEventKind get kind;
 
   LocalGameEvent forTransition({required int version, required int order}) =>
-      LocalGameEvent(
-        type,
-        playerId: playerId,
-        pawnId: pawnId,
-        value: value,
-        stateVersion: version,
-        sequence: order,
-      );
+      switch (this) {
+        DiceRolled event => DiceRolled(
+            playerId: event.playerId!,
+            value: event.value!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        TurnEnded event => TurnEnded(
+            playerId: event.playerId!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        NoLegalMove event => NoLegalMove(
+            playerId: event.playerId!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        ExtraRollGranted event => ExtraRollGranted(
+            playerId: event.playerId!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        PawnMoved event => PawnMoved(
+            playerId: event.playerId!,
+            pawnId: event.pawnId!,
+            value: event.value!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        PawnCaptured event => PawnCaptured(
+            playerId: event.playerId!,
+            capturedPawnId: event.pawnId!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        PawnFinished event => PawnFinished(
+            playerId: event.playerId!,
+            pawnId: event.pawnId!,
+            stateVersion: version,
+            sequence: order,
+          ),
+        GameCompleted event => GameCompleted(
+            playerId: event.playerId!,
+            stateVersion: version,
+            sequence: order,
+          ),
+      };
+}
+
+final class DiceRolled extends LocalGameEvent {
+  const DiceRolled({
+    required String playerId,
+    required int value,
+    super.stateVersion,
+    super.sequence,
+  }) : super(playerId: playerId, value: value);
+
+  int get rollValue => value!;
+  @override
+  String get type => 'DiceRolled';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.diceRolled;
+}
+
+final class TurnEnded extends LocalGameEvent {
+  const TurnEnded({required String playerId, super.stateVersion, super.sequence})
+      : super(playerId: playerId);
+
+  @override
+  String get type => 'TurnEnded';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.turnEnded;
+}
+
+final class NoLegalMove extends LocalGameEvent {
+  const NoLegalMove({required String playerId, super.stateVersion, super.sequence})
+      : super(playerId: playerId);
+
+  @override
+  String get type => 'NoLegalMove';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.noLegalMove;
+}
+
+final class ExtraRollGranted extends LocalGameEvent {
+  const ExtraRollGranted({
+    required String playerId,
+    super.stateVersion,
+    super.sequence,
+  }) : super(playerId: playerId);
+
+  @override
+  String get type => 'ExtraRollGranted';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.extraRollGranted;
+}
+
+final class PawnMoved extends LocalGameEvent {
+  const PawnMoved({
+    required String playerId,
+    required String pawnId,
+    required int value,
+    super.stateVersion,
+    super.sequence,
+  }) : super(playerId: playerId, pawnId: pawnId, value: value);
+
+  @override
+  String get type => 'PawnMoved';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.pawnMoved;
+}
+
+final class PawnCaptured extends LocalGameEvent {
+  const PawnCaptured({
+    required String playerId,
+    required String capturedPawnId,
+    super.stateVersion,
+    super.sequence,
+  }) : super(playerId: playerId, pawnId: capturedPawnId);
+
+  String get capturedPawnId => pawnId!;
+  @override
+  String get type => 'PawnCaptured';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.pawnCaptured;
+}
+
+final class PawnFinished extends LocalGameEvent {
+  const PawnFinished({
+    required String playerId,
+    required String pawnId,
+    super.stateVersion,
+    super.sequence,
+  }) : super(playerId: playerId, pawnId: pawnId);
+
+  @override
+  String get type => 'PawnFinished';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.pawnFinished;
+}
+
+final class GameCompleted extends LocalGameEvent {
+  const GameCompleted({
+    required String playerId,
+    super.stateVersion,
+    super.sequence,
+  }) : super(playerId: playerId);
+
+  @override
+  String get type => 'GameCompleted';
+  @override
+  LocalGameEventKind get kind => LocalGameEventKind.gameCompleted;
 }
 
 class LocalGameTransition {
@@ -240,8 +376,8 @@ class PathBasedLocalGameEngine {
         version: state.version + 1,
       ));
       return LocalGameTransition(next, <LocalGameEvent>[
-        LocalGameEvent('DiceRolled', playerId: playerId, value: value),
-        LocalGameEvent('TurnEnded', playerId: playerId),
+        DiceRolled(playerId: playerId, value: value),
+        TurnEnded(playerId: playerId),
       ]);
     }
 
@@ -256,9 +392,9 @@ class PathBasedLocalGameEngine {
         return LocalGameTransition(
           rolled.copyWith(clearPendingRoll: true, version: state.version + 1),
           <LocalGameEvent>[
-            LocalGameEvent('DiceRolled', playerId: playerId, value: value),
-            LocalGameEvent('NoLegalMove', playerId: playerId),
-            LocalGameEvent('ExtraRollGranted', playerId: playerId),
+            DiceRolled(playerId: playerId, value: value),
+            NoLegalMove(playerId: playerId),
+            ExtraRollGranted(playerId: playerId),
           ],
         );
       }
@@ -269,14 +405,14 @@ class PathBasedLocalGameEngine {
           version: state.version + 1,
         )),
         <LocalGameEvent>[
-          LocalGameEvent('DiceRolled', playerId: playerId, value: value),
-          LocalGameEvent('NoLegalMove', playerId: playerId),
-          LocalGameEvent('TurnEnded', playerId: playerId),
+          DiceRolled(playerId: playerId, value: value),
+          NoLegalMove(playerId: playerId),
+          TurnEnded(playerId: playerId),
         ],
       );
     }
     return LocalGameTransition(rolled, <LocalGameEvent>[
-      LocalGameEvent('DiceRolled', playerId: playerId, value: value),
+      DiceRolled(playerId: playerId, value: value),
     ]);
   }
 
@@ -363,20 +499,16 @@ class PathBasedLocalGameEngine {
     }
 
     final events = <LocalGameEvent>[
-      LocalGameEvent('PawnMoved', playerId: playerId, pawnId: pawnId, value: rollValue),
+      PawnMoved(playerId: playerId, pawnId: pawnId, value: rollValue),
     ];
     for (final capturedPawnId in capturedPawnIds) {
       events.add(
-        LocalGameEvent(
-          'PawnCaptured',
-          playerId: playerId,
-          pawnId: capturedPawnId,
-        ),
+        PawnCaptured(playerId: playerId, capturedPawnId: capturedPawnId),
       );
     }
     final captured = capturedPawnIds.isNotEmpty;
     if (result.resolution!.finishes) {
-      events.add(LocalGameEvent('PawnFinished', playerId: playerId, pawnId: pawnId));
+      events.add(PawnFinished(playerId: playerId, pawnId: pawnId));
     }
 
     final allFinished = pawns
@@ -393,7 +525,7 @@ class PathBasedLocalGameEngine {
         winnerPlayerId: playerId,
         version: next.version,
       );
-      events.add(LocalGameEvent('GameCompleted', playerId: playerId));
+      events.add(GameCompleted(playerId: playerId));
       return LocalGameTransition(next, events);
     }
 
@@ -405,10 +537,10 @@ class PathBasedLocalGameEngine {
         consecutiveSixes: rollValue == 6 ? state.consecutiveSixes : 0,
         version: next.version,
       );
-      events.add(LocalGameEvent('ExtraRollGranted', playerId: playerId));
+      events.add(ExtraRollGranted(playerId: playerId));
     } else {
       next = _advance(next.copyWith(consecutiveSixes: 0));
-      events.add(LocalGameEvent('TurnEnded', playerId: playerId));
+      events.add(TurnEnded(playerId: playerId));
     }
     return LocalGameTransition(next, events);
   }
