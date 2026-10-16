@@ -11,7 +11,7 @@ void main() {
     expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
     expect(find.text('Love Mode'), findsOneWidget);
     expect(find.text('Explore the Board'), findsOneWidget);
-    expect(find.text('Open Local Game Lab'), findsOneWidget);
+    expect(find.text('Play Local Match (Prototype)'), findsOneWidget);
   });
 
   testWidgets('opens the board preview', (tester) async {
@@ -43,17 +43,17 @@ void main() {
     expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsNothing);
   });
 
-  testWidgets('opens the local game lab and clearly labels its limitation',
+  testWidgets('opens the local match preview and clearly labels its limitation',
       (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
 
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Local Game Lab'), findsOneWidget);
-    expect(find.text('Current turn: ORANGE'), findsOneWidget);
+    expect(find.text('Local Match Preview'), findsOneWidget);
+    expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('Roll Dice'), findsOneWidget);
-    expect(find.textContaining('DEVELOPMENT ONLY'), findsOneWidget);
-    expect(find.textContaining('board route is provisional'), findsOneWidget);
+    expect(find.textContaining('PROTOTYPE ONLY'), findsOneWidget);
+    expect(find.textContaining('board route and safe cells are provisional'), findsOneWidget);
   });
 }
