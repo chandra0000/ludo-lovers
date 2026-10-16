@@ -2,7 +2,7 @@
 
 **Project:** Ludo Lovers  
 **Roadmap step:** 06 — Ludo Game Rules  
-**Status:** Rules specification; not yet implemented or tested in executable code.  
+**Status:** Rules specification with a provisional `LudoRuleProfile` implementation and profile unit tests. Full rules acceptance coverage and board-topology validation remain incomplete.  
 **Purpose:** Agree on deterministic game rules before building the local game engine in Step 07.
 
 ## 1. Rule-profile decision
@@ -111,7 +111,7 @@ If multiple bonus conditions happen on the same move, they do not stack into mul
 
 ## 8. Configurable rule profile
 
-Implement a plain immutable configuration object (for example, `LudoRuleProfile`) consumed by the pure game engine. Do not read these settings directly from widgets.
+Implemented foundation: `apps/mobile/lib/features/game/domain/engine/ludo_rule_profile.dart` defines immutable `LudoRuleProfile`, consumed by `PathBasedLocalGameEngine`. It defensively copies and freezes safe-cell indexes and validates profile identity/version, safe-cell indexes, and the consecutive-six limit. Do not read these settings directly from widgets. The profile defaults are provisional, not product-approved.
 
 Initial fields:
 - `playerCount`: 2, 3, or 4.
@@ -233,6 +233,6 @@ These decisions must be settled before coding the engine so tests describe one u
 
 ## 15. Scope and next step
 
-This step defines the rules and tests; it does not implement the engine or UI. After the product owner confirms the decisions above, proceed to **Step 07 — Local Game Engine**, implement the pure-Dart state machine, and make the acceptance tests executable before building the visual board.
+This document remains the rules specification. A provisional profile and part of the local engine are implemented, but the full acceptance matrix is not yet executable and board topology is not approved. Next, expand classic 52-cell route tests and convert compatibility string events to typed event payloads before connecting the visual board.
 
 **Brand consistency:** The board renderer and HUD must use the approved Ludo Lovers palette exactly: orange `#FF8928`, green `#33FF28`, blue `#289EFF`, magenta `#F428FF`, gold `#FFD700`, red `#FF3830`, black `#080B0B`, and cream `#FFF8E1`. The existing official logo remains unchanged.
