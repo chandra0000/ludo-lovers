@@ -30,8 +30,11 @@ class ClassicLudoBoardGeometryAudit {
       final next = track[(index + 1) % track.length];
       final dx = (current.column - next.column).abs();
       final dy = (current.row - next.row).abs();
-      if (dx > 1 || dy > 1 || dx + dy == 0) {
-        issues.add('Track transition $index to ${(index + 1) % track.length} is disconnected.');
+      if (dx + dy != 1) {
+        issues.add(
+          'Track transition $index to ${(index + 1) % track.length} '
+          'is not orthogonally adjacent.',
+        );
       }
     }
     final laneCells = <BoardGridCell>{};

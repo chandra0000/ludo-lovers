@@ -21,15 +21,24 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('keeps consecutive route cells adjacent including wraparound', () {
+    test('only known provisional blockers are non-orthogonal transitions', () {
       const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      final knownBlockers =
+          ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes;
       for (var index = 0; index < route.length; index++) {
         final current = route[index];
         final next = route[(index + 1) % route.length];
         final dx = (current.column - next.column).abs();
         final dy = (current.row - next.row).abs();
-        expect(dx <= 1 && dy <= 1 && dx + dy > 0, isTrue,
-          reason: 'Consecutive route cells must touch');
+        if (knownBlockers.contains(index)) {
+          expect(dx + dy, 2, reason: 'Known provisional blocker $index');
+        } else {
+          expect(
+            dx + dy,
+            1,
+            reason: 'Transition $index must be orthogonally adjacent',
+          );
+        }
       }
     });
 
