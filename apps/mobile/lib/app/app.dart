@@ -85,7 +85,7 @@ class AppFoundationScreen extends StatelessWidget {
                               Text(
                                 'PLAY • CONNECT • LOVE',
                                 style: TextStyle(
-                                  color: AppTheme.cream,
+                                  color: AppTheme.readableText,
                                   fontSize: 10,
                                   letterSpacing: 1.5,
                                   fontWeight: FontWeight.w700,
@@ -98,7 +98,7 @@ class AppFoundationScreen extends StatelessWidget {
                           tooltip: 'Profile preview',
                           onPressed: () => _showComingSoon(context, 'Profile'),
                           icon: const Icon(Icons.account_circle_outlined),
-                          color: AppTheme.cream,
+                          color: AppTheme.readableText,
                         ),
                       ],
                     ),
@@ -144,7 +144,7 @@ class AppFoundationScreen extends StatelessWidget {
                           Text(
                             'Your next favourite\ngame night starts here.',
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  color: AppTheme.cream,
+                                  color: AppTheme.readableText,
                                   height: 1.12,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -316,7 +316,7 @@ class _FeatureCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: AppTheme.cream,
+              color: AppTheme.readableText,
               fontWeight: FontWeight.w800,
               fontSize: 13,
             ),
@@ -357,7 +357,7 @@ class _FoundationNotice extends StatelessWidget {
             child: Text(
               'Board preview only: playable turns, accounts and real-time multiplayer are not connected yet. The board route remains provisional.',
               style: TextStyle(
-                color: AppTheme.cream,
+                color: AppTheme.readableText,
                 height: 1.45,
                 fontSize: 12,
               ),
