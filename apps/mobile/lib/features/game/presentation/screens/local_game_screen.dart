@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_theme.dart';
+import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/board_pawn_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';

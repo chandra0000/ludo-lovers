@@ -183,7 +183,7 @@ class AppFoundationScreen extends StatelessWidget {
                                 ),
                               ),
                               icon: const Icon(Icons.casino_rounded),
-                              label: const Text('Play Local Match (Prototype)'),
+                              label: const Text('Open Local Game Lab'),
                             ),
                           ),
                         ],
@@ -355,7 +355,7 @@ class _FoundationNotice extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'A local match prototype is available for testing turns and pawn moves. The board route and safe-cell mapping remain provisional; accounts and multiplayer are not connected yet.',
+              'Board preview only: playable turns, accounts and real-time multiplayer are not connected yet. The board route remains provisional.',
               style: TextStyle(
                 color: AppTheme.readableText,
                 height: 1.45,
