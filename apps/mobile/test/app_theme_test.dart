@@ -11,6 +11,14 @@ void main() {
       expect(AppTheme.magenta, const Color(0xFFF428FF));
     });
 
+    test('preserves the approved supporting design tokens', () {
+      expect(AppTheme.gold, const Color(0xFFFFD700));
+      expect(AppTheme.red, const Color(0xFFFF3830));
+      expect(AppTheme.black, const Color(0xFF080B0B));
+      expect(AppTheme.cream, const Color(0xFFFFF8E1));
+      expect(AppTheme.readableText, AppTheme.cream);
+    });
+
     test('keeps the app theme dark and readable', () {
       final theme = AppTheme.light;
       expect(theme.brightness, Brightness.dark);
