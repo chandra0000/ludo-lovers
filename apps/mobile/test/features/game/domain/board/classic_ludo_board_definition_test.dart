@@ -16,10 +16,10 @@ void main() {
         BoardQuadrant.bottomRight,
       ]);
       expect(seats.map((seat) => seat.color).toList(), <Color>[
-        const Color(0xFFF15206),
-        const Color(0xFF2DF732),
-        const Color(0xFF35930F),
-        const Color(0xFFF42227),
+        const Color(0xFFFF8928),
+        const Color(0xFF33FF28),
+        const Color(0xFF289EFF),
+        const Color(0xFFF428FF),
       ]);
     });
 

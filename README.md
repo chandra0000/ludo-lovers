@@ -2,7 +2,7 @@
 
 **Ludo Lovers** is an Android-first social Ludo game concept combining classic board-game fun with friends, family, personalization, and a romance-inspired **Love Mode**.
 
-> **Project status (2026-10-16):** Flutter foundation and local rules-engine work are in place. The latest palette-update CI run exposed one outdated board-color assertion; that test has now been aligned with the locked palette and a fresh CI result is pending. The 52-cell board route is still **provisional**; the app is **not yet a complete playable match or release**. The next blocker is validating the route and safe-cell mapping against an approved, straight-on board reference before connecting gameplay to the board.
+> **Project status (2026-10-16):** Flutter foundation and local rules-engine work are in place. The latest confirmed green main-branch pipeline is #141; this commit aligns the app theme, board palette, regression tests, and documentation with the exact approved palette, and its CI result will be checked before further changes. The 52-cell board route is still **provisional**; the app is **not yet a complete playable match or release**. The next blocker is validating the route and safe-cell mapping against an approved, straight-on board reference before connecting gameplay to the board.
 
 ## Vision
 
@@ -33,15 +33,15 @@ These are product goals, not claims that the features are already implemented.
 
 | Color | Hex |
 | --- | --- |
-| Orange | `#F15206` |
-| Green | `#2DF732` |
-| Blue | `#35930F` |
-| Magenta | `#F42227` |
+| Orange | `#FF8928` |
+| Green | `#33FF28` |
+| Blue | `#289EFF` |
+| Magenta | `#F428FF` |
 
-| Gold | `#FF7300` |
-| Red | `#377530` |
-| Black background | `#000600` |
-| Cream accent | `#F75821` |
+| Gold | `#FFD700` |
+| Red | `#FF3830` |
+| Black background | `#080B0B` |
+| Cream accent | `#FFF8E1` |
 
 The existing Ludo Lovers logo is the fixed brand asset and should not be redesigned or recolored unless explicitly requested.
 

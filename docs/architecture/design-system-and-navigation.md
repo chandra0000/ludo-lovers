@@ -18,14 +18,14 @@ Use these exact hex values for the brand palette. Do not substitute approximate 
 
 | Token | Hex | Intended use |
 |---|---|---|
-| brandOrange | #F15206 | Primary buttons, highlights, orange player identity |
-| playerGreen | #2DF732 | Green player identity and accents |
-| playerBlue | #35930F | Blue player identity and accents |
-| brandMagenta | #F42227 | Magenta player identity and Love Mode accents |
-| brandGold | #FF7300 | Premium borders, royal details, highlights |
-| brandRed | #377530 | Red player identity and selected warnings |
-| brandBlack | #000600 | Main dark background/surfaces |
-| brandCream | #F75821 | Light text and dice surfaces where contrast permits |
+| brandOrange | #FF8928 | Primary buttons, highlights, orange player identity |
+| playerGreen | #33FF28 | Green player identity and accents |
+| playerBlue | #289EFF | Blue player identity and accents |
+| brandMagenta | #F428FF | Magenta player identity and Love Mode accents |
+| brandGold | #FFD700 | Premium borders, royal details, highlights |
+| brandRed | #FF3830 | Red player identity and selected warnings |
+| brandBlack | #080B0B | Main dark background/surfaces |
+| brandCream | #FFF8E1 | Light text and dice surfaces where contrast permits |
 
 The eight values above are transcribed from the uploaded reference image and are the approved palette. Use darker/lighter shades only as secondary UI treatments when required for contrast or state distinction; never replace the base palette colors. Keep long text in readable cream/neutral text rather than vivid green or magenta. Validate text/background contrast and never communicate state by color alone.
 
@@ -49,7 +49,7 @@ The hex codes above are the exact values supplied by the product owner, even whe
 
 ## 5. Component rules
 ### Primary button
-- Gold/orange visual treatment inspired by the reference; use the locked palette tokens `brandOrange` (#F15206) and `brandGold` (#FF7300); do not substitute other hex values.
+- Gold/orange visual treatment inspired by the reference; use the locked palette tokens `brandOrange` (#FF8928) and `brandGold` (#FFD700); do not substitute other hex values.
 - Use dark readable text only when contrast passes; otherwise use a tested light text treatment.
 - Clear pressed, disabled, loading, and focus states.
 - Only one dominant primary action per screen where practical.
@@ -58,7 +58,7 @@ The hex codes above are the exact values supplied by the product owner, even whe
 - Dark raised surface with a clear border; do not compete with the primary action.
 
 ### Cards
-- Use `brandBlack` (#000600) or a restrained dark treatment, readable `brandCream` (#F75821) only where contrast permits, and restrained borders.
+- Use `brandBlack` (#080B0B) or a restrained dark treatment, readable `brandCream` (#FFF8E1) only where contrast permits, and restrained borders.
 - Interactive cards need pressed feedback and a visible selected state.
 
 ### Status chips

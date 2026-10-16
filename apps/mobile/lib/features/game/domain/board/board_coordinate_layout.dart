@@ -113,14 +113,14 @@ class BoardCoordinateLayout {
 class LudoBoardPalette {
   const LudoBoardPalette._();
 
-  static const Color orange = Color(0xFFF15206);
-  static const Color green = Color(0xFF2DF732);
-  static const Color blue = Color(0xFF35930F);
-  static const Color magenta = Color(0xFFF42227);
-  static const Color gold = Color(0xFFFF7300);
-  static const Color red = Color(0xFF377530);
-  static const Color black = Color(0xFF000600);
-  static const Color cream = Color(0xFFF75821);
+  static const Color orange = Color(0xFFFF8928);
+  static const Color green = Color(0xFF33FF28);
+  static const Color blue = Color(0xFF289EFF);
+  static const Color magenta = Color(0xFFF428FF);
+  static const Color gold = Color(0xFFFFD700);
+  static const Color red = Color(0xFFFF3830);
+  static const Color black = Color(0xFF080B0B);
+  static const Color cream = Color(0xFFFFF8E1);
 
   static const List<Color> playerColors = <Color>[
     orange,
