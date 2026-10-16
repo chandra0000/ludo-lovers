@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_theme.dart';
+
 import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
@@ -113,7 +115,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                     aspectRatio: 1,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF17191B),
+                        color: AppTheme.panel,
                         borderRadius: BorderRadius.circular(18),
                         boxShadow: const <BoxShadow>[
                           BoxShadow(
@@ -165,10 +167,10 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                 spacing: 12,
                 runSpacing: 8,
                 children: <Widget>[
-                  _LegendDot(color: Color(0xFFFF8928), label: 'Orange'),
-                  _LegendDot(color: Color(0xFF33FF28), label: 'Green'),
-                  _LegendDot(color: Color(0xFF289EFF), label: 'Blue'),
-                  _LegendDot(color: Color(0xFFF428FF), label: 'Magenta'),
+                  _LegendDot(color: LudoBoardPalette.orange, label: 'Orange'),
+                  _LegendDot(color: LudoBoardPalette.green, label: 'Green'),
+                  _LegendDot(color: LudoBoardPalette.blue, label: 'Blue'),
+                  _LegendDot(color: LudoBoardPalette.magenta, label: 'Magenta'),
                 ],
               ),
             ],
