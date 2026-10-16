@@ -2,7 +2,7 @@
 
 **Ludo Lovers** is an Android-first social Ludo game concept combining classic board-game fun with friends, family, personalization, and a romance-inspired **Love Mode**.
 
-> **Project status (2026-10-16):** Flutter foundation and local rules-engine work are in place, and the latest CI run is green. The 52-cell board route is still **provisional**; the app is **not yet a complete playable match or release**. The next blocker is validating the route and safe-cell mapping against an approved, straight-on board reference before connecting gameplay to the board.
+> **Project status (2026-10-16):** Flutter foundation and local rules-engine work are in place. The latest palette-update CI run exposed one outdated board-color assertion; that test has now been aligned with the locked palette and a fresh CI result is pending. The 52-cell board route is still **provisional**; the app is **not yet a complete playable match or release**. The next blocker is validating the route and safe-cell mapping against an approved, straight-on board reference before connecting gameplay to the board.
 
 ## Vision
 
