@@ -18,16 +18,19 @@ Use these exact hex values for the brand palette. Do not substitute approximate 
 
 | Token | Hex | Intended use |
 |---|---|---|
-| brandOrange | #FF8928 | Primary buttons, highlights, orange player identity |
-| playerGreen | #33FF28 | Green player identity and accents |
-| playerBlue | #289EFF | Blue player identity and accents |
-| brandMagenta | #F428FF | Magenta player identity and Love Mode accents |
-| brandGold | #FFD700 | Premium borders, royal details, highlights |
-| brandRed | #FF3830 | Red player identity and selected warnings |
-| brandBlack | #080B0B | Main dark background/surfaces |
-| brandCream | #FFF8E1 | Light text and dice surfaces where contrast permits |
+| brandOrange | #F15206 | Primary buttons, highlights, orange player identity |
+| playerGreen | #2DF732 | Green player identity and accents |
+| playerBlue | #35930F | Blue player identity and accents |
+| brandMagenta | #F42227 | Magenta player identity and Love Mode accents |
+| brandGold | #FF7300 | Premium borders, royal details, highlights |
+| brandRed | #377530 | Red player identity and selected warnings |
+| brandBlack | #000600 | Main dark background/surfaces |
+| brandCream | #F75821 | Light text and dice surfaces where contrast permits |
 
 The eight values above are transcribed from the uploaded reference image and are the approved palette. Use darker/lighter shades only as secondary UI treatments when required for contrast or state distinction; never replace the base palette colors. Keep long text in readable cream/neutral text rather than vivid green or magenta. Validate text/background contrast and never communicate state by color alone.
+
+### Colour-token note
+The hex codes above are the exact values supplied by the product owner, even where a value looks unusual for its semantic label (for example, the supplied Blue value is green-toned and Cream is orange-toned). Do not silently reinterpret or substitute them; if visual confirmation suggests a transcription error, ask before changing any value.
 
 ## 3. Typography
 - Follow the reference's premium display-heading feel for branding, while using a readable Android-safe sans-serif for most interface text.
