@@ -9,7 +9,7 @@
 - Preserve the palette below exactly. Use dark/near-black surfaces, gold borders/highlights, warm cream text, and restrained glow effects to match the reference.
 - Preserve the visual direction: premium royal gaming, luminous gold trim, dark backgrounds, saturated player colors, rounded panels, clear hierarchy, and romantic details in Love Mode. Avoid turning the interface into a generic Material app or childish cartoon style.
 - Keep the board recognizable as Ludo with four home quadrants, shared track, player home lanes, center finish, and clear token positions.
-- The screenshot is a reference for appearance, not a coordinate specification. Do not guess final logical-cell-to-pixel mappings from the screenshot. Implement and test a normalized 15×15 board layout against an explicitly reviewed coordinate map before wiring gameplay movement to rendering.
+- The screenshot is a reference for appearance, not a coordinate specification. Do not guess final logical-cell-to-pixel mappings from the screenshot. The current local-match prototype may render the provisional route for development testing only; do not approve it for release or competitive play until a normalized 15×15 board layout has been checked against an explicitly reviewed coordinate map.
 - Treat all screen mockups as target designs. Do not claim a screen is finished until it exists in the app and has been validated.
 
 ## Brand palette
@@ -76,4 +76,4 @@ The reference also includes shared UI elements: primary and secondary buttons, L
 
 ## Implementation status guardrail
 
-Current repository work includes a board preview, a pure coordinate-layout model, a classic-board fixture, and a geometry completeness contract. The final coordinate map, fully interactive board, complete screen implementation, and device-level visual validation remain outstanding. The uploaded reference image is in the conversation; it has not yet been committed as a binary asset in the repository.
+Current repository work includes a board preview, a pure coordinate-layout model, a classic-board fixture, geometry checks, and a development-only local-match screen connected to the rules engine. The route still reports four diagonal transitions at indexes 4, 17, 30, and 43, so the gameplay-readiness gate correctly remains false. Final route/safe-cell approval, complete gameplay acceptance coverage, and device-level visual validation remain outstanding. The uploaded reference image is in the conversation; it has not yet been committed as a binary asset in the repository.
