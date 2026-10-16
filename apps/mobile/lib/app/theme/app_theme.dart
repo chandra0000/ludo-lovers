@@ -18,8 +18,7 @@ class AppTheme {
   static const Color mutedText = Color(0xFFB9A99F);
 
   static ThemeData get light {
-    const scheme = ColorScheme(
-      brightness: Brightness.dark,
+    const scheme = ColorScheme.dark(
       primary: orange,
       onPrimary: black,
       secondary: magenta,
@@ -28,7 +27,6 @@ class AppTheme {
       onError: cream,
       surface: panel,
       onSurface: cream,
-      surfaceContainerHighest: panelRaised,
     );
 
     return ThemeData(
