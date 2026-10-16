@@ -2,7 +2,7 @@
 
 **Ludo Lovers** is an Android-first social Ludo game concept combining classic board-game fun with friends, family, personalization, and a romance-inspired **Love Mode**.
 
-> **Project status:** Foundation is now in place with a documented rules profile, canonical board route fixture, route validation tests, and a clearer implementation roadmap. The app is not yet a complete released game, but the project has moved beyond raw planning into active engine and board validation.
+> **Project status (2026-10-16):** Flutter foundation and local rules-engine work are in place, and the latest CI run is green. The 52-cell board route is still **provisional**; the app is **not yet a complete playable match or release**. The next blocker is validating the route and safe-cell mapping against an approved, straight-on board reference before connecting gameplay to the board.
 
 ## Vision
 
@@ -80,10 +80,11 @@ Tasks are tracked by step number so progress is easy to follow:
 
 This repository now contains a foundation layer that is intentionally engineering-driven:
 
-- A canonical four-player Ludo route fixture with a 52-cell shared track and six-cell home lane exists for each player in `apps/mobile/lib/features/game/domain/board/classic_ludo_board_fixture.dart`.
-- Engine tests cover the standard board route invariants in `apps/mobile/test/features/game/domain/board/classic_ludo_board_fixture_test.dart`.
-- The path-based local engine remains the active rules contract, while old overlapping implementations should be migrated before broader feature work.
-- Rendering and board art remain separate from the rules engine; the geometry is now explicit and testable before UI integration.
+- The path-based local engine is the canonical rules engine; the old overlapping engine has been removed.
+- Typed domain events, an immutable rules profile, centralized seat metadata, and engine/controller tests are in place.
+- A provisional 52-cell track and six-cell home lanes are represented in board fixtures and geometry tests. The route includes four diagonal transitions and has **not** been approved for gameplay.
+- The Board Preview and Local Game Lab are development tools only. They are not a complete board-backed match.
+- Recent route-acceptance tests cover each seat's track wrap, home-lane entry, exact finish, and overshoot behavior. These tests verify movement-model boundaries, not whether the physical route matches the intended board art.
 
 ## Initial alpha target
 
@@ -129,9 +130,11 @@ Directories will be added as implementation begins.
 
 ## Current next step
 
-**Step 07/08 foundation consolidation:** canonical board paths and route validation are now implemented as explicit fixtures, and the remaining work is to complete the full path-based engine consolidation, safe-cell validation against final board art, and UI integration on top of a stable rules contract.
+**Next action — approve the board topology.** Supply a clear, straight-on image of the intended Ludo board (not a composite brand sheet). Use it to verify the 52 track cells in movement order, each seat's start cell and direction, home-lane transitions, and safe cells. Until that review and the corresponding tests pass, keep `ClassicLudoBoardCoordinateFactory.isGameplayReady == false` and keep the Local Game Lab warning visible. After approval, connect engine state to board coordinates and add widget tests for roll → legal pawn highlights → move → capture/bonus/turn → win/rematch.
 
-## Engineering decision records
+## Current engineering decision records
+
+- [Local game integration gate](docs/architecture/step-10-local-game-integration-gate.md) — route-approval prerequisites, engine-to-board integration order, Alpha 0.1 acceptance criteria, and device-validation limits.
 
 - [Canonical game engine consolidation](docs/architecture/step-07-canonical-engine-consolidation-decision.md) — source of truth for engine migration, rules/profile requirements, immutable state, and the final rules boundary.
 - [Step 07 validation plan](docs/architecture/step-07-edge-case-review-and-validation-plan.md) — known edge cases and engine exit criteria.
