@@ -10,7 +10,7 @@ void main() {
     expect(find.text('PLAY • CONNECT • LOVE'), findsOneWidget);
     expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
     expect(find.text('Love Mode'), findsOneWidget);
-    expect(find.text('Preview Ludo Board'), findsOneWidget);
+    expect(find.text('Explore the Board'), findsOneWidget);
     expect(find.text('Open Local Game Lab'), findsOneWidget);
   });
 
