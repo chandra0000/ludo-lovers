@@ -18,7 +18,7 @@ void main() {
     test('each seat route has 52 unique cells and a six-cell home lane', () {
       final paths = ClassicLudoBoardFixture.create();
 
-      expect(paths.players, hasLength(4));
+      expect(paths.pathsByPlayer, hasLength(4));
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final path = paths.forPlayer(seat.id);
         expect(path.mainTrackCells, hasLength(52), reason: seat.id);
