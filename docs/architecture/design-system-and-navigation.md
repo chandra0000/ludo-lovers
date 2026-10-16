@@ -49,7 +49,7 @@ The hex codes above are the exact values supplied by the product owner, even whe
 
 ## 5. Component rules
 ### Primary button
-- Gold/orange visual treatment inspired by the reference; use approved #FF8928 and #FFD700 as the core colors.
+- Gold/orange visual treatment inspired by the reference; use the locked palette tokens `brandOrange` (#F15206) and `brandGold` (#FF7300); do not substitute other hex values.
 - Use dark readable text only when contrast passes; otherwise use a tested light text treatment.
 - Clear pressed, disabled, loading, and focus states.
 - Only one dominant primary action per screen where practical.
@@ -58,7 +58,7 @@ The hex codes above are the exact values supplied by the product owner, even whe
 - Dark raised surface with a clear border; do not compete with the primary action.
 
 ### Cards
-- Use #080B0B or a closely related dark treatment, readable cream text, and restrained borders.
+- Use `brandBlack` (#000600) or a restrained dark treatment, readable `brandCream` (#F75821) only where contrast permits, and restrained borders.
 - Interactive cards need pressed feedback and a visible selected state.
 
 ### Status chips
