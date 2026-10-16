@@ -8,12 +8,14 @@ class BoardPawnMarker {
     required this.pawnId,
     required this.cellId,
     required this.color,
+    this.pointOverride,
     this.selected = false,
   });
 
   final String pawnId;
   final int cellId;
   final Color color;
+  final BoardPoint? pointOverride;
   final bool selected;
 }
 
@@ -36,7 +38,12 @@ class ClassicLudoPawnLayer extends CustomPainter {
       throw ArgumentError('Pawn IDs must be non-empty and unique.');
     }
     for (final pawn in this.pawns) {
-      layout.forCell(pawn.cellId);
+      final point = pawn.pointOverride;
+      if (point == null) {
+        layout.forCell(pawn.cellId);
+      } else if (!point.isValid) {
+        throw ArgumentError('Pawn ${pawn.pawnId} has an invalid visual point.');
+      }
     }
   }
 
@@ -56,17 +63,24 @@ class ClassicLudoPawnLayer extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
     final cellSize = size.shortestSide / gridSize;
-    final grouped = <int, List<BoardPawnMarker>>{};
+    final grouped = <String, List<BoardPawnMarker>>{};
     for (final pawn in pawns) {
-      grouped.putIfAbsent(pawn.cellId, () => <BoardPawnMarker>[]).add(pawn);
+      final point = pawn.pointOverride;
+      final key = point == null
+          ? 'cell:${pawn.cellId}'
+          : 'point:${point.x.toStringAsFixed(5)},${point.y.toStringAsFixed(5)}';
+      grouped.putIfAbsent(key, () => <BoardPawnMarker>[]).add(pawn);
     }
 
     for (final entry in grouped.entries) {
-      final point = layout.pixelForCell(
-        cellId: entry.key,
-        width: size.width,
-        height: size.height,
-      );
+      final first = entry.value.first;
+      final normalized = first.pointOverride;
+      final point = normalized?.toPixels(width: size.width, height: size.height) ??
+          layout.pixelForCell(
+            cellId: first.cellId,
+            width: size.width,
+            height: size.height,
+          );
       final occupants = entry.value;
       for (var index = 0; index < occupants.length; index++) {
         final pawn = occupants[index];
@@ -142,7 +156,9 @@ class ClassicLudoPawnLayer extends CustomPainter {
       if (left.pawnId != right.pawnId ||
           left.cellId != right.cellId ||
           left.color != right.color ||
-          left.selected != right.selected) {
+          left.selected != right.selected ||
+          left.pointOverride?.x != right.pointOverride?.x ||
+          left.pointOverride?.y != right.pointOverride?.y) {
         return false;
       }
     }
