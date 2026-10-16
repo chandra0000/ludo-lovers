@@ -130,7 +130,7 @@ Directories will be added as implementation begins.
 
 ## Current next step
 
-**Next action — approve the board topology.** Supply a clear, straight-on image of the intended Ludo board (not a composite brand sheet). Use it to verify the 52 track cells in movement order, each seat's start cell and direction, home-lane transitions, and safe cells. Until that review and the corresponding tests pass, keep `ClassicLudoBoardCoordinateFactory.isGameplayReady == false` and keep the Local Game Lab warning visible. After approval, connect engine state to board coordinates and add widget tests for roll → legal pawn highlights → move → capture/bonus/turn → win/rematch.
+**Board reference reviewed — topology still needs a clearer source.** The supplied composite visual-design sheet is now accepted for visual direction: keep the fixed Ludo Lovers logo, dark premium presentation with gold accents, and Orange/Green/Blue/Magenta seats in the shown quadrants. However, its small embedded board image does not reliably identify all 52 physical track cells, exact start cells, home-lane transitions, or safe-cell IDs. The current route has four non-orthogonal transitions, so do not enable gameplay from this thumbnail alone. Please supply a clean, straight-on crop of only the board with cells and safe markers legible, or confirm the exact standard layout and rules variant separately. Until then, keep `ClassicLudoBoardCoordinateFactory.isGameplayReady == false` and the Local Game Lab warning visible. After topology approval, connect engine state to board coordinates and add widget tests for roll → legal pawn highlights → move → capture/bonus/turn → win/rematch.
 
 ## Current engineering decision records
 
