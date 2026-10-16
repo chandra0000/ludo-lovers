@@ -8,6 +8,7 @@ library;
 import '../board/classic_ludo_board_fixture.dart';
 import '../board/ludo_board_paths.dart';
 import 'ludo_path_movement.dart';
+import 'ludo_rule_profile.dart';
 import 'path_based_local_game_engine.dart';
 
 class LocalGameSetup {
@@ -46,7 +47,7 @@ class LocalGameFactory {
     final paths = ClassicLudoBoardFixture.create();
     final engine = PathBasedLocalGameEngine(
       paths: paths,
-      safeCellIndexes: safeCellIndexes,
+      profile: LudoRuleProfile(safeCellIndexes: safeCellIndexes),
     );
     final pawns = <LocalPawn>[
       for (final playerId in playerIds)
