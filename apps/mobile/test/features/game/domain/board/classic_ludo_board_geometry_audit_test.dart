@@ -22,7 +22,7 @@ void main() {
     });
 
     test('every provisional player start is included in the safe-cell set', () {
-      final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+      const safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
       expect(safeCells, hasLength(8));
       for (final seat in ClassicLudoBoardDefinition.seats) {
         expect(
