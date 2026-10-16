@@ -35,6 +35,12 @@ void main() {
     ));
     await tester.pump();
     expect(find.text('Sample pawn selected on cell 0.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('clear_pawn_selection_button')));
+    await tester.pump();
+    expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
+    expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsNothing);
   });
 
   testWidgets('opens the local game lab and clearly labels its limitation',
