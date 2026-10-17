@@ -582,4 +582,64 @@ void main() {
     );
   });
 
+
+  test('replays the same command sequence deterministically', () {
+    LocalGameTransition playSequence() {
+      final rolled = engine.roll(
+        initial,
+        playerId: 'orange',
+        expectedVersion: initial.version,
+        value: 6,
+      );
+      return engine.move(
+        rolled.state,
+        playerId: 'orange',
+        expectedVersion: rolled.state.version,
+        pawnId: 'o1',
+      );
+    }
+
+    final first = playSequence();
+    final replay = playSequence();
+
+    expect(replay.state.version, first.state.version);
+    expect(replay.state.currentPlayerId, first.state.currentPlayerId);
+    expect(replay.state.pendingRoll, first.state.pendingRoll);
+    expect(replay.state.consecutiveSixes, first.state.consecutiveSixes);
+    expect(replay.state.completed, first.state.completed);
+    expect(replay.state.winnerPlayerId, first.state.winnerPlayerId);
+    expect(
+      replay.state.pawns.map((pawn) => (
+        pawn.id,
+        pawn.playerId,
+        pawn.position.section,
+        pawn.position.progress,
+      )).toList(),
+      first.state.pawns.map((pawn) => (
+        pawn.id,
+        pawn.playerId,
+        pawn.position.section,
+        pawn.position.progress,
+      )).toList(),
+    );
+    expect(
+      replay.events.map((event) => (
+        event.type,
+        event.playerId,
+        event.pawnId,
+        event.value,
+        event.stateVersion,
+        event.sequence,
+      )).toList(),
+      first.events.map((event) => (
+        event.type,
+        event.playerId,
+        event.pawnId,
+        event.value,
+        event.stateVersion,
+        event.sequence,
+      )).toList(),
+    );
+  });
+
 }

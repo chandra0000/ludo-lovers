@@ -122,3 +122,11 @@ A step is complete only when all relevant gates pass:
 - Pipeline #223 failed in one engine test, not in formatting or static analysis: 143 tests passed and `skips a player whose pawns are all finished` failed because its fixture listed a green player without defining a green route.
 - The test fixture now defines a valid green path, matching the three players declared in that test state. This keeps the production invariant check strict rather than weakening it to accommodate an incomplete fixture.
 - Re-run the full CI gate before treating this fix as verified. The board readiness gate remains false until topology is approved.
+
+
+## Deterministic replay acceptance — 2026-10-18
+
+- Added an engine regression test that replays the same accepted roll-and-move command sequence from the same immutable initial state.
+- The test compares resulting turn/version/pawn state and typed event payload/order, making deterministic local replay an explicit quality gate before AI or server-authoritative play is introduced.
+- Pipeline #224 passed on commit `d9afdbe2e35efd3c956104659a2ada59166000f8`. This confirms the existing formatting, analysis, tests, and debug APK workflow on that revision; the new replay test requires its own pipeline run.
+- Next gameplay priority remains visual route acceptance: do not enable production readiness or finalize safe cells until the clear board-cell diagram and route orientation are reconciled.
