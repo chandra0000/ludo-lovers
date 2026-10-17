@@ -194,4 +194,65 @@ void main() {
     );
     expect(find.text('Roll the dice to start your turn.'), findsOneWidget);
   });
+
+  testWidgets('local match advances turn after a legal non-bonus move',
+      (tester) async {
+    final rolls = <int>[6, 3];
+    final controller = LocalGameController(nextDiceValue: () => rolls.removeAt(0));
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(home: LocalGameScreen(controller: controller)),
+    );
+
+    // Six enters a pawn and grants the same player another roll.
+    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pump();
+    expect(controller.legalPawnIds, contains('orange_pawn_1'));
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pump();
+    expect(controller.state.currentPlayerId, 'orange');
+    expect(controller.state.pawns
+        .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+        .position.progress, 0);
+
+    // A non-six move advances the pawn and passes the turn to green.
+    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pump();
+    expect(controller.state.pendingRoll, 3);
+    expect(controller.legalPawnIds, contains('orange_pawn_1'));
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pump();
+
+    expect(
+      controller.state.pawns
+          .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+          .position.progress,
+      3,
+    );
+    expect(controller.state.pendingRoll, isNull);
+    expect(controller.state.currentPlayerId, 'green');
+    expect(find.text('GREEN’S TURN'), findsOneWidget);
+  });
+
+  testWidgets('local match auto-advances when a roll has no legal pawns',
+      (tester) async {
+    final controller = LocalGameController(nextDiceValue: () => 3);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(home: LocalGameScreen(controller: controller)),
+    );
+    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pump();
+
+    expect(controller.state.currentPlayerId, 'green');
+    expect(controller.state.pendingRoll, isNull);
+    expect(controller.legalPawnIds, isEmpty);
+    expect(find.text('GREEN’S TURN'), findsOneWidget);
+  });
+
 }
