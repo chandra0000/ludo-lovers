@@ -86,15 +86,14 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Local Match Preview'), findsOneWidget);
+    expect(find.text('Ludo Lovers · Match'), findsOneWidget);
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('Roll Dice'), findsOneWidget);
     expect(
       find.byTooltip('Roll a die to begin the current player’s turn.'),
       findsOneWidget,
     );
-    expect(find.textContaining('PROTOTYPE ONLY'), findsOneWidget);
-    expect(find.textContaining('board route and safe cells are provisional'), findsOneWidget);
+    expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
   });
 
   testWidgets('local match help explains provisional rules', (tester) async {
