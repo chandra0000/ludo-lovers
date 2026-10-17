@@ -450,7 +450,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
     final point = _pawnLayout.layout.forCell(destinationCell);
     return Positioned(
-      key: ValueKey<String>('destination_cell_$destinationCell'),
+      key: ValueKey<String>('destination_cell_${destinationCell}_${visual.pawnId}'),
       left: point.x * boardSize.width - cellSize * 0.31,
       top: point.y * boardSize.height - cellSize * 0.31,
       width: cellSize * 0.62,
