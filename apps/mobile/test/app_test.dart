@@ -60,6 +60,21 @@ void main() {
     expect(find.textContaining('board route and safe cells are provisional'), findsOneWidget);
   });
 
+  testWidgets('local match help explains provisional rules', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(home: LocalGameScreen(controller: LocalGameController(nextDiceValue: () => 3))),
+    );
+
+    await tester.tap(find.byTooltip('How to play'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('How to play'), findsOneWidget);
+    expect(find.text('Roll the dice'), findsOneWidget);
+    expect(find.text('Choose a glowing pawn'), findsOneWidget);
+    expect(find.text('Prototype warning'), findsOneWidget);
+    expect(find.textContaining('still provisional'), findsOneWidget);
+  });
+
   testWidgets('local match rolls, moves a legal pawn, and updates the board',
       (tester) async {
     final controller = LocalGameController(nextDiceValue: () => 6);
