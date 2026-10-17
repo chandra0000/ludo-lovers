@@ -85,6 +85,8 @@ void main() {
     );
 
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
+    expect(find.text('TURN ORDER'), findsOneWidget);
+    expect(find.text('OUT 0/4'), findsNWidgets(4));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
 
@@ -108,6 +110,8 @@ void main() {
     // A six grants another turn under the current local rule profile.
     expect(controller.state.currentPlayerId, 'orange');
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
+    expect(find.text('OUT 1/4'), findsOneWidget);
+    expect(find.text('OUT 0/4'), findsNWidgets(3));
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       findsNothing,
