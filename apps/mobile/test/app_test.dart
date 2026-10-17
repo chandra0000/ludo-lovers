@@ -49,7 +49,6 @@ void main() {
     expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsNothing);
   });
 
-
   testWidgets('board preview exposes route blockers and provisional safe cells',
       (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
@@ -71,7 +70,11 @@ void main() {
     expect(find.byKey(const ValueKey('safe_cell_coordinate_audit')), findsOneWidget);
     expect(find.textContaining('0 (1,6)'), findsOneWidget);
     expect(
-      find.textContaining('not approved Ludo rules'),
+      find.textContaining('cannot prove this custom board’s exact cell mapping'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('The four diagonal route transitions still block gameplay.'),
       findsOneWidget,
     );
   });
