@@ -72,7 +72,8 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
 
 
   void _showRouteAudit() {
-    final blockers = ClassicLudoBoardGeometryAudit.inspect()
+    final auditIssues = ClassicLudoBoardGeometryAudit.inspect();
+    final blockers = auditIssues
         .where((issue) => issue.contains('not orthogonally adjacent'))
         .toList(growable: false);
     final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
@@ -100,8 +101,8 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               const SizedBox(height: 8),
               Text(
                 ClassicLudoBoardCoordinateFactory.isGameplayReady
-                    ? 'The structural route checks pass. Visual and rules approval is still required.'
-                    : 'Gameplay readiness is disabled because the shared route has ${blockers.length} non-orthogonal transitions.',
+                    ? 'Structural checks pass. Visual and rules approval is still required before release.'
+                    : 'Gameplay is blocked by route-integrity checks. Current audit findings: ${auditIssues.length}.',
               ),
               const SizedBox(height: 12),
               const Text(
@@ -120,6 +121,19 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                       '• ${ClassicLudoBoardCoordinateFactory.describeTransition(index)}',
                     ),
                   ),
+              if (auditIssues.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 8),
+                const Text(
+                  'All structural findings',
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 4),
+                for (final issue in auditIssues)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('• $issue'),
+                  ),
+              ],
               const SizedBox(height: 8),
               const Text(
                 'Provisional safe track IDs',
