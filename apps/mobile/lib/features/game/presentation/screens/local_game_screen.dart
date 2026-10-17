@@ -209,14 +209,21 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Text(
-                                    state.completed
-                                        ? 'MATCH COMPLETE'
-                                        : '${current.toUpperCase()}’S TURN',
-                                    style: TextStyle(
-                                      color: _colors[current] ?? AppTheme.cream,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.8,
+                                  Semantics(
+                                    key: const ValueKey('turn_status_semantics'),
+                                    liveRegion: true,
+                                    label: state.completed
+                                        ? 'Match complete. ${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins.'
+                                        : '${current.toUpperCase()} player turn.',
+                                    child: Text(
+                                      state.completed
+                                          ? 'MATCH COMPLETE'
+                                          : '${current.toUpperCase()}’S TURN',
+                                      style: TextStyle(
+                                        color: _colors[current] ?? AppTheme.cream,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.8,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 3),
