@@ -129,7 +129,7 @@ class ClassicLudoBoardGeometryAudit {
         );
       }
     }
-    final actualSafeCells =
+    const actualSafeCells =
         ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
     if (expectedSafeCells.length != actualSafeCells.length ||
         !expectedSafeCells.containsAll(actualSafeCells) ||
