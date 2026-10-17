@@ -47,12 +47,83 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     super.dispose();
   }
 
+  void _showRules() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.panel,
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                'How to play',
+                style: Theme.of(sheetContext).textTheme.headlineSmall?.copyWith(
+                      color: AppTheme.gold,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Quick guide for this local prototype',
+                style: TextStyle(color: AppTheme.readableText, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              const _RuleRow(
+                number: '1',
+                title: 'Roll the dice',
+                detail: 'Tap Roll Dice when it is your turn. A six is required to bring a pawn out of the yard.',
+              ),
+              const _RuleRow(
+                number: '2',
+                title: 'Choose a glowing pawn',
+                detail: 'After a roll, only pawns marked with a gold ring can be moved.',
+              ),
+              const _RuleRow(
+                number: '3',
+                title: 'Earn another roll',
+                detail: 'In this provisional rules profile, rolling a six grants another roll. Captures and finishing may also grant one.',
+              ),
+              const _RuleRow(
+                number: '4',
+                title: 'Reach home exactly',
+                detail: 'A pawn must reach the final home position with an exact roll; an overshoot is not allowed.',
+              ),
+              const _RuleRow(
+                number: '5',
+                title: 'Prototype warning',
+                detail: 'The board route and safe-cell positions are still provisional. This guide describes the current local test rules, not approved online or competitive rules.',
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  child: const Text('Back to match'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Local Match Preview'),
         actions: <Widget>[
+          IconButton(
+            tooltip: 'How to play',
+            onPressed: _showRules,
+            icon: const Icon(Icons.help_outline_rounded),
+          ),
           IconButton(
             tooltip: 'Restart match',
             onPressed: _controller.reset,
@@ -353,4 +424,69 @@ class _PawnVisual {
   final String pawnId;
   final String playerId;
   final BoardPoint point;
+}
+
+class _RuleRow extends StatelessWidget {
+  const _RuleRow({
+    required this.number,
+    required this.title,
+    required this.detail,
+  });
+
+  final String number;
+  final String title;
+  final String detail;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppTheme.gold.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.gold.withValues(alpha: 0.7)),
+            ),
+            child: Text(
+              number,
+              style: const TextStyle(
+                color: AppTheme.gold,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppTheme.readableText,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  detail,
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    height: 1.4,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
