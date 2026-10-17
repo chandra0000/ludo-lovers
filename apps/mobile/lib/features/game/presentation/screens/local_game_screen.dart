@@ -136,7 +136,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           builder: (context, constraints) {
             final boardSize = math.min(
               constraints.maxWidth,
-              constraints.maxHeight * 0.57,
+              constraints.maxHeight * 0.45,
             );
             return AnimatedBuilder(
               animation: _controller,
