@@ -87,6 +87,7 @@ void main() {
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('TURN ORDER'), findsOneWidget);
     expect(find.text('OUT 0/4'), findsNWidgets(4));
+    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
 
