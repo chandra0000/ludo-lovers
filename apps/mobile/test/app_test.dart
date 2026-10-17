@@ -46,6 +46,27 @@ void main() {
     expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsNothing);
   });
 
+
+  testWidgets('board preview exposes route blockers and provisional safe cells',
+      (tester) async {
+    await tester.pumpWidget(const LudoLoversApp());
+
+    await tester.tap(find.byKey(const ValueKey('preview_board_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('board_route_audit_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Route & safe-cell audit'), findsOneWidget);
+    expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
+    expect(find.textContaining('4 non-orthogonal transitions'), findsOneWidget);
+    expect(find.text('Provisional safe track IDs'), findsOneWidget);
+    expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
+    expect(
+      find.textContaining('not approved Ludo rules'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('opens the local match preview and clearly labels its limitation',
       (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
