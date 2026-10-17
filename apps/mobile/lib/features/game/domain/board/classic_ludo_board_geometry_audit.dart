@@ -129,10 +129,11 @@ class ClassicLudoBoardGeometryAudit {
         );
       }
     }
-    if (!setEquals(
-      expectedSafeCells,
-      ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
-    )) {
+    final actualSafeCells =
+        ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+    if (expectedSafeCells.length != actualSafeCells.length ||
+        !expectedSafeCells.containsAll(actualSafeCells) ||
+        !actualSafeCells.containsAll(expectedSafeCells)) {
       issues.add(
         'Provisional safe cells must match the selected profile: four starts '
         'plus the four track cells eight steps after each start.',
