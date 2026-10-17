@@ -7,6 +7,7 @@ import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/board_pawn_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
+import '../../domain/board/classic_ludo_board_geometry_audit.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/board/classic_ludo_pawn_layer.dart';
 import '../../domain/engine/ludo_path_movement.dart';
@@ -664,6 +665,7 @@ class _BoardReadinessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auditIssues = ClassicLudoBoardGeometryAudit.inspect();
     final blockers =
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes;
     final safeCells =
@@ -698,7 +700,7 @@ class _BoardReadinessCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${blockers.length} blockers',
+                '${auditIssues.length} geometry issues',
                 style: const TextStyle(
                   color: AppTheme.cream,
                   fontSize: 10,
@@ -718,9 +720,34 @@ class _BoardReadinessCard extends StatelessWidget {
               height: 1.35,
             ),
           ),
-          const SizedBox(height: 4),
+          if (auditIssues.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 6),
+            const Text(
+              'STRUCTURAL AUDIT FINDINGS',
+              style: TextStyle(
+                color: AppTheme.gold,
+                fontSize: 9,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.7,
+              ),
+            ),
+            const SizedBox(height: 3),
+            for (final issue in auditIssues)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: Text(
+                  '• $issue',
+                  style: const TextStyle(
+                    color: AppTheme.readableText,
+                    fontSize: 10,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+          ],
+          const SizedBox(height: 5),
           Text(
-            'Provisional safe track cells: ${safeCells.join(', ')}',
+            'Provisional safe track cell IDs: ${safeCells.join(', ')}. These IDs are not visually approved; do not enable release gameplay until the route and safe squares are checked against the approved board diagram.',
             style: const TextStyle(
               color: AppTheme.mutedText,
               fontSize: 10,
