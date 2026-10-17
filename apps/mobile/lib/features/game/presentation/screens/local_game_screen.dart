@@ -8,6 +8,7 @@ import '../../domain/board/board_pawn_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
 import '../../domain/board/classic_ludo_board_geometry_audit.dart';
+import '../../domain/board/classic_ludo_board_fixture.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/board/classic_ludo_pawn_layer.dart';
 import '../../domain/engine/ludo_path_movement.dart';
@@ -34,6 +35,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   late final BoardPawnLayout _pawnLayout = BoardPawnLayout(
     layout: ClassicLudoBoardCoordinateFactory.create(),
   );
+  late final _paths = ClassicLudoBoardFixture.create();
+  static const LudoPathMovement _movement = LudoPathMovement();
 
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
@@ -301,6 +304,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         ),
                                       ),
                                     ),
+                                    // Preview each legal move's destination using
+                                    // the same pure movement resolver as the engine.
+                                    // This is an aid for local testing, not route approval.
+                                    if (state.pendingRoll != null)
+                                      for (final visual in visuals)
+                                        if (legalIds.contains(visual.pawnId))
+                                          _buildDestinationMarker(
+                                            visual: visual,
+                                            statePawns: state.pawns,
+                                            diceValue: state.pendingRoll!,
+                                            boardSize: size,
+                                            cellSize: cellSize,
+                                          ),
                                     for (final visual in visuals)
                                       if (legalIds.contains(visual.pawnId))
                                         Positioned(
@@ -404,6 +420,64 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               },
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDestinationMarker({
+    required _PawnVisual visual,
+    required List<dynamic> statePawns,
+    required int diceValue,
+    required Size boardSize,
+    required double cellSize,
+  }) {
+    final pawn = statePawns.cast<dynamic?>().firstWhere(
+          (candidate) => candidate?.id == visual.pawnId,
+          orElse: () => null,
+        );
+    if (pawn == null) return const SizedBox.shrink();
+
+    final result = _movement.resolve(
+      path: _paths.forPlayer(pawn.playerId as String),
+      current: pawn.position as PawnRoutePosition,
+      diceValue: diceValue,
+      sixRequiredToEnter: true,
+      requireExactFinishRoll: true,
+    );
+    final destinationCell = result.resolution?.destinationCell;
+    if (destinationCell == null) return const SizedBox.shrink();
+
+    final point = _pawnLayout.layout.forCell(destinationCell);
+    return Positioned(
+      key: ValueKey<String>('destination_cell_$destinationCell'),
+      left: point.x * boardSize.width - cellSize * 0.31,
+      top: point.y * boardSize.height - cellSize * 0.31,
+      width: cellSize * 0.62,
+      height: cellSize * 0.62,
+      child: IgnorePointer(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppTheme.gold.withValues(alpha: 0.16),
+            border: Border.all(color: AppTheme.gold, width: 2),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: AppTheme.gold.withValues(alpha: 0.28),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Container(
+              width: cellSize * 0.12,
+              height: cellSize * 0.12,
+              decoration: const BoxDecoration(
+                color: AppTheme.gold,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
         ),
       ),
     );
