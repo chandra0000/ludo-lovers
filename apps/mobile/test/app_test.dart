@@ -56,6 +56,10 @@ void main() {
     expect(find.text('Local Match Preview'), findsOneWidget);
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('Roll Dice'), findsOneWidget);
+    expect(
+      find.byTooltip('Roll a die to begin the current player’s turn.'),
+      findsOneWidget,
+    );
     expect(find.textContaining('PROTOTYPE ONLY'), findsOneWidget);
     expect(find.textContaining('board route and safe cells are provisional'), findsOneWidget);
   });
@@ -99,6 +103,7 @@ void main() {
 
     expect(controller.state.pendingRoll, 6);
     expect(find.text('Rolled 6 · Tap a glowing pawn.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('last_game_action_semantics')), findsOneWidget);
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       findsOneWidget,
