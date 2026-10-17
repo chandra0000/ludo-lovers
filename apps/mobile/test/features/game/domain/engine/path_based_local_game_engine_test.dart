@@ -90,6 +90,45 @@ void main() {
     );
   });
 
+  test('rejects pawn progress that does not match its route section', () {
+    final malformed = LocalGameState(
+      players: const <String>['orange', 'blue'],
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 8,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+
+    expect(
+      () => engine.roll(
+        malformed,
+        playerId: 'orange',
+        expectedVersion: malformed.version,
+        value: 1,
+      ),
+      throwsA(
+        isA<LocalGameException>().having(
+          (error) => error.error,
+          'error',
+          LocalActionError.invalidState,
+        ),
+      ),
+    );
+    expect(malformed.version, 0, reason: 'Rejected actions never mutate input.');
+  });
+
   test('rejects stale action version without mutating input state', () {
     expect(
       () => engine.roll(

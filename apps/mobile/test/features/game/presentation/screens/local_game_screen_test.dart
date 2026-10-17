@@ -24,6 +24,8 @@ void main() {
       );
 
       expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+      expect(find.byKey(const ValueKey('local_playtest_status')), findsOneWidget);
+      expect(find.textContaining('Board route and safe cells are provisional'), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();

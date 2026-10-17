@@ -19,12 +19,13 @@ class ClassicLudoBoardGeometry {
   static Set<int> get safeTrackCellIds =>
       ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
 
-  static const Map<String, int> homeLaneStartByPlayer = <String, int>{
-    'orange': 200,
-    'blue': 210,
-    'green': 220,
-    'magenta': 230,
-  };
+  /// Logical home-lane ID ranges are derived from canonical seat metadata.
+  /// Keep one source of truth when a seat's lane IDs change.
+  static Map<String, int> get homeLaneStartByPlayer =>
+      Map<String, int>.unmodifiable(<String, int>{
+        for (final seat in ClassicLudoBoardDefinition.seats)
+          seat.id: seat.homeLaneStartCellId,
+      });
 
   /// Ensures the renderer layout contains every cell used by the route model.
   ///

@@ -27,6 +27,16 @@ void main() {
       );
     });
 
+    test('derives home-lane logical ID starts from canonical seat metadata', () {
+      expect(
+        ClassicLudoBoardGeometry.homeLaneStartByPlayer,
+        <String, int>{
+          for (final seat in ClassicLudoBoardDefinition.seats)
+            seat.id: seat.homeLaneStartCellId,
+        },
+      );
+    });
+
     test('validates a layout that covers track and all four home lanes', () {
       final points = <int, BoardPoint>{
         for (var cell = 0; cell < 52; cell++)

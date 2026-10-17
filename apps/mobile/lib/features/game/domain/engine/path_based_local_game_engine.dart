@@ -115,6 +115,7 @@ enum LocalActionError {
   pawnNotFound,
   pawnNotOwned,
   illegalMove,
+  invalidState,
 }
 
 class LocalGameException implements Exception {
@@ -564,8 +565,31 @@ class PathBasedLocalGameEngine {
     if (state.currentPlayerId != playerId) {
       throw const LocalGameException(LocalActionError.wrongPlayer);
     }
+    _validatePawnPositions(state);
     if (maxConsecutiveSixes < 1) {
       throw StateError('maxConsecutiveSixes must be at least 1.');
+    }
+  }
+
+  /// Reject malformed route positions before they can corrupt capture or
+  /// rendering logic. The renderer and engine share the same player paths.
+  void _validatePawnPositions(LocalGameState state) {
+    for (final pawn in state.pawns) {
+      final path = paths.forPlayer(pawn.playerId);
+      final progress = pawn.position.progress;
+      final valid = switch (pawn.position.section) {
+        PawnRouteSection.yard => progress == null,
+        PawnRouteSection.mainTrack =>
+          progress != null && progress >= 0 && progress < path.trackLength,
+        PawnRouteSection.homeLane =>
+          progress != null &&
+              progress >= path.trackLength &&
+              progress < path.finishProgress,
+        PawnRouteSection.finished => progress == path.finishProgress,
+      };
+      if (!valid) {
+        throw const LocalGameException(LocalActionError.invalidState);
+      }
     }
   }
 

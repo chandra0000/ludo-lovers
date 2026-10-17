@@ -250,6 +250,32 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         currentPlayerId: current,
                         pawns: state.pawns,
                       ),
+                      const SizedBox(height: 8),
+                      Container(
+                        key: const ValueKey('local_playtest_status'),
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.gold.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppTheme.gold.withValues(alpha: 0.32),
+                          ),
+                        ),
+                        child: const Text(
+                          'LOCAL PLAYTEST · Board route and safe cells are provisional. '
+                          'Use this build to test interactions, not competitive rules.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppTheme.readableText,
+                            fontSize: 11,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       Center(
                         child: SizedBox(
@@ -417,8 +443,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       path: _paths.forPlayer(pawn.playerId as String),
       current: pawn.position as PawnRoutePosition,
       diceValue: diceValue,
-      sixRequiredToEnter: true,
-      requireExactFinishRoll: true,
+      sixRequiredToEnter: _controller.setup.engine.sixRequiredToEnter,
+      requireExactFinishRoll:
+          _controller.setup.engine.requireExactFinishRoll,
     );
     final destinationCell = result.resolution?.destinationCell;
     if (destinationCell == null) return const SizedBox.shrink();

@@ -105,3 +105,13 @@ A step is complete only when all relevant gates pass:
 - Added `canonical_board_source_of_truth_test.dart` to assert the shared-track alias identity, route/entry alignment, home-lane alignment, safe-cell agreement, and the release blocker.
 - Do not infer cell geometry from the composite brand collage. The currently recorded non-orthogonal transitions remain indexes 4, 17, 30 and 43; `isGameplayReady` must remain false until a clear cell diagram validates the route or a documented v1 topology is explicitly approved.
 - Latest inspected CI run was #219 (commit `de36cb96dba532dd39ec98310ac1b7b8c5d23205`). Formatting and analysis passed, but automated tests failed in two UI tests because they expected stale labels (`Local Match Preview` and `PROTOTYPE ONLY`) that are no longer rendered by the current screen. The Android debug build was skipped after the test failure. The test assertions have been aligned to the current UI and the new topology regression suite added; a fresh CI run must confirm the fix before this increment is considered green.
+
+
+## Local Android playtest hardening — 2026-10-18
+
+- The local match screen is explicitly labelled as a local playtest. This is intentional while board topology and safe-cell IDs remain provisional; it is not an online/competitive release.
+- The board destination preview now reads movement flags from the active engine profile instead of duplicating hard-coded rule booleans in presentation code.
+- The engine now rejects malformed pawn route positions before accepting roll/move commands: yard positions must have null progress; track progress must stay on the shared track; home-lane progress must be inside that player's lane; finished progress must equal the route finish value.
+- Added regression coverage for invalid position rejection and for deriving logical home-lane ID ranges from canonical seat metadata, removing a duplicate map from geometry.
+- Reference used: Flutter's official testing guidance recommends unit/widget tests for logic and UI behavior and integration tests for whole-app/device behavior. This increment strengthens deterministic engine/widget gates; a physical Android install/play session is still required before calling the build device-verified.
+- Next gate: confirm the route against a clear board-cell diagram, keep `isGameplayReady == false` until then, and expand device-level testing after the board contract is approved.
