@@ -25,6 +25,9 @@ void main() {
 
     expect(find.text('Classic Board'), findsOneWidget);
     expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
+    expect(find.text('GAMEPLAY LOCKED · ROUTE REVIEW REQUIRED'), findsOneWidget);
+    expect(find.text('4 route blockers · 8 provisional safe cells'), findsOneWidget);
+    expect(find.byKey(const ValueKey('board_route_gate_summary')), findsOneWidget);
     expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
 
     final board = tester.getRect(find.byKey(const ValueKey('interactive_board')));
