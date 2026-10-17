@@ -108,11 +108,46 @@ class ClassicLudoBoardCoordinateFactory {
   ///
   /// This deliberately remains false while the route contains diagonal jumps.
   /// The final route must be reconciled with a reviewed board-cell diagram.
-  static bool get isGameplayReady =>
-      sharedTrack.length == ClassicLudoBoardDefinition.sharedTrackLength &&
-      sharedTrack.toSet().length == sharedTrack.length &&
-      sharedTrack.every((cell) => cell.isInsideBoard) &&
-      nonOrthogonalTransitionIndexes.isEmpty;
+  static bool get isGameplayReady {
+    if (sharedTrack.length != ClassicLudoBoardDefinition.sharedTrackLength ||
+        sharedTrack.toSet().length != sharedTrack.length ||
+        !sharedTrack.every((cell) => cell.isInsideBoard) ||
+        nonOrthogonalTransitionIndexes.isNotEmpty) {
+      return false;
+    }
+
+    final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+    if (!safeCells.every((id) => id >= 0 && id < sharedTrack.length)) {
+      return false;
+    }
+
+    // A player's entry cell must be the same physical cell as their marker,
+    // and must be protected under the selected rules profile.
+    for (final seat in ClassicLudoBoardDefinition.seats) {
+      final entry = seat.provisionalTrackEntryIndex;
+      if (entry < 0 ||
+          entry >= sharedTrack.length ||
+          seat.startMarker != sharedTrack[entry] ||
+          !safeCells.contains(entry)) {
+        return false;
+      }
+    }
+
+    // A track must not reuse a physical cell as part of a private home lane.
+    final trackCells = sharedTrack.toSet();
+    for (final seat in ClassicLudoBoardDefinition.seats) {
+      if (seat.homeLaneCells.length !=
+              ClassicLudoBoardDefinition.homeLaneLength ||
+          seat.homeLaneCells.toSet().length != seat.homeLaneCells.length ||
+          seat.homeLaneCells.any(
+            (cell) => !cell.isInsideBoard || trackCells.contains(cell),
+          )) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   static BoardCoordinateLayout create() {
     if (sharedTrack.length != ClassicLudoBoardDefinition.sharedTrackLength) {
