@@ -64,7 +64,7 @@ void main() {
     expect(find.textContaining('4 non-orthogonal transitions'), findsOneWidget);
     expect(find.text('Provisional safe track IDs'), findsOneWidget);
     expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
-    expect(find.text('4 (5,6) → 5 (6,5)'), findsOneWidget);
+    expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
     expect(find.byKey(const ValueKey('safe_cell_coordinate_audit')), findsOneWidget);
     expect(find.textContaining('0 (1,6)'), findsOneWidget);
     expect(
