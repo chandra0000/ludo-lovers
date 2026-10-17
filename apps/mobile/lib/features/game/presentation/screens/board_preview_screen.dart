@@ -5,6 +5,7 @@ import '../../../../app/theme/app_theme.dart';
 import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
+import '../../domain/board/classic_ludo_board_geometry_audit.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/board/classic_ludo_pawn_layer.dart';
 
@@ -69,11 +70,91 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
     });
   }
 
+
+  void _showRouteAudit() {
+    final blockers = ClassicLudoBoardGeometryAudit.inspect()
+        .where((issue) => issue.contains('not orthogonally adjacent'))
+        .toList(growable: false);
+    final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
+        .toList()
+      ..sort();
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Route & safe-cell audit'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text(
+                'NOT APPROVED FOR RELEASE',
+                key: ValueKey('route_audit_blocked_status'),
+                style: TextStyle(
+                  color: AppTheme.gold,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.7,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                ClassicLudoBoardCoordinateFactory.isGameplayReady
+                    ? 'The structural route checks pass. Visual and rules approval is still required.'
+                    : 'Gameplay readiness is disabled because the shared route has ${blockers.length} non-orthogonal transitions.',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Route blockers',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 4),
+              if (blockers.isEmpty)
+                const Text('No non-orthogonal transitions detected.')
+              else
+                for (final issue in blockers)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('• $issue'),
+                  ),
+              const SizedBox(height: 12),
+              const Text(
+                'Provisional safe track IDs',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 4),
+              Text(safeCells.join(', ')),
+              const SizedBox(height: 8),
+              const Text(
+                'These IDs are test metadata, not approved Ludo rules. Confirm them against a clear, straight-on board diagram before enabling release gameplay.',
+                style: TextStyle(color: AppTheme.mutedText, height: 1.4),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Classic Board'),
+        actions: <Widget>[
+          IconButton(
+            key: const ValueKey('board_route_audit_button'),
+            tooltip: 'Route and safe-cell audit',
+            onPressed: _showRouteAudit,
+            icon: const Icon(Icons.fact_check_outlined),
+          ),
+        ],
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back_rounded),
