@@ -61,7 +61,10 @@ void main() {
 
     expect(find.text('Route & safe-cell audit'), findsOneWidget);
     expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
-    expect(find.textContaining('4 non-orthogonal transitions'), findsOneWidget);
+    expect(find.textContaining('Track transition 4 to 5 is not orthogonally adjacent.'), findsOneWidget);
+    expect(find.textContaining('Track transition 17 to 18 is not orthogonally adjacent.'), findsOneWidget);
+    expect(find.textContaining('Track transition 30 to 31 is not orthogonally adjacent.'), findsOneWidget);
+    expect(find.textContaining('Track transition 43 to 44 is not orthogonally adjacent.'), findsOneWidget);
     expect(find.text('Provisional safe track IDs'), findsOneWidget);
     expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
     expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
