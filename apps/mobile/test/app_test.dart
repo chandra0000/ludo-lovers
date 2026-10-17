@@ -81,7 +81,6 @@ void main() {
     addTearDown(controller.dispose);
 
     final semantics = tester.ensureSemantics();
-    addTearDown(semantics.dispose);
 
     await tester.pumpWidget(
       MaterialApp(home: LocalGameScreen(controller: controller)),
@@ -124,6 +123,7 @@ void main() {
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       findsNothing,
     );
+    semantics.dispose();
   });
 
   testWidgets('restart action restores the initial local board state',
