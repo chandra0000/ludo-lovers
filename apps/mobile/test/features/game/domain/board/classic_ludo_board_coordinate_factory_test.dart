@@ -59,6 +59,25 @@ void main() {
       }
     });
 
+    test('describes route transitions and safe cells with physical coordinates', () {
+      expect(
+        ClassicLudoBoardCoordinateFactory.describeTransition(4),
+        '4 (5,6) → 5 (6,5)',
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.describeTransition(51),
+        '51 (0,6) → 0 (1,6)',
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.describeTrackCell(13),
+        '13 (8,1)',
+      );
+      expect(
+        () => ClassicLudoBoardCoordinateFactory.describeTrackCell(52),
+        throwsRangeError,
+      );
+    });
+
     test('builds normalized coordinates for track and all private lanes', () {
       final layout = ClassicLudoBoardCoordinateFactory.create();
       expect(layout.pointsByCell, hasLength(52 + 4 * 6));
