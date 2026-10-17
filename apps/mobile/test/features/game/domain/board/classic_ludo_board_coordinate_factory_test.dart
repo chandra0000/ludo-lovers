@@ -59,6 +59,25 @@ void main() {
       }
     });
 
+
+    test('provisional safe cells include each start and the four offset star cells', () {
+      final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+      final entries = ClassicLudoBoardDefinition.seats
+          .map((seat) => seat.provisionalTrackEntryIndex)
+          .toSet();
+
+      // Classic boards commonly protect each colored start plus a star eight
+      // physical cells later. This checks internal consistency only; the IDs
+      // remain provisional until visually reconciled with the approved board.
+      expect(safeCells, hasLength(8));
+      expect(safeCells.containsAll(entries), isTrue);
+      expect(
+        safeCells,
+        entries.expand((entry) => <int>{entry, (entry + 8) % 52}).toSet(),
+      );
+      expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
+    });
+
     test('describes route transitions and safe cells with physical coordinates', () {
       expect(
         ClassicLudoBoardCoordinateFactory.describeTransition(4),
