@@ -116,7 +116,7 @@ class ClassicLudoBoardCoordinateFactory {
       return false;
     }
 
-    final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+    const safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
     if (!safeCells.every((id) => id >= 0 && id < sharedTrack.length)) {
       return false;
     }
