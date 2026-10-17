@@ -95,3 +95,13 @@ A step is complete only when all relevant gates pass:
 - Rule defaults are provisional.
 - The legacy `LudoEngine` source file is removed and CI passed on commit `1c834dfc2c96a44a22c3aa229d93bfb4ed82ffd5`. Historical documents may still mention the former file and should not be read as current implementation status.
 - Passing CI validates the current code and tests only; it does not establish production readiness or prove every game-rule combination correct.
+
+
+## Board topology consolidation — 2026-10-18
+
+- The canonical 52-cell physical coordinate sequence is now declared in `ClassicLudoBoardDefinition.sharedTrackCells`; `ClassicLudoBoardCoordinateFactory.sharedTrack` is a compatibility alias to that exact list, not a second coordinate table.
+- The four seat-entry indexes, home-lane coordinate lists and logical home-lane IDs remain on the canonical seat definitions. `ClassicLudoBoardFixture` derives its player-relative paths and entry map from those seats.
+- `LudoRuleProfile` defaults its safe-cell set from `ClassicLudoBoardDefinition.provisionalSafeTrackCellIds`; the geometry helper reads the same set. These values are still provisional and are not a visual approval of the board.
+- Added `canonical_board_source_of_truth_test.dart` to assert the shared-track alias identity, route/entry alignment, home-lane alignment, safe-cell agreement, and the release blocker.
+- Do not infer cell geometry from the composite brand collage. The currently recorded non-orthogonal transitions remain indexes 4, 17, 30 and 43; `isGameplayReady` must remain false until a clear cell diagram validates the route or a documented v1 topology is explicitly approved.
+- Latest inspected CI run was #219 (commit `de36cb96dba532dd39ec98310ac1b7b8c5d23205`). Formatting and analysis passed, but automated tests failed in two UI tests because they expected stale labels (`Local Match Preview` and `PROTOTYPE ONLY`) that are no longer rendered by the current screen. The Android debug build was skipped after the test failure. The test assertions have been aligned to the current UI and the new topology regression suite added; a fresh CI run must confirm the fix before this increment is considered green.
