@@ -7,7 +7,6 @@ import '../../domain/board/board_coordinate_layout.dart';
 import '../../domain/board/board_pawn_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
-import '../../domain/board/classic_ludo_board_geometry_audit.dart';
 import '../../domain/board/classic_ludo_board_fixture.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/board/classic_ludo_pawn_layer.dart';
@@ -121,7 +120,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Local Match Preview'),
+        title: const Text('Ludo Lovers · Match'),
         actions: <Widget>[
           IconButton(
             tooltip: 'How to play',
@@ -140,7 +139,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           builder: (context, constraints) {
             final boardSize = math.min(
               constraints.maxWidth,
-              constraints.maxHeight * 0.45,
+              constraints.maxHeight * 0.62,
             );
             return AnimatedBuilder(
               animation: _controller,
@@ -163,31 +162,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 ];
 
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(14, 4, 14, 18),
+                  padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 9,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2A2011),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppTheme.gold),
-                        ),
-                        child: const Text(
-                          'PROTOTYPE ONLY · The board route and safe cells are provisional. Test local turns here; do not treat this as release-ready gameplay.',
-                          style: TextStyle(
-                            color: AppTheme.cream,
-                            fontSize: 11,
-                            height: 1.35,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
@@ -268,9 +245,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      const _BoardReadinessCard(),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       _PlayerTurnStrip(
                         currentPlayerId: current,
                         pawns: state.pawns,
@@ -731,105 +706,3 @@ class _RuleRow extends StatelessWidget {
   }
 }
 
-
-/// Keeps the unresolved geometry visible during local integration work.
-/// A clean structural audit is not the same as visual approval.
-class _BoardReadinessCard extends StatelessWidget {
-  const _BoardReadinessCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final auditIssues = ClassicLudoBoardGeometryAudit.inspect();
-    final blockers =
-        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes;
-    final safeCells =
-        ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.toList()..sort();
-
-    return Container(
-      key: const ValueKey('board_readiness_card'),
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.panel,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.gold.withValues(alpha: 0.55)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              const Icon(Icons.warning_amber_rounded,
-                  color: AppTheme.gold, size: 18),
-              const SizedBox(width: 7),
-              const Expanded(
-                child: Text(
-                  'BOARD VALIDATION · NOT APPROVED',
-                  style: TextStyle(
-                    color: AppTheme.gold,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.7,
-                  ),
-                ),
-              ),
-              Text(
-                '${auditIssues.length} geometry issues',
-                style: const TextStyle(
-                  color: AppTheme.cream,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            blockers.isEmpty
-                ? 'No non-orthogonal transitions detected; visual review is still required.'
-                : 'Track transitions needing review: ${blockers.join(', ')}. The route gate remains closed.',
-            style: const TextStyle(
-              color: AppTheme.readableText,
-              fontSize: 11,
-              height: 1.35,
-            ),
-          ),
-          if (auditIssues.isNotEmpty) ...<Widget>[
-            const SizedBox(height: 6),
-            const Text(
-              'STRUCTURAL AUDIT FINDINGS',
-              style: TextStyle(
-                color: AppTheme.gold,
-                fontSize: 9,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.7,
-              ),
-            ),
-            const SizedBox(height: 3),
-            for (final issue in auditIssues)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 3),
-                child: Text(
-                  '• $issue',
-                  style: const TextStyle(
-                    color: AppTheme.readableText,
-                    fontSize: 10,
-                    height: 1.3,
-                  ),
-                ),
-              ),
-          ],
-          const SizedBox(height: 5),
-          Text(
-            'Provisional safe track cell IDs: ${safeCells.join(', ')}. These IDs are not visually approved; do not enable release gameplay until the route and safe squares are checked against the approved board diagram.',
-            style: const TextStyle(
-              color: AppTheme.mutedText,
-              fontSize: 10,
-              height: 1.35,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
