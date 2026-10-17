@@ -155,7 +155,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'These IDs and coordinates are test metadata, not approved Ludo rules. The public rules/reference page confirms Ludo as a classic board game but does not provide a clean cell-by-cell diagram for this exact design. Confirm the route, safe cells and selected rules variant against an approved straight-on board diagram before enabling release gameplay.',
+                'The selected provisional profile models eight safe cells: the four player starts and one star cell eight track steps after each start. Public rules references describe this common pattern, but variants differ and cannot prove this custom board’s exact cell mapping. The four diagonal route transitions still block gameplay. Approve a straight-on 15×15 board diagram before enabling release gameplay.',
                 style: TextStyle(color: AppTheme.mutedText, height: 1.4),
               ),
             ],
