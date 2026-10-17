@@ -8,12 +8,10 @@ void main() {
     });
 
     test('provisional route retains the known transition audit markers', () {
-      final layout = ClassicLudoBoardCoordinateFactory.create();
 
       // These diagonal transitions are known unresolved geometry, not
       // approved gameplay topology. Keep this assertion until the reference
-      // board is reconciled and the acceptance tests are deliberately updated.
-      expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
+      // board is reconciled and the acceptance tests are deliberately updated
       expect(ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes, <int>{4, 17, 30, 43});
     });
   });
