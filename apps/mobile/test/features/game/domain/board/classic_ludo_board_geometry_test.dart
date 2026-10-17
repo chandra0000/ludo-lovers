@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/board_coordinate_layout.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_geometry.dart';
 
 void main() {
@@ -12,6 +13,17 @@ void main() {
       expect(
         ClassicLudoBoardGeometry.safeTrackCellIds,
         containsAll(<int>[0, 13, 26, 39]),
+      );
+    });
+
+    test('uses the board definition as the single safe-cell source of truth', () {
+      expect(
+        ClassicLudoBoardGeometry.safeTrackCellIds,
+        same(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds),
+      );
+      expect(
+        ClassicLudoBoardGeometry.safeTrackCellIds,
+        <int>{0, 8, 13, 21, 26, 34, 39, 47},
       );
     });
 
