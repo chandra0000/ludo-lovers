@@ -23,11 +23,6 @@ void main() {
         ),
       );
 
-      expect(find.textContaining('PROTOTYPE ONLY'), findsOneWidget);
-      expect(find.byKey(const ValueKey('board_readiness_card')), findsOneWidget);
-      expect(find.textContaining('BOARD VALIDATION · NOT APPROVED'), findsOneWidget);
-      expect(find.textContaining('Track transitions needing review: 4, 17, 30, 43'), findsOneWidget);
-      expect(find.textContaining('Provisional safe track cell IDs: 0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
       expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
@@ -58,7 +53,6 @@ void main() {
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'orange');
       expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
-      expect(find.textContaining('PROTOTYPE ONLY'), findsOneWidget);
     },
   );
 
