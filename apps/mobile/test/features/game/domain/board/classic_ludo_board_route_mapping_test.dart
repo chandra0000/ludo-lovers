@@ -64,6 +64,32 @@ void main() {
       }
     });
 
+
+    test('provisional safe cells are four starts plus four eight-step stars', () {
+      final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
+          .toList()
+        ..sort();
+
+      // Explicitly records the current classic-rule hypothesis; it does not
+      // mark the board route as visually approved.
+      expect(safeCells, <int>[0, 8, 13, 21, 26, 34, 39, 47]);
+      expect(safeCells, hasLength(8));
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(
+          ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
+              .contains(seat.provisionalTrackEntryIndex),
+          isTrue,
+          reason: '${seat.id} start square must be protected in this profile',
+        );
+        expect(
+          ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
+              .contains((seat.provisionalTrackEntryIndex + 8) % 52),
+          isTrue,
+          reason: '${seat.id} star square hypothesis must be protected',
+        );
+      }
+    });
+
     test('coordinate route remains gated until non-orthogonal transitions are fixed', () {
       expect(ClassicLudoBoardCoordinateFactory.sharedTrack, hasLength(52));
       expect(
