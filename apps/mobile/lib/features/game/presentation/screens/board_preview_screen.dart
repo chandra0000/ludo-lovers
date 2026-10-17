@@ -112,21 +112,36 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               if (blockers.isEmpty)
                 const Text('No non-orthogonal transitions detected.')
               else
-                for (final issue in blockers)
+                for (final index
+                    in ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: Text('• $issue'),
+                    child: Text(
+                      '• ${ClassicLudoBoardCoordinateFactory.describeTransition(index)}',
+                    ),
                   ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               const Text(
                 'Provisional safe track IDs',
                 style: TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 4),
               Text(safeCells.join(', ')),
+              const SizedBox(height: 6),
+              const Text(
+                'Safe-cell coordinates (column,row)',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                safeCells
+                    .map(ClassicLudoBoardCoordinateFactory.describeTrackCell)
+                    .join(' · '),
+                key: const ValueKey('safe_cell_coordinate_audit'),
+              ),
               const SizedBox(height: 8),
               const Text(
-                'These IDs are test metadata, not approved Ludo rules. Confirm them against a clear, straight-on board diagram before enabling release gameplay.',
+                'These IDs and coordinates are test metadata, not approved Ludo rules. The public rules/reference page confirms Ludo as a classic board game but does not provide a clean cell-by-cell diagram for this exact design. Confirm the route, safe cells and selected rules variant against an approved straight-on board diagram before enabling release gameplay.',
                 style: TextStyle(color: AppTheme.mutedText, height: 1.4),
               ),
             ],
