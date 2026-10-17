@@ -80,6 +80,30 @@ class ClassicLudoBoardCoordinateFactory {
     return List<int>.unmodifiable(indexes);
   }
 
+  /// Human-readable coordinates for reviewing a route transition in the audit UI.
+  ///
+  /// IDs are physical shared-track indexes. This reports geometry only; it
+  /// does not decide whether a transition is valid under the approved rules.
+  static String describeTransition(int index) {
+    if (index < 0 || index >= sharedTrack.length) {
+      throw RangeError.index(index, sharedTrack, 'index');
+    }
+    final nextIndex = (index + 1) % sharedTrack.length;
+    final from = sharedTrack[index];
+    final to = sharedTrack[nextIndex];
+    return '$index (${from.column},${from.row}) → '
+        '$nextIndex (${to.column},${to.row})';
+  }
+
+  /// Human-readable coordinate for a physical shared-track cell.
+  static String describeTrackCell(int index) {
+    if (index < 0 || index >= sharedTrack.length) {
+      throw RangeError.index(index, sharedTrack, 'index');
+    }
+    final cell = sharedTrack[index];
+    return '$index (${cell.column},${cell.row})';
+  }
+
   /// Conservative release gate for consuming this geometry in game rules.
   ///
   /// This deliberately remains false while the route contains diagonal jumps.
