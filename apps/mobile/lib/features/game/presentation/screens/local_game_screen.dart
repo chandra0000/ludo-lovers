@@ -257,6 +257,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
+                      _PlayerTurnStrip(
+                        currentPlayerId: current,
+                        pawns: state.pawns,
+                      ),
+                      const SizedBox(height: 10),
                       Center(
                         child: SizedBox(
                           width: boardSize,
@@ -411,6 +416,147 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       );
     }
     return result;
+  }
+}
+
+class _PlayerTurnStrip extends StatelessWidget {
+  const _PlayerTurnStrip({
+    required this.currentPlayerId,
+    required this.pawns,
+  });
+
+  final String currentPlayerId;
+  final List<dynamic> pawns;
+
+  static const List<String> _playerIds = <String>[
+    'orange',
+    'green',
+    'blue',
+    'magenta',
+  ];
+
+  static const Map<String, Color> _colors = <String, Color>{
+    'orange': AppTheme.orange,
+    'green': AppTheme.green,
+    'blue': AppTheme.blue,
+    'magenta': AppTheme.magenta,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Padding(
+          padding: EdgeInsets.only(left: 2, bottom: 7),
+          child: Text(
+            'TURN ORDER',
+            style: TextStyle(
+              color: AppTheme.gold,
+              fontSize: 10,
+              letterSpacing: 1.3,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        Row(
+          children: <Widget>[
+            for (final playerId in _playerIds)
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    right: playerId == _playerIds.last ? 0 : 6,
+                  ),
+                  child: _PlayerTurnTile(
+                    playerId: playerId,
+                    color: _colors[playerId]!,
+                    isCurrent: playerId == currentPlayerId,
+                    pawnsOut: pawns.where((dynamic pawn) {
+                      final position = pawn.position as PawnRoutePosition;
+                      return pawn.playerId == playerId &&
+                          position.section != PawnRouteSection.yard;
+                    }).length,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PlayerTurnTile extends StatelessWidget {
+  const _PlayerTurnTile({
+    required this.playerId,
+    required this.color,
+    required this.isCurrent,
+    required this.pawnsOut,
+  });
+
+  final String playerId;
+  final Color color;
+  final bool isCurrent;
+  final int pawnsOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: '${playerId.toUpperCase()}, ${isCurrent ? 'current turn' : 'waiting'}, $pawnsOut of 4 pawns out',
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+        decoration: BoxDecoration(
+          color: isCurrent ? color.withValues(alpha: 0.13) : AppTheme.panel,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isCurrent ? color : AppTheme.gold.withValues(alpha: 0.18),
+            width: isCurrent ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: isCurrent
+                    ? <BoxShadow>[
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.45),
+                          blurRadius: 8,
+                        ),
+                      ]
+                    : null,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              playerId.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isCurrent ? color : AppTheme.readableText,
+                fontSize: 9,
+                letterSpacing: 0.3,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'OUT $pawnsOut/4',
+              style: const TextStyle(
+                color: AppTheme.mutedText,
+                fontSize: 8,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
