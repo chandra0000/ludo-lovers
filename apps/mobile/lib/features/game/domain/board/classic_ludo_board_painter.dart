@@ -1,13 +1,15 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
-import 'classic_ludo_board_definition.dart';
-import 'classic_ludo_board_coordinate_factory.dart';
 import 'board_coordinate_layout.dart';
+import 'classic_ludo_board_coordinate_factory.dart';
+import 'classic_ludo_board_definition.dart';
 
 /// Visual board prototype driven by the shared seat definition.
 ///
-/// The renderer still uses provisional anchors; logical track IDs are not yet
-/// mapped to every displayed cell and this painter does not implement gameplay.
+/// Safe-square stars are drawn from the same provisional cell IDs consumed by
+/// the local rules engine. The route is still not approved for release.
 class ClassicLudoBoardPainter extends CustomPainter {
   const ClassicLudoBoardPainter();
 
@@ -26,7 +28,9 @@ class ClassicLudoBoardPainter extends CustomPainter {
     );
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
-      _drawHome(canvas, left, top, cell, seat.yardColumn, seat.yardRow, seat.color);
+      _drawHome(
+        canvas, left, top, cell, seat.yardColumn, seat.yardRow, seat.color,
+      );
     }
 
     final trackPaint = Paint()..color = LudoBoardPalette.cream;
@@ -37,8 +41,8 @@ class ClassicLudoBoardPainter extends CustomPainter {
 
     for (var row = 0; row < grid; row++) {
       for (var col = 0; col < grid; col++) {
-        final inCentralCross = (row >= 6 && row <= 8) ||
-            (col >= 6 && col <= 8);
+        final inCentralCross =
+            (row >= 6 && row <= 8) || (col >= 6 && col <= 8);
         if (!inCentralCross) continue;
         final rect = Rect.fromLTWH(
           left + col * cell,
@@ -52,17 +56,15 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
 
     final layout = ClassicLudoBoardCoordinateFactory.create();
-    for (var trackId = 0; trackId < ClassicLudoBoardDefinition.sharedTrackLength; trackId++) {
+    for (var trackId = 0;
+        trackId < ClassicLudoBoardDefinition.sharedTrackLength;
+        trackId++) {
       final point = layout.forCell(trackId);
       final center = Offset(
         left + point.x * cell * grid,
         top + point.y * cell * grid,
       );
-      final rect = Rect.fromCenter(
-        center: center,
-        width: cell,
-        height: cell,
-      );
+      final rect = Rect.fromCenter(center: center, width: cell, height: cell);
       canvas.drawRect(rect, trackPaint);
       canvas.drawRect(rect, linePaint);
     }
@@ -74,14 +76,27 @@ class ClassicLudoBoardPainter extends CustomPainter {
           left + point.x * cell * grid,
           top + point.y * cell * grid,
         );
-        final rect = Rect.fromCenter(
-          center: center,
-          width: cell,
-          height: cell,
+        final rect = Rect.fromCenter(center: center, width: cell, height: cell);
+        canvas.drawRect(
+          rect,
+          Paint()..color = seat.color.withValues(alpha: 0.82),
         );
-        canvas.drawRect(rect, Paint()..color = seat.color.withValues(alpha: 0.82));
         canvas.drawRect(rect, linePaint);
       }
+    }
+
+    // Start squares are coloured; draw stars only on the four additional
+    // provisional safe squares so the UI does not visually double-mark starts.
+    const startIds = <int>{0, 13, 26, 39};
+    for (final safeId
+        in ClassicLudoBoardDefinition.provisionalSafeTrackCellIds) {
+      if (startIds.contains(safeId)) continue;
+      final point = layout.forCell(safeId);
+      final center = Offset(
+        left + point.x * cell * grid,
+        top + point.y * cell * grid,
+      );
+      _drawStar(canvas, center, cell * 0.27);
     }
 
     final center = Offset(left + 7.5 * cell, top + 7.5 * cell);
@@ -96,18 +111,57 @@ class ClassicLudoBoardPainter extends CustomPainter {
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
       _drawStart(
-        canvas, left, top, cell,
-        seat.startMarker.column, seat.startMarker.row, seat.color,
+        canvas,
+        left,
+        top,
+        cell,
+        seat.startMarker.column,
+        seat.startMarker.row,
+        seat.color,
       );
     }
   }
 
+  void _drawStar(Canvas canvas, Offset center, double radius) {
+    final path = Path();
+    for (var pointIndex = 0; pointIndex < 10; pointIndex++) {
+      final angle = -math.pi / 2 + pointIndex * math.pi / 5;
+      final pointRadius = pointIndex.isEven ? radius : radius * 0.43;
+      final point = Offset(
+        center.dx + math.cos(angle) * pointRadius,
+        center.dy + math.sin(angle) * pointRadius,
+      );
+      if (pointIndex == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        path.lineTo(point.dx, point.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, Paint()..color = LudoBoardPalette.gold);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = LudoBoardPalette.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.7,
+    );
+  }
+
   void _drawHome(
-    Canvas canvas, double left, double top, double cell,
-    int col, int row, Color color,
+    Canvas canvas,
+    double left,
+    double top,
+    double cell,
+    int col,
+    int row,
+    Color color,
   ) {
     final rect = Rect.fromLTWH(
-      left + col * cell, top + row * cell, cell * 6, cell * 6,
+      left + col * cell,
+      top + row * cell,
+      cell * 6,
+      cell * 6,
     );
     canvas.drawRect(rect, Paint()..color = color.withValues(alpha: 0.24));
     canvas.drawRect(
@@ -141,17 +195,25 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
   }
 
-
   void _drawStart(
-    Canvas canvas, double left, double top, double cell,
-    int col, int row, Color color,
+    Canvas canvas,
+    double left,
+    double top,
+    double cell,
+    int col,
+    int row,
+    Color color,
   ) {
     final rect = Rect.fromLTWH(
-      left + col * cell, top + row * cell, cell, cell,
+      left + col * cell,
+      top + row * cell,
+      cell,
+      cell,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        rect.deflate(cell * 0.12), Radius.circular(cell * 0.2),
+        rect.deflate(cell * 0.12),
+        Radius.circular(cell * 0.2),
       ),
       Paint()..color = color,
     );
