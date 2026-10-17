@@ -90,4 +90,53 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets(
+    'keeps turn HUD and pawn counters synchronized after a skipped turn',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final rolls = <int>[3, 6];
+      final controller = LocalGameController(
+        nextDiceValue: () => rolls.removeAt(0),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+
+      expect(controller.state.currentPlayerId, 'green');
+      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
+      expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('legal_pawn_green_pawn_1')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('legal_pawn_green_pawn_1')));
+      await tester.pumpAndSettle();
+
+      expect(controller.state.currentPlayerId, 'green');
+      expect(
+        controller.state.pawns.firstWhere((pawn) => pawn.id == 'green_pawn_1')
+            .position.section,
+        PawnRouteSection.mainTrack,
+      );
+      expect(find.text('OUT 1/4'), findsOneWidget);
+      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
+    },
+  );
+
 }

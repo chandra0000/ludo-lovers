@@ -130,3 +130,12 @@ A step is complete only when all relevant gates pass:
 - The test compares resulting turn/version/pawn state and typed event payload/order, making deterministic local replay an explicit quality gate before AI or server-authoritative play is introduced.
 - Pipeline #224 passed on commit `d9afdbe2e35efd3c956104659a2ada59166000f8`. This confirms the existing formatting, analysis, tests, and debug APK workflow on that revision; the new replay test requires its own pipeline run.
 - Next gameplay priority remains visual route acceptance: do not enable production readiness or finalize safe cells until the clear board-cell diagram and route orientation are reconciled.
+
+
+## Board-backed turn and pawn HUD regression — 2026-10-18
+
+- Pipeline #225 passed on commit `230fe6846119dc0dcab3356cf132da60d1f1acf3`, including the deterministic replay regression.
+- Added a widget-level flow that rolls a non-six while all pawns are in the yard, verifies the turn advances and no previous-player pawn remains selectable, then rolls a six for the next player and moves that player's pawn.
+- The widget test also checks that the visible current-turn label and `OUT 1/4` pawn counter reflect the controller state after movement.
+- This validates synchronization between engine state, legal pawn hit targets, and the board HUD in a deterministic widget environment. It is not a substitute for a physical-device playtest.
+- Board route and safe cells remain provisional; no production readiness flag is enabled by this test.
