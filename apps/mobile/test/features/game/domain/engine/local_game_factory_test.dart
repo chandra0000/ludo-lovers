@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
 
@@ -53,6 +54,46 @@ void main() {
       expect(pawn.position.progress, 0);
       expect(moved.state.currentPlayerId, 'orange');
       expect(moved.state.pendingRoll, isNull);
+    });
+
+    test('all player paths are rotations of the same physical 52-cell track', () {
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = setup.paths.forPlayer(seat.id);
+        expect(path.mainTrackCells, hasLength(52), reason: seat.id);
+        expect(
+          path.entryCell,
+          seat.provisionalTrackEntryIndex,
+          reason: '${seat.id} must enter at its board-defined start marker',
+        );
+        for (var progress = 0; progress < 52; progress++) {
+          expect(
+            path.mainTrackCells[progress],
+            (progress + seat.provisionalTrackEntryIndex) % 52,
+            reason: '${seat.id} route progress $progress',
+          );
+        }
+        expect(
+          path.homeLaneCells,
+          seat.homeLaneCellIds,
+          reason: '${seat.id} engine home lane must match the shared seat definition',
+        );
+      }
+    });
+
+    test('provisional safe cells are valid physical IDs and protect every start', () {
+      const safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+
+      expect(safeCells, isNotEmpty);
+      expect(safeCells.every((cellId) => cellId >= 0 && cellId < 52), isTrue);
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(
+          safeCells.contains(seat.provisionalTrackEntryIndex),
+          isTrue,
+          reason: '${seat.id} start cell must be protected in the provisional profile',
+        );
+      }
     });
   });
 }
