@@ -265,7 +265,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      _BoardReadinessCard(),
+                      const _BoardReadinessCard(),
                       const SizedBox(height: 10),
                       _PlayerTurnStrip(
                         currentPlayerId: current,
