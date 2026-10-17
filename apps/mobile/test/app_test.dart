@@ -80,11 +80,18 @@ void main() {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
+    final semantics = tester.ensureSemantics();
+    addTearDown(semantics.dispose);
+
     await tester.pumpWidget(
       MaterialApp(home: LocalGameScreen(controller: controller)),
     );
 
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
+    expect(
+      tester.getSemantics(find.byKey(const ValueKey('turn_status_semantics'))).label,
+      'ORANGE player turn.',
+    );
     expect(find.text('TURN ORDER'), findsOneWidget);
     expect(find.text('OUT 0/4'), findsNWidgets(4));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
