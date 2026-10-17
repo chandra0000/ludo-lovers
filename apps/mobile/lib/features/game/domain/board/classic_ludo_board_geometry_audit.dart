@@ -113,17 +113,30 @@ class ClassicLudoBoardGeometryAudit {
       }
     }
 
-    // Every player's entry square is protected under this provisional rules
-    // profile. This validates metadata consistency, not visual approval.
+    // This prototype currently models the common eight-square profile:
+    // four player starts plus one star square eight track cells after each
+    // start. This is a rules-profile consistency check, not visual approval.
+    final expectedSafeCells = <int>{};
     for (final seat in ClassicLudoBoardDefinition.seats) {
       final entry = seat.provisionalTrackEntryIndex;
-      if (entry >= 0 &&
-          entry < track.length &&
-          !ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.contains(entry)) {
+      if (entry < 0 || entry >= track.length) continue;
+      expectedSafeCells
+        ..add(entry)
+        ..add((entry + 8) % track.length);
+      if (!ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.contains(entry)) {
         issues.add(
           '${seat.id} start cell $entry is missing from provisional safe cells.',
         );
       }
+    }
+    if (!setEquals(
+      expectedSafeCells,
+      ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
+    )) {
+      issues.add(
+        'Provisional safe cells must match the selected profile: four starts '
+        'plus the four track cells eight steps after each start.',
+      );
     }
 
     return List<String>.unmodifiable(issues);
