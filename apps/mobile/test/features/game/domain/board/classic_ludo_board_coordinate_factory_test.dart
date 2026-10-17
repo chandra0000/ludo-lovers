@@ -8,7 +8,9 @@ void main() {
       const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
       expect(route, hasLength(52));
       expect(route.toSet(), hasLength(52));
-      for (final cell in route) { expect(cell.isInsideBoard, isTrue); }
+      for (final cell in route) {
+        expect(cell.isInsideBoard, isTrue);
+      }
     });
 
     test('reports the provisional diagonal transitions as a gameplay blocker', () {
@@ -59,9 +61,8 @@ void main() {
       }
     });
 
-
     test('provisional safe cells include each start and the four offset star cells', () {
-      final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+      const safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
       final entries = ClassicLudoBoardDefinition.seats
           .map((seat) => seat.provisionalTrackEntryIndex)
           .toSet();
@@ -160,10 +161,16 @@ void main() {
         expect(seat.homeLaneCells.toSet(), hasLength(6));
         for (final cell in seat.homeLaneCells) {
           expect(cell.isInsideBoard, isTrue, reason: seat.id);
-          expect(track.contains(cell), isFalse,
-              reason: '${seat.id} home lane must not overlap the shared track');
-          expect(allLaneCells.add(cell), isTrue,
-              reason: 'Home-lane cells must not overlap between seats');
+          expect(
+            track.contains(cell),
+            isFalse,
+            reason: '${seat.id} home lane must not overlap the shared track',
+          );
+          expect(
+            allLaneCells.add(cell),
+            isTrue,
+            reason: 'Home-lane cells must not overlap between seats',
+          );
         }
       }
     });
