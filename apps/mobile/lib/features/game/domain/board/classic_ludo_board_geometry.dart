@@ -1,22 +1,23 @@
 import 'board_coordinate_layout.dart';
+import 'classic_ludo_board_definition.dart';
 
 /// Shared geometry contract for the classic Ludo Lovers board.
 ///
 /// Coordinates remain a separate renderer concern; this class validates that
-/// a supplied layout covers every logical track and private-lane cell. The
-/// safe-cell indexes follow the current provisional 52-cell rules profile and
-/// must be checked against the approved board reference before gameplay ships.
+/// a supplied layout covers every logical track and private-lane cell. Safe
+/// cell IDs are read from the board definition so renderer audits and local
+/// rules cannot silently drift apart. They remain provisional until approved
+/// against a clear, straight-on reference board.
 class ClassicLudoBoardGeometry {
   const ClassicLudoBoardGeometry._();
 
-  static const int gridSize = 15;
-  static const int trackLength = 52;
-  static const int homeLaneLength = 6;
+  static const int gridSize = ClassicLudoBoardDefinition.gridSize;
+  static const int trackLength = ClassicLudoBoardDefinition.sharedTrackLength;
+  static const int homeLaneLength = ClassicLudoBoardDefinition.homeLaneLength;
 
-  /// Four start cells plus four star/safe cells in global track coordinates.
-  static const Set<int> safeTrackCellIds = <int>{
-    0, 8, 13, 21, 26, 34, 39, 47,
-  };
+  /// Canonical provisional safe cells, expressed as physical shared-track IDs.
+  static Set<int> get safeTrackCellIds =>
+      ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
 
   static const Map<String, int> homeLaneStartByPlayer = <String, int>{
     'orange': 200,
@@ -42,7 +43,9 @@ class ClassicLudoBoardGeometry {
       );
     }
 
-    if (!safeTrackCellIds.every((cellId) => cellId >= 0 && cellId < trackLength)) {
+    if (!safeTrackCellIds.every(
+      (cellId) => cellId >= 0 && cellId < trackLength,
+    )) {
       throw StateError('Safe cells must refer to shared-track cell IDs.');
     }
   }
