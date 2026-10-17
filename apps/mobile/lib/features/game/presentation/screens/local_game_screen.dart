@@ -432,7 +432,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     required Size boardSize,
     required double cellSize,
   }) {
-    final pawn = statePawns.cast<dynamic?>().firstWhere(
+    final pawn = statePawns.cast<dynamic>().firstWhere(
           (candidate) => candidate?.id == visual.pawnId,
           orElse: () => null,
         );
