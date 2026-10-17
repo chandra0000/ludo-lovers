@@ -197,6 +197,60 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 11, color: AppTheme.mutedText),
               ),
+              const SizedBox(height: 12),
+              Container(
+                key: const ValueKey('board_route_gate_summary'),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppTheme.panel,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppTheme.gold.withValues(alpha: 0.45),
+                  ),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      Icons.gpp_maybe_outlined,
+                      color: AppTheme.gold,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const Text(
+                            'GAMEPLAY LOCKED · ROUTE REVIEW REQUIRED',
+                            style: TextStyle(
+                              color: AppTheme.gold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.45,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes.length} route blockers · ${ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.length} provisional safe cells',
+                            key: const ValueKey('board_route_gate_counts'),
+                            style: const TextStyle(
+                              color: AppTheme.cream,
+                              fontSize: 12,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Review route blockers',
+                      onPressed: _showRouteAudit,
+                      icon: const Icon(Icons.chevron_right_rounded),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               Expanded(
                 child: Center(
