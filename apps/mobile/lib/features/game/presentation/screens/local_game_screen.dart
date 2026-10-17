@@ -332,17 +332,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton.icon(
-                          key: const ValueKey('roll_dice_button'),
-                          onPressed: state.completed ||
-                                  state.pendingRoll != null
-                              ? null
-                              : _controller.rollDice,
-                          icon: const Icon(Icons.casino_rounded),
-                          label: const Text('Roll Dice'),
-                          tooltip: state.pendingRoll != null
+                        child: Tooltip(
+                          message: state.pendingRoll != null
                               ? 'Choose a highlighted pawn to use the current roll.'
                               : 'Roll a die to begin the current player’s turn.',
+                          child: ElevatedButton.icon(
+                            key: const ValueKey('roll_dice_button'),
+                            onPressed: state.completed ||
+                                    state.pendingRoll != null
+                                ? null
+                                : _controller.rollDice,
+                            icon: const Icon(Icons.casino_rounded),
+                            label: const Text('Roll Dice'),
+                          ),
                         ),
                       ),
                       if (state.completed) ...<Widget>[
