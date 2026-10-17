@@ -19,7 +19,7 @@ void main() {
 
     test('the additional four star cells are unique and in range', () {
       const starts = <int>{0, 13, 26, 39};
-      final safe = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
+      const safe = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
       final stars = safe.difference(starts);
 
       expect(safe, hasLength(8));
