@@ -115,3 +115,10 @@ A step is complete only when all relevant gates pass:
 - Added regression coverage for invalid position rejection and for deriving logical home-lane ID ranges from canonical seat metadata, removing a duplicate map from geometry.
 - Reference used: Flutter's official testing guidance recommends unit/widget tests for logic and UI behavior and integration tests for whole-app/device behavior. This increment strengthens deterministic engine/widget gates; a physical Android install/play session is still required before calling the build device-verified.
 - Next gate: confirm the route against a clear board-cell diagram, keep `isGameplayReady == false` until then, and expand device-level testing after the board contract is approved.
+
+
+## CI failure follow-up — local playtest hardening
+
+- Pipeline #223 failed in one engine test, not in formatting or static analysis: 143 tests passed and `skips a player whose pawns are all finished` failed because its fixture listed a green player without defining a green route.
+- The test fixture now defines a valid green path, matching the three players declared in that test state. This keeps the production invariant check strict rather than weakening it to accommodate an incomplete fixture.
+- Re-run the full CI gate before treating this fix as verified. The board readiness gate remains false until topology is approved.

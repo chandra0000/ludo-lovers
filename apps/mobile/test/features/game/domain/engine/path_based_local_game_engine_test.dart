@@ -23,6 +23,12 @@ void main() {
         homeLaneCells: <int>[110, 111, 112],
         trackLength: 8,
       ),
+      LudoPlayerPath(
+        playerId: 'green',
+        mainTrackCells: List<int>.generate(8, (i) => (i + 2) % 8),
+        homeLaneCells: <int>[120, 121, 122],
+        trackLength: 8,
+      ),
     ]);
     engine = PathBasedLocalGameEngine(
       paths: paths,
