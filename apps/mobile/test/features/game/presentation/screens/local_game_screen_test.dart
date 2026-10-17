@@ -39,6 +39,11 @@ void main() {
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsOneWidget,
       );
+      expect(
+        find.byKey(const ValueKey('destination_cell_0_orange_pawn_1')),
+        findsOneWidget,
+        reason: 'Legal entry should preview its destination on the board.',
+      );
 
       await tester.tap(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
