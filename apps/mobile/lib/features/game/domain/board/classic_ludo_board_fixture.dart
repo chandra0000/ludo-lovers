@@ -15,8 +15,9 @@ import 'ludo_board_paths.dart';
 class ClassicLudoBoardFixture {
   const ClassicLudoBoardFixture._();
 
-  static const int sharedTrackLength = 52;
-  static const int homeLaneLength = 6;
+  static const int sharedTrackLength =
+      ClassicLudoBoardDefinition.sharedTrackLength;
+  static const int homeLaneLength = ClassicLudoBoardDefinition.homeLaneLength;
 
   /// Derived from the shared seat definition to avoid duplicate entry offsets.
   static Map<String, int> get provisionalEntryCellByPlayer =>
@@ -29,29 +30,19 @@ class ClassicLudoBoardFixture {
     ClassicLudoBoardDefinition.validate();
     return LudoBoardPaths(<LudoPlayerPath>[
       for (final seat in ClassicLudoBoardDefinition.seats)
-        _createPlayerPath(
-          seat.id,
-          seat.homeLaneStartCellId,
-          seat.provisionalTrackEntryIndex,
-        ),
+        _createPlayerPath(seat),
     ]);
   }
 
-  static LudoPlayerPath _createPlayerPath(
-    String playerId,
-    int homeLaneBase,
-    int entry,
-  ) {
+  static LudoPlayerPath _createPlayerPath(ClassicLudoSeat seat) {
+    final entry = seat.provisionalTrackEntryIndex;
     return LudoPlayerPath(
-      playerId: playerId,
+      playerId: seat.id,
       mainTrackCells: List<int>.generate(
         sharedTrackLength,
         (index) => (index + entry) % sharedTrackLength,
       ),
-      homeLaneCells: List<int>.generate(
-        homeLaneLength,
-        (index) => homeLaneBase + index,
-      ),
+      homeLaneCells: seat.homeLaneCellIds,
       trackLength: sharedTrackLength,
     );
   }

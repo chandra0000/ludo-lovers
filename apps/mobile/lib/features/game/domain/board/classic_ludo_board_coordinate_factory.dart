@@ -9,60 +9,9 @@ import 'classic_ludo_board_definition.dart';
 class ClassicLudoBoardCoordinateFactory {
   const ClassicLudoBoardCoordinateFactory._();
 
-  static const List<BoardGridCell> sharedTrack = <BoardGridCell>[
-    BoardGridCell(column: 1, row: 6),
-    BoardGridCell(column: 2, row: 6),
-    BoardGridCell(column: 3, row: 6),
-    BoardGridCell(column: 4, row: 6),
-    BoardGridCell(column: 5, row: 6),
-    BoardGridCell(column: 6, row: 5),
-    BoardGridCell(column: 6, row: 4),
-    BoardGridCell(column: 6, row: 3),
-    BoardGridCell(column: 6, row: 2),
-    BoardGridCell(column: 6, row: 1),
-    BoardGridCell(column: 6, row: 0),
-    BoardGridCell(column: 7, row: 0),
-    BoardGridCell(column: 8, row: 0),
-    BoardGridCell(column: 8, row: 1),
-    BoardGridCell(column: 8, row: 2),
-    BoardGridCell(column: 8, row: 3),
-    BoardGridCell(column: 8, row: 4),
-    BoardGridCell(column: 8, row: 5),
-    BoardGridCell(column: 9, row: 6),
-    BoardGridCell(column: 10, row: 6),
-    BoardGridCell(column: 11, row: 6),
-    BoardGridCell(column: 12, row: 6),
-    BoardGridCell(column: 13, row: 6),
-    BoardGridCell(column: 14, row: 6),
-    BoardGridCell(column: 14, row: 7),
-    BoardGridCell(column: 14, row: 8),
-    BoardGridCell(column: 13, row: 8),
-    BoardGridCell(column: 12, row: 8),
-    BoardGridCell(column: 11, row: 8),
-    BoardGridCell(column: 10, row: 8),
-    BoardGridCell(column: 9, row: 8),
-    BoardGridCell(column: 8, row: 9),
-    BoardGridCell(column: 8, row: 10),
-    BoardGridCell(column: 8, row: 11),
-    BoardGridCell(column: 8, row: 12),
-    BoardGridCell(column: 8, row: 13),
-    BoardGridCell(column: 8, row: 14),
-    BoardGridCell(column: 7, row: 14),
-    BoardGridCell(column: 6, row: 14),
-    BoardGridCell(column: 6, row: 13),
-    BoardGridCell(column: 6, row: 12),
-    BoardGridCell(column: 6, row: 11),
-    BoardGridCell(column: 6, row: 10),
-    BoardGridCell(column: 6, row: 9),
-    BoardGridCell(column: 5, row: 8),
-    BoardGridCell(column: 4, row: 8),
-    BoardGridCell(column: 3, row: 8),
-    BoardGridCell(column: 2, row: 8),
-    BoardGridCell(column: 1, row: 8),
-    BoardGridCell(column: 0, row: 8),
-    BoardGridCell(column: 0, row: 7),
-    BoardGridCell(column: 0, row: 6),
-  ];
+  /// Compatibility alias; the canonical physical route lives in the definition.
+  static const List<BoardGridCell> sharedTrack =
+      ClassicLudoBoardDefinition.sharedTrackCells;
 
   /// Indexes whose next route cell is diagonal rather than orthogonally adjacent.
   ///

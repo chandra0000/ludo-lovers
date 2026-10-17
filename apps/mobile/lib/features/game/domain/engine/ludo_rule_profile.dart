@@ -5,11 +5,13 @@
 /// shared-track indexes and must match the selected board definition.
 library;
 
+import '../board/classic_ludo_board_definition.dart';
+
 final class LudoRuleProfile {
   LudoRuleProfile({
     this.id = 'classic-v1-provisional',
     this.version = 1,
-    Set<int> safeCellIndexes = const <int>{},
+    Set<int>? safeCellIndexes,
     this.sixRequiredToEnter = true,
     this.extraRollOnSix = true,
     this.extraRollOnCapture = true,
@@ -19,7 +21,10 @@ final class LudoRuleProfile {
     this.thirdSixEndsTurnWithoutMove = true,
     this.finishEndsMatchImmediately = true,
     this.captureOnlySingleOpponentPawn = true,
-  }) : safeCellIndexes = Set<int>.unmodifiable(safeCellIndexes) {
+  }) : safeCellIndexes = Set<int>.unmodifiable(
+          safeCellIndexes ??
+              ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
+        ) {
     if (id.trim().isEmpty) {
       throw ArgumentError.value(id, 'id', 'Must not be empty.');
     }
@@ -33,8 +38,14 @@ final class LudoRuleProfile {
         'Must be at least 1.',
       );
     }
-    if (this.safeCellIndexes.any((index) => index < 0)) {
-      throw ArgumentError('Safe-cell indexes cannot be negative.');
+    if (this.safeCellIndexes.any(
+      (index) =>
+          index < 0 ||
+          index >= ClassicLudoBoardDefinition.sharedTrackLength,
+    )) {
+      throw ArgumentError(
+        'Safe-cell indexes must be within the canonical shared track.',
+      );
     }
   }
 
