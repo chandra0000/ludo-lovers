@@ -309,8 +309,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           height: cellSize * 0.96,
                                           child: Semantics(
                                             button: true,
-                                            label:
-                                                'Move pawn ${visual.pawnId}',
+                                            label: 'Move pawn ${visual.pawnId}',
+                                            hint: 'Moves this pawn using the current dice roll.',
                                             child: GestureDetector(
                                               key: ValueKey<String>(
                                                 'legal_pawn_${visual.pawnId}',
@@ -340,6 +340,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               : _controller.rollDice,
                           icon: const Icon(Icons.casino_rounded),
                           label: const Text('Roll Dice'),
+                          tooltip: state.pendingRoll != null
+                              ? 'Choose a highlighted pawn to use the current roll.'
+                              : 'Roll a die to begin the current player’s turn.',
                         ),
                       ),
                       if (state.completed) ...<Widget>[
@@ -356,13 +359,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       ],
                       if (_controller.lastMessage != null) ...<Widget>[
                         const SizedBox(height: 8),
-                        Text(
-                          _controller.lastMessage!,
-                          key: const ValueKey('last_game_action'),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppTheme.mutedText,
-                            fontSize: 11,
+                        Semantics(
+                          liveRegion: true,
+                          key: const ValueKey('last_game_action_semantics'),
+                          child: Text(
+                            _controller.lastMessage!,
+                            key: const ValueKey('last_game_action'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppTheme.mutedText,
+                              fontSize: 11,
+                            ),
                           ),
                         ),
                       ],
