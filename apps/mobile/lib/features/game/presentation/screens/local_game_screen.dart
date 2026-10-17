@@ -212,6 +212,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   Semantics(
                                     key: const ValueKey('turn_status_semantics'),
                                     liveRegion: true,
+                                    excludeSemantics: true,
                                     label: state.completed
                                         ? 'Match complete. ${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins.'
                                         : '${current.toUpperCase()} player turn.',
