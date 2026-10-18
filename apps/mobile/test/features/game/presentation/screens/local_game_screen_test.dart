@@ -678,6 +678,33 @@ void main() {
     },
   );
 
+  testWidgets('passes a non-six roll when every pawn is still in the yard', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 3);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.currentPlayerId, 'green');
+    expect(controller.state.pendingRoll, isNull);
+    expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
+    expect(find.text('GREEN’S TURN'), findsOneWidget);
+  });
+
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
