@@ -101,6 +101,47 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 title: 'Prototype warning',
                 detail: 'The board route and safe-cell positions are still provisional. This guide describes the current local test rules, not approved online or competitive rules.',
               ),
+              const SizedBox(height: 16),
+              Text(
+                'Board geometry review',
+                style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
+                      color: AppTheme.gold,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'These route transitions need review before the board can be marked gameplay-ready:',
+                style: TextStyle(
+                  color: AppTheme.readableText,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 8),
+              for (final index
+                  in ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.panelRaised,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      ClassicLudoBoardCoordinateFactory.describeTransition(index),
+                      style: const TextStyle(
+                        color: AppTheme.cream,
+                        fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
