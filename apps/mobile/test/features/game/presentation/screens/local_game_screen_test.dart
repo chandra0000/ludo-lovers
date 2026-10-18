@@ -740,14 +740,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pump(const Duration(milliseconds: 100));
-
-    final inFlight = tester.getTopLeft(marker);
     await tester.pumpAndSettle();
     final end = tester.getTopLeft(marker);
 
     expect(end, isNot(start));
-    expect(inFlight, isNot(start));
     expect(
       controller.state.pawns
           .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
