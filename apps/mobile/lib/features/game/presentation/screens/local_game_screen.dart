@@ -826,7 +826,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         duration: const Duration(milliseconds: 260),
                                         child: state.pendingRoll == null
                                             ? const Icon(Icons.casino_rounded, key: ValueKey('dice_idle'), size: 44, color: Color(0xFF3B2600))
-                                            : Text('${state.pendingRoll}', key: ValueKey('dice_value_${state.pendingRoll}'), style: const TextStyle(color: Color(0xFF3B2600), fontSize: 36, fontWeight: FontWeight.w900)),
+                                            : Container(
+                                                key: ValueKey<String>('dice_result_${state.pendingRoll}'),
+                                                alignment: Alignment.center,
+                                                child: Semantics(
+                                                  key: const ValueKey('dice_result_semantics'),
+                                                  label: 'Dice result: ${state.pendingRoll}',
+                                                  liveRegion: true,
+                                                  excludeSemantics: true,
+                                                  child: Text('${state.pendingRoll}', style: const TextStyle(color: Color(0xFF3B2600), fontSize: 36, fontWeight: FontWeight.w900)),
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ),
