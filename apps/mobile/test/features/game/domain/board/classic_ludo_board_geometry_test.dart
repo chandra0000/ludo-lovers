@@ -62,7 +62,7 @@ void main() {
         for (var cell = 0; cell < 52; cell++)
           cell: const BoardPoint(x: 0.5, y: 0.5),
         for (final start in ClassicLudoBoardGeometry.homeLaneStartByPlayer.values)
-          for (var offset = 0; offset < 6; offset++)
+          for (var offset = 0; offset < 5; offset++)
             if (start + offset != 234)
               start + offset: const BoardPoint(x: 0.5, y: 0.5),
       };
