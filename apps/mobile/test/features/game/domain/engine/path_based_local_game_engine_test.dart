@@ -359,6 +359,24 @@ void main() {
     expect(captureEvents.single.playerId, 'orange');
     expect(moved.state.currentPlayerId, 'orange',
         reason: 'A capture grants the configured bonus roll.');
+    expect(
+      moved.events.every((event) => event.stateVersion == moved.state.version),
+      isTrue,
+      reason: 'Every capture transition event must reference the same resulting snapshot.',
+    );
+    expect(
+      moved.events.map((event) => event.sequence),
+      List<int>.generate(moved.events.length, (index) => index),
+      reason: 'Multi-event capture transitions must preserve deterministic event order.',
+    );
+    expect(
+      moved.events.map((event) => event.kind),
+      containsAll(<LocalGameEventKind>[
+        LocalGameEventKind.pawnMoved,
+        LocalGameEventKind.pawnCaptured,
+        LocalGameEventKind.extraRollGranted,
+      ]),
+    );
   });
 
   test('does not capture an opponent on a safe cell', () {
