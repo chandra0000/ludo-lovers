@@ -815,11 +815,19 @@ void main() {
     final orangePath = setup.paths.forPlayer('orange');
     final initialState = setup.initialState.copyWith(
       pawns: setup.initialState.pawns.map((pawn) {
-        if (pawn.id != 'orange_pawn_1') return pawn;
+        if (pawn.playerId != 'orange') return pawn;
+        if (pawn.id == 'orange_pawn_1') {
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: orangePath.finishProgress - 1,
+            ),
+          );
+        }
         return pawn.copyWith(
           position: PawnRoutePosition(
-            section: PawnRouteSection.homeLane,
-            progress: orangePath.finishProgress - 1,
+            section: PawnRouteSection.finished,
+            progress: orangePath.finishProgress,
           ),
         );
       }).toList(growable: false),
