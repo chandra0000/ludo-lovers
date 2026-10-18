@@ -127,7 +127,7 @@ void main() {
       tester.getSemantics(find.byKey(const ValueKey('turn_status_semantics'))).label,
       'ORANGE player turn.',
     );
-    expect(find.text('YOU'), findsNothing);
+    expect(find.text('YOU'), findsOneWidget);
     expect(find.text('OPPONENT'), findsNothing);
     expect(find.text('ORANGE'), findsOneWidget);
     expect(find.text('GREEN'), findsOneWidget);
