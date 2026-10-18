@@ -77,9 +77,12 @@ void main() {
       final resetState = controller.state;
 
       expect(resetState.version, greaterThan(oldRenderedVersion));
-      expect(resetState.pawns.every(
-        (pawn) => pawn.position.section == PawnRouteSection.yard,
-      ), isTrue);
+      expect(
+        resetState.pawns.every(
+          (pawn) => pawn.position.section == PawnRouteSection.yard,
+        ),
+        isTrue,
+      );
 
       controller.rollDice(expectedVersion: oldRenderedVersion);
 
