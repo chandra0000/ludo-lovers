@@ -3,16 +3,16 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixtur
 
 void main() {
   group('ClassicLudoBoardFixture', () {
-    test('defines four routes with 52 shared-track cells and six home cells', () {
+    test('defines four routes with 52 shared-track cells and five home cells', () {
       final board = ClassicLudoBoardFixture.create();
 
       expect(board.pathsByPlayer.length, 4);
       for (final route in board.pathsByPlayer.values) {
         expect(route.trackLength, 52);
-        expect(route.homeLaneLength, 6);
+        expect(route.homeLaneLength, 5);
         expect(route.mainTrackCells.length, 52);
         expect(route.mainTrackCells.toSet().length, 52);
-        expect(route.homeLaneCells.length, 6);
+        expect(route.homeLaneCells.length, 5);
       }
     });
 
@@ -52,12 +52,12 @@ void main() {
       final green = board.forPlayer('green');
       final blue = board.forPlayer('blue');
 
-      expect(green.finishProgress, 58);
+      expect(green.finishProgress, 57);
       expect(green.cellAtProgress(0), 13);
       expect(green.cellAtProgress(51), 12);
       expect(green.cellAtProgress(52), 220);
-      expect(green.cellAtProgress(57), 225);
-      expect(green.cellAtProgress(58), isNull);
+      expect(green.cellAtProgress(56), 224);
+      expect(green.cellAtProgress(57), isNull);
 
       expect(blue.cellAtProgress(0), 39);
       expect(blue.cellAtProgress(51), 38);
