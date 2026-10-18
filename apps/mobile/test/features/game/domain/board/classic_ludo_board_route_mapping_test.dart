@@ -43,7 +43,7 @@ void main() {
       expect(entries, {'orange': 0, 'green': 13, 'blue': 39, 'magenta': 26});
     });
 
-    test('each seat route has 52 unique cells and a six-cell home lane', () {
+    test('each seat route has 52 unique cells and a five-cell home lane', () {
       final paths = ClassicLudoBoardFixture.create();
 
       expect(paths.pathsByPlayer, hasLength(4));
@@ -51,7 +51,7 @@ void main() {
         final path = paths.forPlayer(seat.id);
         expect(path.mainTrackCells, hasLength(52), reason: seat.id);
         expect(path.mainTrackCells.toSet(), hasLength(52), reason: seat.id);
-        expect(path.homeLaneCells, hasLength(6), reason: seat.id);
+        expect(path.homeLaneCells, hasLength(5), reason: seat.id);
         expect(path.entryCell, seat.provisionalTrackEntryIndex, reason: seat.id);
         expect(path.cellAtProgress(0), seat.provisionalTrackEntryIndex);
         expect(
@@ -59,8 +59,8 @@ void main() {
           (seat.provisionalTrackEntryIndex + 51) % 52,
         );
         expect(path.cellAtProgress(52), seat.homeLaneStartCellId);
-        expect(path.cellAtProgress(57), seat.homeLaneStartCellId + 5);
-        expect(path.cellAtProgress(58), isNull);
+        expect(path.cellAtProgress(56), seat.homeLaneStartCellId + 4);
+        expect(path.cellAtProgress(57), isNull);
       }
     });
 
