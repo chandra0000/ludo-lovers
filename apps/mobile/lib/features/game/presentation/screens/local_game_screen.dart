@@ -137,7 +137,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       ClassicLudoBoardCoordinateFactory.describeTransition(index),
                       style: const TextStyle(
                         color: AppTheme.cream,
-                        fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+                        fontFamily: 'monospace',
                       ),
                     ),
                   ),
