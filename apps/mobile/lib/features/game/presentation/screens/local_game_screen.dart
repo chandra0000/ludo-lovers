@@ -111,7 +111,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               ),
               const SizedBox(height: 6),
               const Text(
-                'These route transitions need review before the board can be marked gameplay-ready:',
+                'These four diagonal corner links match the independent reference cross-check. The full board artwork and safe-cell placement still need visual approval:',
                 style: TextStyle(
                   color: AppTheme.readableText,
                   fontSize: 13,
