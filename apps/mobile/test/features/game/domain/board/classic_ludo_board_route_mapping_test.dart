@@ -33,6 +33,30 @@ void main() {
       );
     });
 
+    test('provisional shared-track coordinate snapshot stays stable pending visual approval', () {
+      // This is a regression lock for the current provisional route, not proof
+      // that the route matches the final brand artwork. Update only after a
+      // reviewed, explicit topology decision.
+      final coordinateSnapshot = ClassicLudoBoardCoordinateFactory.sharedTrack
+          .map((cell) => '${cell.column},${cell.row}')
+          .toList(growable: false);
+
+      expect(coordinateSnapshot, <String>[
+        '1,6', '2,6', '3,6', '4,6', '5,6', '6,5', '6,4', '6,3',
+        '6,2', '6,1', '6,0', '7,0', '8,0', '8,1', '8,2', '8,3',
+        '8,4', '8,5', '9,6', '10,6', '11,6', '12,6', '13,6', '14,6',
+        '14,7', '14,8', '13,8', '12,8', '11,8', '10,8', '9,8', '8,9',
+        '8,10', '8,11', '8,12', '8,13', '8,14', '7,14', '6,14', '6,13',
+        '6,12', '6,11', '6,10', '6,9', '5,8', '4,8', '3,8', '2,8',
+        '1,8', '0,8', '0,7', '0,6',
+      ]);
+      expect(
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
+        <int>[4, 17, 30, 43],
+      );
+      expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
+    });
+
     test('logical route entry offsets derive from the shared seat definition', () {
       final entries = ClassicLudoBoardFixture.provisionalEntryCellByPlayer;
 
