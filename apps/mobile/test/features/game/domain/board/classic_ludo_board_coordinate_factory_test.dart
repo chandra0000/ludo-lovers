@@ -100,7 +100,7 @@ void main() {
 
     test('builds normalized coordinates for track and all private lanes', () {
       final layout = ClassicLudoBoardCoordinateFactory.create();
-      expect(layout.pointsByCell, hasLength(52 + 4 * 6));
+      expect(layout.pointsByCell, hasLength(52 + 4 * 5));
       for (var cellId = 0; cellId < 52; cellId++) {
         expect(layout.pointsByCell.containsKey(cellId), isTrue);
       }
@@ -153,12 +153,12 @@ void main() {
       }
     });
 
-    test('home lanes use six distinct in-bounds physical cells per seat', () {
+    test('home lanes use five distinct in-bounds physical cells per seat', () {
       final track = ClassicLudoBoardCoordinateFactory.sharedTrack.toSet();
       final allLaneCells = <BoardGridCell>{};
       for (final seat in ClassicLudoBoardDefinition.seats) {
-        expect(seat.homeLaneCells, hasLength(6));
-        expect(seat.homeLaneCells.toSet(), hasLength(6));
+        expect(seat.homeLaneCells, hasLength(5));
+        expect(seat.homeLaneCells.toSet(), hasLength(5));
         for (final cell in seat.homeLaneCells) {
           expect(cell.isInsideBoard, isTrue, reason: seat.id);
           expect(
