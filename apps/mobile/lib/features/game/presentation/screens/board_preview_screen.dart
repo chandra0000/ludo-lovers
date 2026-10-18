@@ -74,7 +74,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
   void _showRouteAudit() {
     final auditIssues = ClassicLudoBoardGeometryAudit.inspect();
     final blockers = auditIssues
-        .where((issue) => issue.contains('not orthogonally adjacent'))
+        .where((issue) => issue.contains('not an approved neighbouring-cell connection'))
         .toList(growable: false);
     final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
         .toList()
@@ -102,16 +102,22 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               Text(
                 ClassicLudoBoardCoordinateFactory.isGameplayReady
                     ? 'Structural checks pass. Visual and rules approval is still required before release.'
-                    : 'Gameplay is blocked by route-integrity checks. Current audit findings: ${auditIssues.length}.',
+                    : 'Structural geometry checks pass. Visual topology and rules approval are still required before release.',
               ),
               const SizedBox(height: 12),
               const Text(
-                'Route blockers',
+                'Diagonal corner transitions',
                 style: TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 4),
-              if (blockers.isEmpty)
-                const Text('No non-orthogonal transitions detected.')
+              if (blockers.isNotEmpty)
+                for (final issue in blockers)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('• $issue'),
+                  ),
+              if (ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes.isEmpty)
+                const Text('No diagonal corner transitions detected.')
               else
                 for (final index
                     in ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes)
@@ -261,7 +267,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes.length} route blockers · ${ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.length} provisional safe cells',
+                            '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.length} invalid transitions · ${ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.length} provisional safe cells',
                             key: const ValueKey('board_route_gate_counts'),
                             style: const TextStyle(
                               color: AppTheme.cream,
@@ -273,7 +279,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Review route blockers',
+                      tooltip: 'Review route geometry',
                       onPressed: _showRouteAudit,
                       icon: const Icon(Icons.chevron_right_rounded),
                     ),
