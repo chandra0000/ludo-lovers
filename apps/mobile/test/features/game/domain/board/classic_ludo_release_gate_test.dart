@@ -44,17 +44,15 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('geometry audit accepts only the four documented diagonal corners', () {
+    test('geometry audit recognizes the four documented diagonal corners', () {
       final issues = ClassicLudoBoardGeometryAudit.inspect();
-      final routeIssues = issues
-          .where((issue) => issue.contains('not orthogonally adjacent'))
-          .toList(growable: false);
 
-      expect(routeIssues, hasLength(4));
-      expect(routeIssues.join('\n'), contains('Track transition 4 to 5'));
-      expect(routeIssues.join('\n'), contains('Track transition 17 to 18'));
-      expect(routeIssues.join('\n'), contains('Track transition 30 to 31'));
-      expect(routeIssues.join('\n'), contains('Track transition 43 to 44'));
-    });
+      expect(issues, isEmpty);
+      expect(
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
+        <int>[4, 17, 30, 43],
+      );
+      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+    });;
   });
 }
