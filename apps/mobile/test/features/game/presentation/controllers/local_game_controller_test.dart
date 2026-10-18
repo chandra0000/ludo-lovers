@@ -111,10 +111,12 @@ void main() {
 
     test('rejects stale rendered callbacks before consuming a dice value', () {
       var diceCalls = 0;
-      final controller = LocalGameController(nextDiceValue: () {
-        diceCalls++;
-        return 6;
-      });
+      final controller = LocalGameController(
+        nextDiceValue: () {
+          diceCalls++;
+          return 6;
+        },
+      );
       addTearDown(controller.dispose);
 
       controller.rollDice();
@@ -127,8 +129,11 @@ void main() {
       expect(identical(controller.state, afterRoll), isTrue);
       expect(controller.state.version, afterRoll.version);
       expect(controller.state.pendingRoll, 6);
-      expect(diceCalls, 1,
-          reason: 'A stale roll callback must not consume the dice source.');
+      expect(
+        diceCalls,
+        1,
+        reason: 'A stale roll callback must not consume the dice source.',
+      );
       expect(controller.lastError?.error, LocalActionError.staleVersion);
     });
 
@@ -151,6 +156,5 @@ void main() {
       );
       expect(controller.lastError?.error, LocalActionError.staleVersion);
     });
-
   });
 }
