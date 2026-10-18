@@ -11,6 +11,7 @@ import '../../domain/board/classic_ludo_board_definition.dart';
 import '../../domain/board/classic_ludo_board_fixture.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/engine/ludo_path_movement.dart';
+import '../../domain/engine/path_based_local_game_engine.dart';
 import '../controllers/local_game_controller.dart';
 
 /// Development-only board-backed local match.
@@ -65,7 +66,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _scheduleAiTurn(_controller.state);
   }
 
-  void _scheduleAiTurn(dynamic state) {
+  void _scheduleAiTurn(LocalGameState state) {
     if (!_playAgainstAi ||
         state.completed ||
         state.currentPlayerId == _humanPlayerId ||
@@ -74,7 +75,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       return;
     }
 
-    final expectedPlayerId = state.currentPlayerId as String;
+    final expectedPlayerId = state.currentPlayerId;
     _aiTimer = Timer(const Duration(milliseconds: 420), () {
       _aiTimer = null;
       if (!mounted ||
@@ -111,7 +112,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     });
   }
 
-  String _chooseAiPawn(List<String> legalPawnIds, dynamic state) {
+  String _chooseAiPawn(List<String> legalPawnIds, LocalGameState state) {
     String bestPawnId = legalPawnIds.first;
     var bestScore = -1 << 30;
 
@@ -121,7 +122,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       final resolution = _movement.resolve(
         path: path,
         current: pawn.position,
-        diceValue: state.pendingRoll as int,
+        diceValue: state.pendingRoll!,
         sixRequiredToEnter: _controller.setup.engine.sixRequiredToEnter,
         requireExactFinishRoll:
             _controller.setup.engine.requireExactFinishRoll,
