@@ -196,7 +196,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
-      // Orange moves from global cell 1 to 2; blue's relative progress 41
+      // Orange moves from global cell 1 to 2; blue's relative progress 15
       // resolves to that same provisional shared-track cell.
       final initialState = setup.initialState.copyWith(
         pawns: setup.initialState.pawns.map((pawn) {
@@ -212,7 +212,7 @@ void main() {
             return pawn.copyWith(
               position: const PawnRoutePosition(
                 section: PawnRouteSection.mainTrack,
-                progress: 41,
+                progress: 15,
               ),
             );
           }
