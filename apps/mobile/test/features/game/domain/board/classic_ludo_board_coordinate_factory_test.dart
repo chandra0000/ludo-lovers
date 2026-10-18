@@ -13,17 +13,18 @@ void main() {
       }
     });
 
-    test('reports the provisional diagonal transitions as a gameplay blocker', () {
-      // This is an explicit guard, not approval of the route. The four diagonal
-      // transitions must be corrected before movement/hit-testing uses it.
+    test('reports the four documented diagonal corner links for visual review', () {
+      // These four diagonal links are valid neighbouring cells in the independent
+      // reference, but do not constitute visual approval of the complete board.
       expect(
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
+      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('only known provisional blockers are non-orthogonal transitions', () {
+    test('only the four documented corners use diagonal adjacency', () {
       const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
       final knownBlockers =
           ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes;
@@ -33,7 +34,8 @@ void main() {
         final dx = (current.column - next.column).abs();
         final dy = (current.row - next.row).abs();
         if (knownBlockers.contains(index)) {
-          expect(dx + dy, 2, reason: 'Known provisional blocker $index');
+          expect(dx, 1, reason: 'Corner transition $index must change one column');
+          expect(dy, 1, reason: 'Corner transition $index must change one row');
         } else {
           expect(
             dx + dy,
