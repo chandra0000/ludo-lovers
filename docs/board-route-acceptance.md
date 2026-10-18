@@ -10,7 +10,7 @@ This checklist deliberately records the current defects without guessing which g
 
 A read-only comparison against the public `rojanparajuli/Flutter_ludo` board constants found that its 52-cell shared-track sequence, start indexes `0, 13, 26, 39`, and safe-cell indexes `0, 8, 13, 21, 26, 34, 39, 47` match this repository's current values when row/column coordinates are normalized. Reference: https://github.com/rojanparajuli/Flutter_ludo/blob/master/lib/constant/board_constants.dart
 
-This is useful corroboration, not approval to enable gameplay: the reference uses a different home-stretch/finish indexing model (five shared-to-center stretch cells plus a separate finished position), while this app currently models six physical home-lane cells. Confirm the intended lane/finish convention against the supplied board design and this app's rules before changing the release gate. Do not copy third-party code into this repository.
+This is useful corroboration, not approval to enable gameplay: the reference uses a different home-stretch/finish indexing model (five shared-to-center stretch cells plus a separate finished position), while this app previously modelled six physical home-lane cells. The user has now confirmed the intended convention: five coloured home-lane cells plus a separate centre finish; implementation is being updated to that model. Confirm the intended lane/finish convention against the supplied board design and this app's rules before changing the release gate. Do not copy third-party code into this repository.
 
 The four diagonal coordinate transitions listed below also occur in that reference sequence. They may represent intentional corner connections rather than incorrect route order; review the rendered cell/track artwork before deciding whether the geometry audit should permit these specific transitions. Keep `isGameplayReady` false until the entire visual route, home-lane model, and rules profile are reconciled and tested.
 
@@ -32,7 +32,7 @@ Do not simply remove these diagnostics or mark the route ready. A valid replacem
 - [ ] Obtain/review a clear, straight-on board image or annotated cell-by-cell reference.
 - [ ] Confirm the shared-track order clockwise or counter-clockwise, including all four corners.
 - [ ] Confirm the exact entry/start cell and direction for orange, green, blue, and magenta.
-- [ ] Confirm each private home lane's six physical cells and finish position.
+- [ ] Confirm each private home lane's five physical cells and the separate centre finish position.
 - [ ] Confirm all safe cells against the same reference and the chosen written rules profile.
 - [ ] Verify the shared track has exactly 52 unique cells, all inside the 15×15 grid.
 - [ ] Verify every consecutive shared-track pair, including index 51 back to 0, is orthogonally adjacent.
