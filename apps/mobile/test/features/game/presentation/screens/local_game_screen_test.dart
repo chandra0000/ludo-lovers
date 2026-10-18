@@ -7,6 +7,42 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
+  testWidgets('keeps the complete board square and within a phone viewport', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    final boardFinder = find.byKey(const ValueKey('local_game_board'));
+    expect(boardFinder, findsOneWidget);
+    final boardSize = tester.getSize(boardFinder);
+    expect(boardSize.width, greaterThan(0));
+    expect(boardSize.height, greaterThan(0));
+    expect(
+      boardSize.width,
+      closeTo(boardSize.height, 0.01),
+      reason: 'The four home areas and centre must not be distorted by layout.',
+    );
+    expect(
+      boardSize.width,
+      lessThanOrEqualTo(340),
+      reason: 'Board width must fit the 360 px viewport with screen padding.',
+    );
+    expect(find.byType(CustomPaint), findsWidgets);
+  });
+
   testWidgets(
     'rolls, highlights a legal pawn, moves it, and preserves prototype warning',
     (tester) async {
