@@ -430,6 +430,98 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ],
                         ),
                       ),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 420),
+                        switchInCurve: Curves.easeOutBack,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child: ScaleTransition(
+                            scale: Tween<double>(begin: 0.92, end: 1).animate(
+                              animation,
+                            ),
+                            child: child,
+                          ),
+                        ),
+                        child: state.completed
+                            ? Container(
+                                key: const ValueKey('match_finish_banner'),
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: <Color>[
+                                      AppTheme.gold.withValues(alpha: 0.22),
+                                      AppTheme.panelRaised,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: AppTheme.gold,
+                                    width: 1.4,
+                                  ),
+                                  boxShadow: <BoxShadow>[
+                                    BoxShadow(
+                                      color: AppTheme.gold.withValues(alpha: 0.12),
+                                      blurRadius: 18,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(
+                                      Icons.emoji_events_rounded,
+                                      color: AppTheme.gold,
+                                      size: 34,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          const Text(
+                                            'MATCH WON',
+                                            style: TextStyle(
+                                              color: AppTheme.gold,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 1.4,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 3),
+                                          Text(
+                                            '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} TAKES THE CROWN',
+                                            key: const ValueKey('match_winner_title'),
+                                            style: const TextStyle(
+                                              color: AppTheme.cream,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          const Text(
+                                            'A brilliant finish. Ready for a rematch?',
+                                            style: TextStyle(
+                                              color: AppTheme.readableText,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox.shrink(
+                                key: ValueKey('match_finish_banner_hidden'),
+                              ),
+                      ),
                       const SizedBox(height: 8),
                       _PlayerTurnStrip(
                         currentPlayerId: current,
