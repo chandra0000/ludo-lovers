@@ -117,6 +117,76 @@ void main() {
     },
   );
 
+
+  testWidgets(
+    'previews the private home-lane destination before accepting a move',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final orangePath = setup.paths.forPlayer('orange');
+      final startOfHomeLane = orangePath.trackLength;
+      final initialState = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id != 'orange_pawn_1') return pawn;
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: orangePath.trackLength - 1,
+            ),
+          );
+        }).toList(growable: false),
+      );
+      final controller = LocalGameController(
+        nextDiceValue: () => 1,
+        gameSetup: setup,
+        initialState: initialState,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+
+      final homeLaneCell = orangePath.cellAtProgress(startOfHomeLane);
+      expect(homeLaneCell, isNotNull);
+      expect(
+        find.byKey(
+          ValueKey('destination_cell_${homeLaneCell}_orange_pawn_1'),
+        ),
+        findsOneWidget,
+        reason: 'The preview should show the exact private-lane destination.',
+      );
+
+      await tester.tap(
+        find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
+      );
+      await tester.pumpAndSettle();
+
+      final movedPawn = controller.state.pawns.firstWhere(
+        (pawn) => pawn.id == 'orange_pawn_1',
+      );
+      expect(movedPawn.position.section, PawnRouteSection.homeLane);
+      expect(movedPawn.position.progress, orangePath.trackLength);
+      expect(
+        find.byKey(
+          ValueKey('destination_cell_${homeLaneCell}_orange_pawn_1'),
+        ),
+        findsNothing,
+        reason: 'A consumed roll must clear the stale destination preview.',
+      );
+    },
+  );
+
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
