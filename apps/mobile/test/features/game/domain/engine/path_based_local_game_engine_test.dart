@@ -562,6 +562,62 @@ void main() {
     expect(moved.state.currentPlayerId, 'blue');
   });
 
+  test('rejects a finish overshoot without consuming the pending roll', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: 10,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 2,
+    );
+
+    expect(
+      () => engine.move(
+        rolled.state,
+        playerId: 'orange',
+        expectedVersion: rolled.state.version,
+        pawnId: 'o1',
+      ),
+      throwsA(
+        isA<LocalGameException>().having(
+          (error) => error.error,
+          'error',
+          LocalActionError.illegalMove,
+        ),
+      ),
+    );
+    expect(rolled.state.pendingRoll, 2);
+    expect(rolled.state.version, state.version + 1);
+    expect(
+      rolled.state.pawns.firstWhere((pawn) => pawn.id == 'o1').position.progress,
+      10,
+      reason: 'A rejected overshoot must leave the prior snapshot unchanged.',
+    );
+  });
+
   test('declares the winner when the last pawn reaches finish', () {
     final state = LocalGameState(
       players: initial.players,
