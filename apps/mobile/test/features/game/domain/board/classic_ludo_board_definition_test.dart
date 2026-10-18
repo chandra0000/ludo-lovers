@@ -28,7 +28,7 @@ void main() {
           .expand((seat) => seat.homeLaneCellIds)
           .toList();
       expect(allLaneIds, hasLength(20));
-      expect(allLaneIds.toSet(), hasLength(24));
+      expect(allLaneIds.toSet(), hasLength(20));
       expect(ClassicLudoBoardDefinition.seatFor('orange').homeLaneCellIds,
           <int>[200, 201, 202, 203, 204]);
     });
