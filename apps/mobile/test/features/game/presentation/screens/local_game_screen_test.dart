@@ -7,6 +7,110 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
+  testWidgets('AI chooses a legal capture over an ordinary advance', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+    final greenPath = setup.paths.forPlayer('green');
+    final bluePath = setup.paths.forPlayer('blue');
+    final safeCells = setup.engine.safeCellIndexes;
+
+    int? captureProgress;
+    int? blueProgress;
+    int? captureDestination;
+    for (var progress = 0; progress < greenPath.trackLength; progress++) {
+      final destination =
+          greenPath.mainTrackCells[(progress + 1) % greenPath.trackLength];
+      final matchingBlueProgress = bluePath.mainTrackCells.indexOf(destination);
+      if (matchingBlueProgress >= 0 && !safeCells.contains(destination)) {
+        captureProgress = progress;
+        blueProgress = matchingBlueProgress;
+        captureDestination = destination;
+        break;
+      }
+    }
+    expect(captureProgress, isNotNull);
+    expect(blueProgress, isNotNull);
+    expect(captureDestination, isNotNull);
+
+    int? alternateProgress;
+    for (var progress = 0; progress < greenPath.trackLength; progress++) {
+      final destination =
+          greenPath.mainTrackCells[(progress + 1) % greenPath.trackLength];
+      if (progress != captureProgress &&
+          destination != captureDestination &&
+          !safeCells.contains(destination)) {
+        alternateProgress = progress;
+        break;
+      }
+    }
+    expect(alternateProgress, isNotNull);
+
+    final initialState = setup.initialState.copyWith(
+      currentPlayerIndex: 1,
+      pendingRoll: 1,
+      pawns: setup.initialState.pawns.map((pawn) {
+        if (pawn.id == 'green_pawn_1') {
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: captureProgress,
+            ),
+          );
+        }
+        if (pawn.id == 'green_pawn_2') {
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: alternateProgress,
+            ),
+          );
+        }
+        if (pawn.id == 'blue_pawn_1') {
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: blueProgress,
+            ),
+          );
+        }
+        return pawn;
+      }).toList(growable: false),
+    );
+    final controller = LocalGameController(
+      nextDiceValue: () => 1,
+      gameSetup: setup,
+      initialState: initialState,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
+    await tester.pump(const Duration(milliseconds: 450));
+
+    final greenPawn = controller.state.pawns.firstWhere(
+      (pawn) => pawn.id == 'green_pawn_1',
+    );
+    final bluePawn = controller.state.pawns.firstWhere(
+      (pawn) => pawn.id == 'blue_pawn_1',
+    );
+    expect(greenPawn.position.progress, (captureProgress! + 1) % greenPath.trackLength);
+    expect(bluePawn.position.section, PawnRouteSection.yard);
+    expect(controller.state.currentPlayerId, 'green');
+    expect(controller.state.pendingRoll, isNull);
+    expect(controller.lastMessage, contains('PawnCaptured'));
+  });
+
   testWidgets('keeps the complete board square and within a phone viewport', (
     tester,
   ) async {
