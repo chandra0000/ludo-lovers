@@ -690,6 +690,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       const SizedBox(height: 10),
                       Center(
                         child: SizedBox(
+                          key: const ValueKey('local_game_board'),
                           width: boardSize,
                           height: boardSize,
                           child: ClipRRect(
