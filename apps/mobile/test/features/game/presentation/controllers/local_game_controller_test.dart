@@ -44,11 +44,12 @@ void main() {
 
       controller.rollDice();
       controller.movePawn('orange_pawn_1');
+      final versionBeforeReset = controller.state.version;
       controller.reset();
 
       expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
-      expect(controller.state.version, 0);
+      expect(controller.state.version, versionBeforeReset + 1);
       expect(
         controller.state.pawns.every(
           (pawn) => pawn.position.section == PawnRouteSection.yard,
@@ -57,6 +58,35 @@ void main() {
       );
       expect(controller.lastError, isNull);
       expect(controller.lastMessage, 'New local game');
+    });
+
+    test('rejects callbacks from the previous match after reset', () {
+      var diceCalls = 0;
+      final controller = LocalGameController(
+        nextDiceValue: () {
+          diceCalls++;
+          return 6;
+        },
+      );
+      addTearDown(controller.dispose);
+
+      final oldRenderedVersion = controller.state.version;
+      controller.rollDice();
+      controller.movePawn('orange_pawn_1');
+      controller.reset();
+      final resetState = controller.state;
+
+      expect(resetState.version, greaterThan(oldRenderedVersion));
+      expect(resetState.pawns.every(
+        (pawn) => pawn.position.section == PawnRouteSection.yard,
+      ), isTrue);
+
+      controller.rollDice(expectedVersion: oldRenderedVersion);
+
+      expect(identical(controller.state, resetState), isTrue);
+      expect(controller.state.pendingRoll, isNull);
+      expect(diceCalls, 1);
+      expect(controller.lastError?.error, LocalActionError.staleVersion);
     });
 
     test('records a no-legal-move turn without crashing the screen', () {
