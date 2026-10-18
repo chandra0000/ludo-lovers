@@ -251,7 +251,7 @@ class ClassicLudoBoardDefinition {
       if (seat.homeLaneCellIds.length != homeLaneLength ||
           seat.homeLaneCells.length != homeLaneLength ||
           seat.homeLaneCells.any((cell) => !cell.isInsideBoard)) {
-        throw StateError('Home lane for ${seat.id} must contain six cells.');
+        throw StateError('Home lane for ${seat.id} must contain five cells.');
       }
       if (seat.provisionalTrackEntryIndex < 0 ||
           seat.provisionalTrackEntryIndex >= sharedTrackLength ||
