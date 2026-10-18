@@ -12,9 +12,9 @@ A read-only comparison against the public `rojanparajuli/Flutter_ludo` board con
 
 This is useful corroboration, not approval to enable gameplay: the reference uses a different home-stretch/finish indexing model (five shared-to-center stretch cells plus a separate finished position), while this app previously modelled six physical home-lane cells. The user has confirmed the intended convention: five coloured home-lane cells plus a separate centre finish, and the board definition, logical path lengths, and tests now use that model. The remaining approval blocker is visual confirmation of the shared-track corner connections, entry orientation, and safe-cell placement before changing the release gate. Do not copy third-party code into this repository.
 
-The four diagonal coordinate transitions listed below also occur in that reference sequence. They may represent intentional corner connections rather than incorrect route order; review the rendered cell/track artwork before deciding whether the geometry audit should permit these specific transitions. Keep `isGameplayReady` false until the entire visual route, home-lane model, and rules profile are reconciled and tested.
+The four diagonal coordinate transitions listed below also occur in that reference sequence. The geometry audit now treats exactly these four one-cell diagonal corner links as structurally valid, while reporting any other non-neighbour transition as a defect. This is structural validation only: `isGameplayReady` remains false behind the explicit `isVisualTopologyApproved` gate until the supplied board artwork, entry orientation, and safe-cell placement are visually approved.
 
-## Known shared-track discontinuities
+## Known diagonal corner transitions
 
 The current 52-cell loop has four non-orthogonal transitions:
 
@@ -25,7 +25,7 @@ The current 52-cell loop has four non-orthogonal transitions:
 | 30 | (9, 8) | 31 | (8, 9) | Confirm the intended track cell sequence around the lower-right turn. |
 | 43 | (6, 9) | 44 | (5, 8) | Confirm the intended track cell sequence around the lower-left turn. |
 
-Do not simply remove these diagnostics or mark the route ready. A valid replacement must be consistent with the actual board cells and every seat-relative route.
+Do not simply remove these diagnostics or mark the route ready. The listed transitions are retained as diagnostic review points, not presumed defects. A valid route must remain consistent with the actual board cells and every seat-relative route.
 
 ## Acceptance checklist
 
@@ -35,7 +35,7 @@ Do not simply remove these diagnostics or mark the route ready. A valid replacem
 - [ ] Confirm each private home lane's five physical cells and the separate centre finish position.
 - [ ] Confirm all safe cells against the same reference and the chosen written rules profile.
 - [ ] Verify the shared track has exactly 52 unique cells, all inside the 15×15 grid.
-- [ ] Verify every consecutive shared-track pair, including index 51 back to 0, is orthogonally adjacent.
+- [ ] Verify every consecutive shared-track pair, including index 51 back to 0, is either orthogonally adjacent or one of the four explicitly validated diagonal corner connections.
 - [ ] Verify home lanes do not overlap the shared track or one another and connect to their intended final route cell.
 - [ ] Verify each player-relative path is a rotation of the same shared physical track and enters the correct private lane.
 - [ ] Run board geometry, route mapping, movement, safe-cell, capture, finish, and board-backed widget acceptance tests.
@@ -45,6 +45,6 @@ Do not simply remove these diagnostics or mark the route ready. A valid replacem
 ## Current engineering safeguards
 
 - The logical movement engine remains pure Dart and separate from Flutter presentation.
-- The route geometry audit reports the four known diagonal transitions.
+- The route geometry audit validates the four known diagonal corner connections and rejects other non-neighbour transitions; the visual-approval release gate remains closed.
 - Local Game Lab / board-backed UI remains a development prototype and visibly warns that route and safe cells are provisional.
 - No online multiplayer, server-authoritative dice, or release-ready gameplay is claimed by this document.
