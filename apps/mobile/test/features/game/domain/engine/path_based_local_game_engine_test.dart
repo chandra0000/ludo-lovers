@@ -68,6 +68,12 @@ void main() {
       value: 6,
     );
     expect(rolled.state.pendingRoll, 6);
+    expect(initial.version, 0, reason: 'Accepted commands must not mutate the prior snapshot.');
+    expect(initial.pendingRoll, isNull);
+    expect(
+      initial.pawns.every((pawn) => pawn.position.section == PawnRouteSection.yard),
+      isTrue,
+    );
     expect(rolled.state.version, initial.version + 1);
     expect(rolled.events.single, isA<DiceRolled>());
     expect(rolled.events.single.kind, LocalGameEventKind.diceRolled);
@@ -81,7 +87,10 @@ void main() {
       expectedVersion: rolled.state.version,
       pawnId: 'o1',
     );
+    expect(rolled.state.pendingRoll, 6, reason: 'A later move must not consume an older snapshot.');
+    expect(rolled.state.pawns.first.position.section, PawnRouteSection.yard);
     expect(moved.state.pawns.first.position.section, PawnRouteSection.mainTrack);
+    expect(moved.state.currentPlayerId, 'orange', reason: 'A six grants the same player another roll.');
     expect(moved.state.pawns.first.position.progress, 0);
     expect(moved.state.version, rolled.state.version + 1);
     expect(moved.events.map((event) => event.type), contains('PawnMoved'));
@@ -93,6 +102,30 @@ void main() {
     expect(
       moved.events.singleWhere((event) => event.type == 'PawnMoved').kind,
       LocalGameEventKind.pawnMoved,
+    );
+  });
+
+  test('state snapshots defensively copy and freeze player and pawn collections', () {
+    final sourcePlayers = <String>['orange', 'blue'];
+    final sourcePawns = <LocalPawn>[...initial.pawns];
+    final snapshot = LocalGameState(
+      players: sourcePlayers,
+      pawns: sourcePawns,
+      currentPlayerIndex: 0,
+    );
+
+    sourcePlayers[0] = 'green';
+    sourcePawns.clear();
+
+    expect(snapshot.players, <String>['orange', 'blue']);
+    expect(snapshot.pawns, hasLength(3));
+    expect(
+      () => snapshot.players.add('green'),
+      throwsUnsupportedError,
+    );
+    expect(
+      () => snapshot.pawns.clear(),
+      throwsUnsupportedError,
     );
   });
 

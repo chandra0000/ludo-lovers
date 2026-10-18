@@ -164,3 +164,11 @@ A step is complete only when all relevant gates pass:
 - The same test taps Play Again and checks that completion/winner/pending roll clear, all pawns return to the yard, the first turn returns to orange, and rolling is re-enabled.
 - This test verifies UI behavior for the engine's terminal state without changing or approving the provisional route. Board topology and safe-cell positions remain provisional.
 - Pipeline #228 passed on commit `216ab248a2bc9f3039fd8ded04cd02f90e7db327`; this regression requires its own CI run.
+
+
+## Immutable snapshots and accepted-command regression — 2026-10-18
+
+- Extended the roll/move engine test to prove that accepted commands produce new snapshots without mutating the initial or intermediate state; the earlier rolled snapshot keeps its pending six and yard pawn after a later move.
+- Asserted the six bonus-turn behavior at the state boundary.
+- Added a collection-immutability regression: constructor inputs are defensively copied, and exposed player/pawn lists reject mutation.
+- This is engine-level coverage only; the route topology and safe-cell map remain provisional. Capture and finish cases are covered by existing focused tests and will continue to be extended without treating the provisional topology as approved.
