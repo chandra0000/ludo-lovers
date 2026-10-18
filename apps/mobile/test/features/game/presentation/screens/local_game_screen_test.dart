@@ -866,4 +866,66 @@ void main() {
     expect(find.byKey(const ValueKey('match_finish_banner')), findsNothing);
   });
 
+
+  testWidgets('AI handles a six bonus roll before passing to the next seat', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final rolls = <int>[6, 1, 6, 1, 3, 3];
+    var rollIndex = 0;
+    final controller = LocalGameController(
+      nextDiceValue: () => rolls[rollIndex++ % rolls.length],
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pumpAndSettle();
+
+    // Orange's six grants another roll; use the one, then pass to Green.
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pumpAndSettle();
+    expect(controller.state.currentPlayerId, 'green');
+
+    // Green rolls six, leaves the yard, and must retain the turn for its bonus.
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+    expect(controller.state.currentPlayerId, 'green');
+    expect(controller.state.pendingRoll, isNull);
+    expect(
+      controller.state.pawns
+          .firstWhere((pawn) => pawn.id == 'green_pawn_1')
+          .position.section,
+      PawnRouteSection.mainTrack,
+    );
+
+    // The AI consumes its bonus roll, then Blue and Magenta pass on non-sixes.
+    for (var turn = 0; turn < 3; turn++) {
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+    }
+
+    expect(controller.state.currentPlayerId, 'orange');
+    expect(controller.state.pendingRoll, isNull);
+    expect(rollIndex, 6);
+  });
+
+
 }
