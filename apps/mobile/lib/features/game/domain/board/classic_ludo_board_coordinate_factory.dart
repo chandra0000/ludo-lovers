@@ -15,8 +15,8 @@ class ClassicLudoBoardCoordinateFactory {
 
   /// Indexes whose next route cell is diagonal rather than orthogonally adjacent.
   ///
-  /// A non-empty result means this provisional route must not drive movement,
-  /// hit-testing, or capture rules yet.
+  /// These four corner transitions also appear in the independent reference.
+  /// They remain visible for review, but are not by themselves geometry defects.
   static List<int> get nonOrthogonalTransitionIndexes {
     final indexes = <int>[];
     for (var index = 0; index < sharedTrack.length; index++) {
@@ -53,15 +53,34 @@ class ClassicLudoBoardCoordinateFactory {
     return '$index (${cell.column},${cell.row})';
   }
 
+  /// Only the four documented one-cell diagonal corner links are permitted.
+  /// Any other gap, jump, or non-neighbour transition is a geometry defect.
+  static List<int> get invalidTransitionIndexes {
+    const expectedDiagonalCorners = <int>{4, 17, 30, 43};
+    final invalid = <int>[];
+    for (var index = 0; index < sharedTrack.length; index++) {
+      final current = sharedTrack[index];
+      final next = sharedTrack[(index + 1) % sharedTrack.length];
+      final dx = (current.column - next.column).abs();
+      final dy = (current.row - next.row).abs();
+      final orthogonal = dx + dy == 1;
+      final expectedDiagonal = expectedDiagonalCorners.contains(index) && dx == 1 && dy == 1;
+      if (!orthogonal && !expectedDiagonal) invalid.add(index);
+    }
+    return List<int>.unmodifiable(invalid);
+  }
+
   /// Conservative release gate for consuming this geometry in game rules.
   ///
-  /// This deliberately remains false while the route contains diagonal jumps.
-  /// The final route must be reconciled with a reviewed board-cell diagram.
+  /// Structural checks may pass while visual approval is still outstanding.
+  /// Keep the explicit approval flag false until the actual board artwork and
+  /// selected rules profile have been reviewed.
   static bool get isGameplayReady {
     if (sharedTrack.length != ClassicLudoBoardDefinition.sharedTrackLength ||
         sharedTrack.toSet().length != sharedTrack.length ||
         !sharedTrack.every((cell) => cell.isInsideBoard) ||
-        nonOrthogonalTransitionIndexes.isNotEmpty) {
+        invalidTransitionIndexes.isNotEmpty ||
+        !ClassicLudoBoardDefinition.isVisualTopologyApproved) {
       return false;
     }
 
