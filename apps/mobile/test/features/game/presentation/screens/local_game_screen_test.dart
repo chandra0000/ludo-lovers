@@ -787,6 +787,8 @@ void main() {
     // A one advances orange and passes the turn to the AI-controlled seats.
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pumpAndSettle();
 
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
