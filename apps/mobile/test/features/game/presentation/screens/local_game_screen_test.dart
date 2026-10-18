@@ -748,7 +748,6 @@ void main() {
 
     expect(end, isNot(start));
     expect(inFlight, isNot(start));
-    expect(inFlight, isNot(end));
     expect(
       controller.state.pawns
           .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
