@@ -709,4 +709,52 @@ void main() {
     expect(controller.state.pendingRoll, isNull);
   });
 
+  testWidgets('animates a pawn from its yard onto the shared track', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    final marker = find.byKey(
+      const ValueKey('pawn_marker_orange_pawn_1'),
+    );
+    expect(marker, findsOneWidget);
+    expect(
+      tester.widget<AnimatedPositioned>(marker).duration,
+      const Duration(milliseconds: 260),
+    );
+    final start = tester.getTopLeft(marker);
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final inFlight = tester.getTopLeft(marker);
+    await tester.pumpAndSettle();
+    final end = tester.getTopLeft(marker);
+
+    expect(end, isNot(start));
+    expect(inFlight, isNot(start));
+    expect(inFlight, isNot(end));
+    expect(
+      controller.state.pawns
+          .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+          .position.section,
+      PawnRouteSection.mainTrack,
+    );
+  });
+
 }
