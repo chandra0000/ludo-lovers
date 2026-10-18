@@ -61,15 +61,15 @@ void main() {
       expect(controller.lastMessage, 'New local game');
     });
 
-    test('reset restores the configured initial state override', () {
+    test('reset restores the canonical fresh setup after a custom start state', () {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
-      final configuredInitialState = setup.initialState.copyWith(
+      final customInitialState = setup.initialState.copyWith(
         currentPlayerIndex: 1,
         version: 4,
       );
       final controller = LocalGameController(
         gameSetup: setup,
-        initialState: configuredInitialState,
+        initialState: customInitialState,
         nextDiceValue: () => 6,
       );
       addTearDown(controller.dispose);
@@ -78,7 +78,7 @@ void main() {
       final versionBeforeReset = controller.state.version;
       controller.reset();
 
-      expect(controller.state.currentPlayerId, 'green');
+      expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.version, versionBeforeReset + 1);
       expect(
