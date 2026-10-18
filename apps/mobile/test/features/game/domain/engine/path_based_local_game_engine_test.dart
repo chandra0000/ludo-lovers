@@ -578,7 +578,10 @@ void main() {
         const LocalPawn(
           id: 'o2',
           playerId: 'orange',
-          position: PawnRoutePosition(section: PawnRouteSection.yard),
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 0,
+          ),
         ),
         const LocalPawn(
           id: 'b1',
