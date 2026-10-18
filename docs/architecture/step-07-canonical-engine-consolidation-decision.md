@@ -146,3 +146,12 @@ A step is complete only when all relevant gates pass:
 - Extended the board-backed widget test to assert that the Roll Dice button is disabled while a roll is waiting for a legal pawn selection.
 - After the pawn move resolves and an extra turn is granted, the test asserts that Roll Dice becomes available again.
 - This guards against duplicate-roll UI actions and verifies the roll control follows the engine's pending-roll state. The provisional board route remains unapproved.
+
+
+## Completed-match action guard — 2026-10-18
+
+- Added a regression test that submits both a roll and a pawn move against a completed state.
+- Both commands must fail with the typed `gameCompleted` error before any state can change; the test verifies winner, pending roll, version, and pawn positions remain unchanged.
+- This protects the engine contract independently of UI button disabling, so a stale or direct command cannot continue a finished match.
+- Pipeline #227 passed on commit `8630a859061634ada1577ceb49f3dd710b079a55`; this new regression requires its own CI run.
+- Board topology and safe-cell IDs remain provisional. Next gameplay work should prioritize a clear topology reference and route approval; do not enable production readiness or infer cell order from style imagery.

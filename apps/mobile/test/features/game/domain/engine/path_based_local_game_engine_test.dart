@@ -161,6 +161,53 @@ void main() {
     );
   });
 
+  test('rejects every action after match completion without mutating state', () {
+    final completed = LocalGameState(
+      players: initial.players,
+      pawns: initial.pawns,
+      currentPlayerIndex: 0,
+      pendingRoll: 6,
+      completed: true,
+      winnerPlayerId: 'orange',
+      version: 12,
+    );
+
+    for (final action in <void Function()>[
+      () => engine.roll(
+            completed,
+            playerId: 'orange',
+            expectedVersion: completed.version,
+            value: 4,
+          ),
+      () => engine.move(
+            completed,
+            playerId: 'orange',
+            expectedVersion: completed.version,
+            pawnId: 'o1',
+          ),
+    ]) {
+      expect(
+        action,
+        throwsA(
+          isA<LocalGameException>().having(
+            (error) => error.error,
+            'error',
+            LocalActionError.gameCompleted,
+          ),
+        ),
+      );
+    }
+
+    expect(completed.completed, isTrue);
+    expect(completed.winnerPlayerId, 'orange');
+    expect(completed.pendingRoll, 6);
+    expect(completed.version, 12);
+    expect(
+      completed.pawns.map((pawn) => (pawn.id, pawn.position.section, pawn.position.progress)),
+      initial.pawns.map((pawn) => (pawn.id, pawn.position.section, pawn.position.progress)),
+    );
+  });
+
   test('roll with no legal move advances turn for a non-six', () {
     final result = engine.roll(
       initial,
