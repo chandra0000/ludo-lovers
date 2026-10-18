@@ -621,6 +621,65 @@ void main() {
     );
   });
 
+  test('grants a bonus roll when a pawn finishes before the match is won', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: 10,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+        const LocalPawn(
+          id: 'o3',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: 11,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns.first.position.section, PawnRouteSection.finished);
+    expect(moved.state.completed, isFalse);
+    expect(moved.state.winnerPlayerId, isNull);
+    expect(moved.state.currentPlayerId, 'orange');
+    expect(moved.state.pendingRoll, isNull);
+    expect(
+      moved.events.map((event) => event.type),
+      containsAll(<String>['PawnFinished', 'ExtraRollGranted']),
+    );
+    expect(moved.events.map((event) => event.type), isNot(contains('TurnEnded')));
+  });
+
   test('declares the winner when the last pawn reaches finish', () {
     final state = LocalGameState(
       players: initial.players,
