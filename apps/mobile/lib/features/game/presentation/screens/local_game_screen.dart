@@ -999,8 +999,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             shape: BoxShape.circle,
             color: _colors[visual.playerId] ?? AppTheme.cream,
             border: Border.all(
+              // Make the current player's legal choices unmistakable on a
+              // small phone: a broad gold ring plus a high-contrast halo.
               color: isLegal ? AppTheme.gold : AppTheme.cream,
-              width: cellSize * (isLegal ? 0.07 : 0.055),
+              width: cellSize * (isLegal ? 0.105 : 0.055),
             ),
             boxShadow: <BoxShadow>[
               BoxShadow(
@@ -1008,12 +1010,18 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 offset: Offset(0, cellSize * 0.07),
                 blurRadius: cellSize * 0.12,
               ),
-              if (isLegal)
+              if (isLegal) ...<BoxShadow>[
                 BoxShadow(
-                  color: AppTheme.gold.withValues(alpha: 0.7),
-                  blurRadius: cellSize * 0.3,
-                  spreadRadius: cellSize * 0.025,
+                  color: AppTheme.gold.withValues(alpha: 0.95),
+                  blurRadius: cellSize * 0.38,
+                  spreadRadius: cellSize * 0.055,
                 ),
+                BoxShadow(
+                  color: AppTheme.cream.withValues(alpha: 0.9),
+                  blurRadius: cellSize * 0.12,
+                  spreadRadius: cellSize * 0.015,
+                ),
+              ],
             ],
           ),
           child: Center(
