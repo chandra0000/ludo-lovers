@@ -53,6 +53,6 @@ void main() {
         <int>[4, 17, 30, 43],
       );
       expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
-    });;
+    });
   });
 }
