@@ -681,6 +681,15 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(find.text('Board geometry review'), findsOneWidget);
+    for (final transition in <String>[
+      '4 (5,6) → 5 (6,5)',
+      '17 (8,5) → 18 (9,6)',
+      '30 (9,8) → 31 (8,9)',
+      '43 (6,9) → 44 (5,8)',
+    ]) {
+      expect(find.text(transition), findsOneWidget);
+    }
 
     await tester.tap(find.text('Back to match'));
     await tester.pumpAndSettle();
