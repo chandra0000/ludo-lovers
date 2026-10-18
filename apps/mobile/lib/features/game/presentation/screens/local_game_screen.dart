@@ -9,7 +9,6 @@ import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
 import '../../domain/board/classic_ludo_board_fixture.dart';
 import '../../domain/board/classic_ludo_board_painter.dart';
-import '../../domain/board/classic_ludo_pawn_layer.dart';
 import '../../domain/engine/ludo_path_movement.dart';
 import '../controllers/local_game_controller.dart';
 
@@ -218,19 +217,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 final current = state.currentPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
                 final visuals = _visuals(state.pawns);
-                final markers = <BoardPawnMarker>[
-                  for (final visual in visuals)
-                    BoardPawnMarker(
-                      // The override is authoritative for this visual marker;
-                      // cellId remains a valid fallback for shared-track tests.
-                      cellId: 0,
-                      pawnId: visual.pawnId,
-                      color: _colors[visual.playerId] ?? AppTheme.cream,
-                      pointOverride: visual.point,
-                      selected: legalIds.contains(visual.pawnId),
-                    ),
-                ];
-
                 return SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   child: Column(
@@ -367,14 +353,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     const CustomPaint(
                                       painter: ClassicLudoBoardPainter(),
                                     ),
-                                    IgnorePointer(
-                                      child: CustomPaint(
-                                        painter: ClassicLudoPawnLayer(
-                                          layout: _pawnLayout.layout,
-                                          pawns: markers,
-                                        ),
+                                    for (final visual in visuals)
+                                      _buildAnimatedPawnMarker(
+                                        visual: visual,
+                                        boardSize: size,
+                                        cellSize: cellSize,
+                                        isLegal: legalIds.contains(visual.pawnId),
                                       ),
-                                    ),
                                     // Preview each legal move's destination using
                                     // the same pure movement resolver as the engine.
                                     // This is an aid for local testing, not route approval.
@@ -559,6 +544,69 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     );
   }
 
+  Widget _buildAnimatedPawnMarker({
+    required _PawnVisual visual,
+    required Size boardSize,
+    required double cellSize,
+    required bool isLegal,
+  }) {
+    final diameter = cellSize * (visual.isStacked ? 0.5 : 0.68);
+    final centerX = visual.point.x * boardSize.width +
+        visual.stackOffset.dx * cellSize;
+    final centerY = visual.point.y * boardSize.height +
+        visual.stackOffset.dy * cellSize;
+
+    return AnimatedPositioned(
+      key: ValueKey<String>('pawn_marker_${visual.pawnId}'),
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      left: centerX - diameter / 2,
+      top: centerY - diameter / 2,
+      width: diameter,
+      height: diameter,
+      child: IgnorePointer(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _colors[visual.playerId] ?? AppTheme.cream,
+            border: Border.all(
+              color: isLegal ? AppTheme.gold : AppTheme.cream,
+              width: cellSize * (isLegal ? 0.07 : 0.055),
+            ),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.34),
+                offset: Offset(0, cellSize * 0.07),
+                blurRadius: cellSize * 0.12,
+              ),
+              if (isLegal)
+                BoxShadow(
+                  color: AppTheme.gold.withValues(alpha: 0.7),
+                  blurRadius: cellSize * 0.3,
+                  spreadRadius: cellSize * 0.025,
+                ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              Icons.favorite_rounded,
+              color: AppTheme.cream,
+              size: diameter * 0.54,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static const List<Offset> _stackOffsets = <Offset>[
+    Offset.zero,
+    Offset(-0.19, -0.19),
+    Offset(0.19, -0.19),
+    Offset(-0.19, 0.19),
+    Offset(0.19, 0.19),
+  ];
+
   List<_PawnVisual> _visuals(List<dynamic> pawns) {
     final result = <_PawnVisual>[];
     final yardSlots = <String, int>{};
@@ -585,7 +633,29 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         ),
       );
     }
-    return result;
+
+    return result.map((visual) {
+      final occupants = result
+          .where(
+            (candidate) =>
+                candidate.point.x == visual.point.x &&
+                candidate.point.y == visual.point.y,
+          )
+          .toList(growable: false);
+      final stackIndex = occupants.indexWhere(
+        (candidate) => candidate.pawnId == visual.pawnId,
+      );
+      final isStacked = occupants.length > 1;
+      return _PawnVisual(
+        pawnId: visual.pawnId,
+        playerId: visual.playerId,
+        point: visual.point,
+        isStacked: isStacked,
+        stackOffset: isStacked
+            ? _stackOffsets[stackIndex % _stackOffsets.length]
+            : Offset.zero,
+      );
+    }).toList(growable: false);
   }
 }
 
@@ -735,11 +805,15 @@ class _PawnVisual {
     required this.pawnId,
     required this.playerId,
     required this.point,
+    this.isStacked = false,
+    this.stackOffset = Offset.zero,
   });
 
   final String pawnId;
   final String playerId;
   final BoardPoint point;
+  final bool isStacked;
+  final Offset stackOffset;
 }
 
 class _RuleRow extends StatelessWidget {
