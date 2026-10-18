@@ -60,6 +60,34 @@ void main() {
       expect(controller.lastMessage, 'New local game');
     });
 
+    test('reset restores the configured initial state override', () {
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final configuredInitialState = setup.initialState.copyWith(
+        currentPlayerIndex: 1,
+        version: 4,
+      );
+      final controller = LocalGameController(
+        gameSetup: setup,
+        initialState: configuredInitialState,
+        nextDiceValue: () => 6,
+      );
+      addTearDown(controller.dispose);
+
+      controller.rollDice();
+      final versionBeforeReset = controller.state.version;
+      controller.reset();
+
+      expect(controller.state.currentPlayerId, 'green');
+      expect(controller.state.pendingRoll, isNull);
+      expect(controller.state.version, versionBeforeReset + 1);
+      expect(
+        controller.state.pawns.every(
+          (pawn) => pawn.position.section == PawnRouteSection.yard,
+        ),
+        isTrue,
+      );
+    });
+
     test('rejects callbacks from the previous match after reset', () {
       var diceCalls = 0;
       final controller = LocalGameController(
