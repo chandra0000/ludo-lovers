@@ -193,7 +193,7 @@ void main() {
   });
 
   testWidgets(
-    'rolls, highlights a legal pawn, moves it, and preserves prototype warning',
+    'rolls, highlights a legal pawn, and moves it on the polished match screen',
     (tester) async {
       tester.view.physicalSize = const Size(900, 1600);
       tester.view.devicePixelRatio = 1;
@@ -241,7 +241,7 @@ void main() {
           matching: find.byType(AnimatedSwitcher),
         ).first,
       );
-      expect(diceSwitcher.duration, const Duration(milliseconds: 300));
+      expect(diceSwitcher.duration, const Duration(milliseconds: 260));
       final rollButtonWhileMovePending =
           tester.widget<ElevatedButton>(find.byKey(const ValueKey('roll_dice_button')));
       expect(
