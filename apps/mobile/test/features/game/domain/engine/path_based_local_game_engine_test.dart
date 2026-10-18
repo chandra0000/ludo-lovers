@@ -594,7 +594,7 @@ void main() {
       state,
       playerId: 'orange',
       expectedVersion: state.version,
-      value: 2,
+      value: 6,
     );
 
     expect(
@@ -612,7 +612,7 @@ void main() {
         ),
       ),
     );
-    expect(rolled.state.pendingRoll, 2);
+    expect(rolled.state.pendingRoll, 6);
     expect(rolled.state.version, state.version + 1);
     expect(
       rolled.state.pawns.firstWhere((pawn) => pawn.id == 'o1').position.progress,
