@@ -160,6 +160,40 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         score += captures * 5000;
       }
 
+      // Prefer a safe landing when an opponent could reach this cell
+      // with a single ordinary roll. This is a heuristic, not a guarantee:
+      // the opponent may not roll the required value next turn.
+      if (destinationCell != null &&
+          move.position.section == PawnRouteSection.mainTrack &&
+          !_controller.setup.engine.safeCellIndexes.contains(destinationCell)) {
+        var threateningOpponents = 0;
+        for (final opponent in state.pawns) {
+          if (opponent.playerId == pawn.playerId ||
+              opponent.position.section != PawnRouteSection.mainTrack) {
+            continue;
+          }
+          final opponentProgress = opponent.position.progress;
+          if (opponentProgress == null) continue;
+          final opponentPath = _paths.forPlayer(opponent.playerId);
+          if (opponentProgress >= opponentPath.trackLength) continue;
+          final opponentCell = opponentPath.cellAtProgress(opponentProgress);
+          if (opponentCell == null) continue;
+          final opponentTrackIndex =
+              opponentPath.mainTrackCells.indexOf(opponentCell);
+          final targetTrackIndex =
+              opponentPath.mainTrackCells.indexOf(destinationCell);
+          if (opponentTrackIndex < 0 || targetTrackIndex < 0) continue;
+          final distance = (targetTrackIndex -
+                  opponentTrackIndex +
+                  opponentPath.trackLength) %
+              opponentPath.trackLength;
+          if (distance >= 1 && distance <= 6) {
+            threateningOpponents++;
+          }
+        }
+        score -= threateningOpponents * 850;
+      }
+
       if (score > bestScore) {
         bestScore = score;
         bestPawnId = pawnId;
