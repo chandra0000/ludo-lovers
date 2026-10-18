@@ -10,7 +10,7 @@ Build an original Ludo Lovers board that is visually clear, touch-friendly, and 
 
 - Use a logical 15 × 15 grid for the classic four-player board presentation.
 - Model the shared perimeter as 52 ordered track positions for the selected classic ruleset.
-- Model each player's private home lane as six progress positions, with the final center/home destination represented as a finish state rather than a capturable shared-track cell.
+- Model each player's private home lane as five physical cells, with the separate center/home destination represented as a finish state rather than a capturable shared-track cell.
 - Define each player's route as a player-relative ordered list of track indexes, followed by that player's private lane positions.
 - Define a separate renderer mapping from each logical track/lane position to a normalized board coordinate. Do not use pixel coordinates in the game engine.
 - Keep safe-cell indexes, starting cells, entry cells, home lanes, and finishing behavior in a single board-rules fixture. Do not scatter these constants through widgets or animation code.
@@ -29,7 +29,7 @@ It defines the standard 52-cell shared track with four rotated player routes:
 - green starts at index 26
 - magenta starts at index 39
 
-Each player also gets a six-cell private home lane, and the values are validated in:
+Each player also gets a five-cell private home lane plus a separate center finish, and the values are validated in:
 
 `apps/mobile/test/features/game/domain/board/classic_ludo_board_fixture_test.dart`
 
