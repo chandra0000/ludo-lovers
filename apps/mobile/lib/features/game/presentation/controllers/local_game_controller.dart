@@ -86,7 +86,9 @@ class LocalGameController extends ChangeNotifier {
   }
 
   void reset() {
-    _state = setup.initialState;
+    // Keep versions monotonic across rematches. Reusing version 0 would let a
+    // delayed callback from the previous match appear current after reset.
+    _state = setup.initialState.copyWith(version: _state.version + 1);
     lastError = null;
     lastMessage = 'New local game';
     notifyListeners();
