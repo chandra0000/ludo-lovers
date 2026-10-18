@@ -336,8 +336,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                                 'legal_pawn_${visual.pawnId}',
                                               ),
                                               behavior: HitTestBehavior.opaque,
-                                              onTap: () => _controller
-                                                  .movePawn(visual.pawnId),
+                                              onTap: () => _controller.movePawn(
+                                                visual.pawnId,
+                                                expectedVersion: state.version,
+                                              ),
                                               child: const SizedBox.expand(),
                                             ),
                                           ),
@@ -361,7 +363,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             onPressed: state.completed ||
                                     state.pendingRoll != null
                                 ? null
-                                : _controller.rollDice,
+                                : () => _controller.rollDice(
+                                      expectedVersion: state.version,
+                                    ),
                             icon: const Icon(Icons.casino_rounded),
                             label: const Text('Roll Dice'),
                           ),
