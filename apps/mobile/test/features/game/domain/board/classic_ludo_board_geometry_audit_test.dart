@@ -18,7 +18,7 @@ void main() {
     });
 
     test('center finish is in bounds and separate from track and lanes', () {
-      final finish = ClassicLudoBoardDefinition.centerFinishCell;
+      const finish = ClassicLudoBoardDefinition.centerFinishCell;
       expect(finish.isInsideBoard, isTrue);
       expect(ClassicLudoBoardCoordinateFactory.sharedTrack, isNot(contains(finish)));
       expect(
