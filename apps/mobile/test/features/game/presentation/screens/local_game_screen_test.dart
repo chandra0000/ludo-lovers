@@ -489,6 +489,66 @@ void main() {
     },
   );
 
+  testWidgets(
+    'shows a distinct home celebration when a pawn reaches the finish',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final finishProgress = setup.paths.forPlayer('orange').finishProgress;
+      final initialState = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id != 'orange_pawn_1') return pawn;
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: finishProgress - 1,
+            ),
+          );
+        }).toList(growable: false),
+      );
+      final controller = LocalGameController(
+        nextDiceValue: () => 1,
+        gameSetup: setup,
+        initialState: initialState,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+      await tester.pumpAndSettle();
+
+      expect(
+        controller.state.pawns
+            .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+            .position.section,
+        PawnRouteSection.finished,
+      );
+      expect(
+        find.text('Home at last! Your pawn reached the centre.'),
+        findsOneWidget,
+      );
+      expect(
+        tester.widget<Icon>(
+          find.byKey(const ValueKey('local_action_feedback_icon')),
+        ).icon,
+        Icons.home_rounded,
+      );
+      expect(controller.state.completed, isFalse);
+    },
+  );
+
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;

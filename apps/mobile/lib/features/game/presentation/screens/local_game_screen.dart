@@ -782,8 +782,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                const Icon(
-                                  Icons.auto_awesome_rounded,
+                                Icon(
+                                  actionFeedback.contains('capture')
+                                      ? Icons.flash_on_rounded
+                                      : actionFeedback.contains('Home at last')
+                                          ? Icons.home_rounded
+                                          : actionFeedback.contains('Bonus roll')
+                                              ? Icons.casino_rounded
+                                              : actionFeedback.contains('wins the match')
+                                                  ? Icons.emoji_events_rounded
+                                                  : Icons.auto_awesome_rounded,
+                                  key: const ValueKey('local_action_feedback_icon'),
                                   color: AppTheme.gold,
                                   size: 18,
                                 ),
