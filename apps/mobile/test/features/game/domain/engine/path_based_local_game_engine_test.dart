@@ -284,6 +284,60 @@ void main() {
     );
   });
 
+  test('a six with no legal move grants another roll to the same player', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: 10,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: 11,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+
+    final result = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 6,
+    );
+
+    expect(result.state.currentPlayerId, 'orange');
+    expect(result.state.pendingRoll, isNull);
+    expect(result.state.consecutiveSixes, 1);
+    expect(result.state.version, state.version + 1);
+    expect(
+      result.events.map((event) => event.type),
+      <String>['DiceRolled', 'NoLegalMove', 'ExtraRollGranted'],
+    );
+    expect(
+      result.events.map((event) => event.stateVersion),
+      everyElement(result.state.version),
+    );
+    expect(
+      result.events.map((event) => event.sequence),
+      <int?>[0, 1, 2],
+    );
+  });
+
   test('third consecutive six ends the turn without a move', () {
     final state = LocalGameState(
       players: initial.players,
