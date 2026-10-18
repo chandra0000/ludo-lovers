@@ -752,4 +752,46 @@ void main() {
     );
   });
 
+
+  testWidgets('AI opponents take turns and return control to orange', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final rolls = <int>[6, 1, 3, 3, 3];
+    var rollIndex = 0;
+    final controller = LocalGameController(
+      nextDiceValue: () => rolls[rollIndex++ % rolls.length],
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pumpAndSettle();
+
+    // A one advances orange and passes the turn to the AI-controlled seats.
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.currentPlayerId, 'orange');
+    expect(controller.state.pendingRoll, isNull);
+    expect(rollIndex, 5);
+    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
+  });
+
 }
