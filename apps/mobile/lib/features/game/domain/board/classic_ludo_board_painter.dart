@@ -106,7 +106,21 @@ class ClassicLudoBoardPainter extends CustomPainter {
       ..lineTo(center.dx, center.dy + cell * 1.5)
       ..lineTo(center.dx - cell * 1.5, center.dy)
       ..close();
-    canvas.drawPath(centerPath, Paint()..color = LudoBoardPalette.gold);
+    canvas.drawPath(
+      centerPath,
+      Paint()
+        ..color = LudoBoardPalette.gold.withValues(alpha: 0.48)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, cell * 0.45),
+    );
+    canvas.drawPath(
+      centerPath,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[Color(0xFFFFF2A8), Color(0xFFFFD700), Color(0xFFC98500)],
+        ).createShader(centerPath.getBounds()),
+    );
     canvas.drawPath(centerPath, linePaint);
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
@@ -176,21 +190,47 @@ class ClassicLudoBoardPainter extends CustomPainter {
       RRect.fromRectAndRadius(inner, Radius.circular(cell * 0.6)),
       Paint()..color = color.withValues(alpha: 0.22),
     );
-    final tokenPaint = Paint()..color = color;
     for (final point in <Offset>[
       Offset(inner.left + inner.width * 0.3, inner.top + inner.height * 0.3),
       Offset(inner.right - inner.width * 0.3, inner.top + inner.height * 0.3),
       Offset(inner.left + inner.width * 0.3, inner.bottom - inner.height * 0.3),
       Offset(inner.right - inner.width * 0.3, inner.bottom - inner.height * 0.3),
     ]) {
-      canvas.drawCircle(point, cell * 0.32, tokenPaint);
+      final radius = cell * 0.32;
+      canvas.drawCircle(
+        point.translate(0, cell * 0.06),
+        radius * 1.04,
+        Paint()
+          ..color = LudoBoardPalette.black.withValues(alpha: 0.75)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, cell * 0.12),
+      );
       canvas.drawCircle(
         point,
-        cell * 0.32,
+        radius,
         Paint()
-          ..color = LudoBoardPalette.cream
+          ..shader = RadialGradient(
+            center: const Alignment(-0.35, -0.48),
+            radius: 1.15,
+            colors: <Color>[
+              Color.lerp(color, Colors.white, 0.72)!,
+              color,
+              Color.lerp(color, Colors.black, 0.48)!,
+            ],
+            stops: const <double>[0, 0.42, 1],
+          ).createShader(Rect.fromCircle(center: point, radius: radius)),
+      );
+      canvas.drawCircle(
+        point.translate(-radius * 0.24, -radius * 0.34),
+        radius * 0.23,
+        Paint()..color = Colors.white.withValues(alpha: 0.78),
+      );
+      canvas.drawCircle(
+        point,
+        radius,
+        Paint()
+          ..color = LudoBoardPalette.cream.withValues(alpha: 0.86)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = cell * 0.07,
+          ..strokeWidth = cell * 0.055,
       );
     }
   }
