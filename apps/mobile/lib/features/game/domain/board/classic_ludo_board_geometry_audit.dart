@@ -25,6 +25,14 @@ class ClassicLudoBoardGeometryAudit {
     }
 
     final trackCells = track.toSet();
+    final finishCell = ClassicLudoBoardDefinition.centerFinishCell;
+    if (!finishCell.isInsideBoard) {
+      issues.add('Center finish cell is outside the 15x15 grid.');
+    }
+    if (trackCells.contains(finishCell)) {
+      issues.add('Center finish cell overlaps the shared track.');
+    }
+
     for (var index = 0; index < track.length; index++) {
       final current = track[index];
       final next = track[(index + 1) % track.length];
@@ -57,7 +65,7 @@ class ClassicLudoBoardGeometryAudit {
 
       if (seat.homeLaneCells.length !=
           ClassicLudoBoardDefinition.homeLaneLength) {
-        issues.add('${seat.id} must have six home-lane cells.');
+        issues.add('${seat.id} must have five home-lane cells.');
       }
       if (seat.homeLaneCells.toSet().length != seat.homeLaneCells.length) {
         issues.add('${seat.id} has duplicate home-lane coordinates.');
@@ -78,6 +86,10 @@ class ClassicLudoBoardGeometryAudit {
         if (distance != 1) {
           issues.add('${seat.id} home-lane cells are not orthogonally consecutive at index $index.');
         }
+      }
+
+      if (seat.homeLaneCells.contains(finishCell)) {
+        issues.add('${seat.id} home lane overlaps the center finish cell.');
       }
 
       for (var index = 0; index < seat.homeLaneCells.length; index++) {
@@ -103,7 +115,7 @@ class ClassicLudoBoardGeometryAudit {
     if (laneIds.length !=
         ClassicLudoBoardDefinition.seats.length *
             ClassicLudoBoardDefinition.homeLaneLength) {
-      issues.add('Expected 24 unique logical home-lane IDs.');
+      issues.add('Expected 20 unique logical home-lane IDs.');
     }
 
     for (final safeId
