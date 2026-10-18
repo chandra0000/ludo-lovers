@@ -5,13 +5,15 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_geomet
 
 void main() {
   group('Classic Ludo release gate', () {
-    test('keeps release gameplay disabled while route has diagonal jumps', () {
+    test('keeps release gameplay disabled until visual approval', () {
       expect(
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
-      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isFalse);
+      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(ClassicLudoBoardDefinition.isVisualTopologyApproved, isFalse);
+      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isTrue);
     });
 
     test('provisional safe-cell IDs are unique and within the 52-cell track', () {
@@ -42,7 +44,7 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('geometry audit reports every non-orthogonal transition', () {
+    test('geometry audit accepts only the four documented diagonal corners', () {
       final issues = ClassicLudoBoardGeometryAudit.inspect();
       final routeIssues = issues
           .where((issue) => issue.contains('not orthogonally adjacent'))
