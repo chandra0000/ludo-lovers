@@ -598,31 +598,30 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       const SizedBox(height: 8),
                       Row(
                         children: <Widget>[
-                          Expanded(
-                            child: _MatchPlayerCard(
-                              title: 'OPPONENT',
-                              name: _playAgainstAi ? 'Ludo Bot' : 'Green Player',
-                              color: _colors['green']!,
-                              avatar: Icons.smart_toy_rounded,
-                              isActive: current == 'green',
-                              pawnsOut: state.pawns.where((pawn) =>
-                                pawn.playerId == 'green' &&
-                                pawn.position.section != PawnRouteSection.yard).length,
+                          for (final player in <({String id, String name, String title, IconData avatar})>[
+                            (id: 'orange', name: 'You', title: 'YOU', avatar: Icons.person_rounded),
+                            (id: 'green', name: 'Green', title: _playAgainstAi ? 'BOT' : 'GREEN', avatar: _playAgainstAi ? Icons.smart_toy_rounded : Icons.person_outline_rounded),
+                            (id: 'blue', name: 'Blue', title: _playAgainstAi ? 'BOT' : 'BLUE', avatar: _playAgainstAi ? Icons.smart_toy_rounded : Icons.person_outline_rounded),
+                            (id: 'magenta', name: 'Magenta', title: _playAgainstAi ? 'BOT' : 'MAGENTA', avatar: _playAgainstAi ? Icons.smart_toy_rounded : Icons.person_outline_rounded),
+                          ])
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  right: player.id == 'magenta' ? 0 : 6,
+                                ),
+                                child: _MatchPlayerCard(
+                                  key: ValueKey('match_player_${player.id}'),
+                                  title: player.title,
+                                  name: player.name,
+                                  color: _colors[player.id]!,
+                                  avatar: player.avatar,
+                                  isActive: current == player.id,
+                                  pawnsOut: state.pawns.where((pawn) =>
+                                    pawn.playerId == player.id &&
+                                    pawn.position.section != PawnRouteSection.yard).length,
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _MatchPlayerCard(
-                              title: 'YOU',
-                              name: 'Player One',
-                              color: _colors['orange']!,
-                              avatar: Icons.person_rounded,
-                              isActive: current == _humanPlayerId,
-                              pawnsOut: state.pawns.where((pawn) =>
-                                pawn.playerId == _humanPlayerId &&
-                                pawn.position.section != PawnRouteSection.yard).length,
-                            ),
-                          ),
                         ],
                       ),
                       if (_playAgainstAi) ...<Widget>[
@@ -1113,6 +1112,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
 class _MatchPlayerCard extends StatelessWidget {
   const _MatchPlayerCard({
+    super.key,
     required this.title,
     required this.name,
     required this.color,
@@ -1132,50 +1132,72 @@ class _MatchPlayerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: <Color>[
-            color.withValues(alpha: isActive ? 0.20 : 0.10),
+            color.withValues(alpha: isActive ? 0.22 : 0.09),
             AppTheme.panel,
           ],
         ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withValues(alpha: isActive ? 0.9 : 0.35), width: isActive ? 1.5 : 1),
-        boxShadow: isActive ? <BoxShadow>[BoxShadow(color: color.withValues(alpha: 0.16), blurRadius: 16)] : null,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(
+          color: color.withValues(alpha: isActive ? 0.95 : 0.32),
+          width: isActive ? 1.5 : 1,
+        ),
+        boxShadow: isActive
+            ? <BoxShadow>[
+                BoxShadow(color: color.withValues(alpha: 0.14), blurRadius: 10),
+              ]
+            : null,
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            width: 38,
-            height: 38,
+            width: 25,
+            height: 25,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: <Color>[color.withValues(alpha: 0.95), color.withValues(alpha: 0.42)]),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.75), width: 1.2),
-              boxShadow: <BoxShadow>[BoxShadow(color: color.withValues(alpha: 0.24), blurRadius: 10, offset: const Offset(0, 3))],
-            ),
-            child: Icon(avatar, color: Colors.white, size: 22),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(title, style: TextStyle(color: color, fontSize: 9, letterSpacing: 1.1, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 2),
-                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppTheme.cream, fontSize: 12, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 3),
-                Row(children: <Widget>[
-                  Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF00E676), shape: BoxShape.circle)),
-                  const SizedBox(width: 4),
-                  const Text('READY', style: TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
-                ]),
-                const SizedBox(height: 2),
-                Text('OUT $pawnsOut/4', style: const TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[
+                  color.withValues(alpha: 0.95),
+                  color.withValues(alpha: 0.42),
+                ],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.72),
+                width: 1,
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(color: color.withValues(alpha: 0.20), blurRadius: 7),
               ],
+            ),
+            child: Icon(avatar, color: Colors.white, size: 15),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: color,
+              fontSize: 8,
+              letterSpacing: 0.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            'OUT $pawnsOut/4',
+            maxLines: 1,
+            style: const TextStyle(
+              color: AppTheme.mutedText,
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
