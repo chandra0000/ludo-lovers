@@ -26,6 +26,13 @@ void main() {
       );
 
       expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+      final initialRollSemantics = tester.widget<Semantics>(
+        find.byKey(const ValueKey('roll_dice_button_semantics')),
+      );
+      expect(
+        initialRollSemantics.properties.hint,
+        'Roll a die to begin the current player’s turn.',
+      );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsOneWidget);
       expect(find.textContaining('Board route and safe cells are provisional'), findsOneWidget);
 
@@ -52,6 +59,13 @@ void main() {
         rollButtonWhileMovePending.onPressed,
         isNull,
         reason: 'A second roll must not be available before the pending move is used.',
+      );
+      final pendingRollSemantics = tester.widget<Semantics>(
+        find.byKey(const ValueKey('roll_dice_button_semantics')),
+      );
+      expect(
+        pendingRollSemantics.properties.hint,
+        'Choose a highlighted pawn to use the current roll.',
       );
       expect(find.text('Rolled 6 · Tap a glowing pawn.'), findsOneWidget);
       expect(

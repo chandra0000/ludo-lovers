@@ -765,13 +765,22 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
-                        child: Tooltip(
-                          message: state.pendingRoll != null
-                              ? 'Choose a highlighted pawn to use the current roll.'
+                        child: Semantics(
+                          key: const ValueKey('roll_dice_button_semantics'),
+                          hint: state.completed
+                              ? 'The match is finished. Choose Play Again to start a new match.'
                               : isAiTurn
-                              ? 'AI is choosing its move…'
+                              ? 'The AI is choosing its move. Please wait.'
+                              : state.pendingRoll != null
+                              ? 'Choose a highlighted pawn to use the current roll.'
                               : 'Roll a die to begin the current player’s turn.',
-                          child: ElevatedButton.icon(
+                          child: Tooltip(
+                            message: state.pendingRoll != null
+                                ? 'Choose a highlighted pawn to use the current roll.'
+                                : isAiTurn
+                                ? 'AI is choosing its move…'
+                                : 'Roll a die to begin the current player’s turn.',
+                            child: ElevatedButton.icon(
                             key: const ValueKey('roll_dice_button'),
                             onPressed: state.completed ||
                                     isAiTurn ||
@@ -781,7 +790,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       expectedVersion: state.version,
                                     ),
                             icon: const Icon(Icons.casino_rounded),
-                            label: const Text('Roll Dice'),
+                              label: const Text('Roll Dice'),
+                            ),
                           ),
                         ),
                       ),
