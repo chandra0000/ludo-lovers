@@ -55,7 +55,7 @@ class ClassicLudoSeat {
   /// These are presentation anchors, not yet a validated movement route.
   final BoardGridCell laneStart;
   final BoardGridCell laneEnd;
-  /// Six physical grid cells ordered from the track edge toward the center.
+  /// Five physical grid cells ordered from the track edge toward the center.
   final List<BoardGridCell> homeLaneCells;
   final BoardGridCell startMarker;
 
@@ -79,7 +79,9 @@ class ClassicLudoBoardDefinition {
 
   static const int gridSize = 15;
   static const int sharedTrackLength = 52;
-  static const int homeLaneLength = 6;
+  static const int homeLaneLength = 5;
+  /// Shared center finish: a completed pawn is rendered here, not as a lane cell.
+  static const BoardGridCell centerFinishCell = BoardGridCell(column: 7, row: 7);
 
   static const List<BoardGridCell> sharedTrackCells = <BoardGridCell>[
     BoardGridCell(column: 1, row: 6),
@@ -145,14 +147,13 @@ class ClassicLudoBoardDefinition {
       yardColumn: 0,
       yardRow: 0,
       laneStart: BoardGridCell(column: 1, row: 7),
-      laneEnd: BoardGridCell(column: 6, row: 7),
+      laneEnd: BoardGridCell(column: 5, row: 7),
       homeLaneCells: <BoardGridCell>[
         BoardGridCell(column: 1, row: 7),
         BoardGridCell(column: 2, row: 7),
         BoardGridCell(column: 3, row: 7),
         BoardGridCell(column: 4, row: 7),
         BoardGridCell(column: 5, row: 7),
-        BoardGridCell(column: 6, row: 7),
       ],
       startMarker: BoardGridCell(column: 1, row: 6),
       provisionalTrackEntryIndex: 0,
@@ -165,14 +166,13 @@ class ClassicLudoBoardDefinition {
       yardColumn: 9,
       yardRow: 0,
       laneStart: BoardGridCell(column: 7, row: 1),
-      laneEnd: BoardGridCell(column: 7, row: 6),
+      laneEnd: BoardGridCell(column: 7, row: 5),
       homeLaneCells: <BoardGridCell>[
         BoardGridCell(column: 7, row: 1),
         BoardGridCell(column: 7, row: 2),
         BoardGridCell(column: 7, row: 3),
         BoardGridCell(column: 7, row: 4),
         BoardGridCell(column: 7, row: 5),
-        BoardGridCell(column: 7, row: 6),
       ],
       startMarker: BoardGridCell(column: 8, row: 1),
       provisionalTrackEntryIndex: 13,
@@ -185,14 +185,13 @@ class ClassicLudoBoardDefinition {
       yardColumn: 0,
       yardRow: 9,
       laneStart: BoardGridCell(column: 7, row: 13),
-      laneEnd: BoardGridCell(column: 7, row: 8),
+      laneEnd: BoardGridCell(column: 7, row: 9),
       homeLaneCells: <BoardGridCell>[
         BoardGridCell(column: 7, row: 13),
         BoardGridCell(column: 7, row: 12),
         BoardGridCell(column: 7, row: 11),
         BoardGridCell(column: 7, row: 10),
         BoardGridCell(column: 7, row: 9),
-        BoardGridCell(column: 7, row: 8),
       ],
       startMarker: BoardGridCell(column: 6, row: 13),
       provisionalTrackEntryIndex: 39,
@@ -205,14 +204,13 @@ class ClassicLudoBoardDefinition {
       yardColumn: 9,
       yardRow: 9,
       laneStart: BoardGridCell(column: 13, row: 7),
-      laneEnd: BoardGridCell(column: 8, row: 7),
+      laneEnd: BoardGridCell(column: 9, row: 7),
       homeLaneCells: <BoardGridCell>[
         BoardGridCell(column: 13, row: 7),
         BoardGridCell(column: 12, row: 7),
         BoardGridCell(column: 11, row: 7),
         BoardGridCell(column: 10, row: 7),
         BoardGridCell(column: 9, row: 7),
-        BoardGridCell(column: 8, row: 7),
       ],
       startMarker: BoardGridCell(column: 13, row: 8),
       provisionalTrackEntryIndex: 26,
