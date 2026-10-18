@@ -181,3 +181,10 @@ A step is complete only when all relevant gates pass:
 - Extended the no-legal-move flow to assert all three events share the accepted command's resulting version and have sequence indexes `0, 1, 2`.
 - This protects the event contract that future board animations/replay consumers will rely on; it does not change game rules or board geometry.
 - Keep board topology and safe-cell IDs provisional and `isGameplayReady = false` until the route is checked against a clear cell-by-cell reference or an explicit v1 topology is approved.
+
+## Stale UI command protection — 2026-10-18
+
+- Board pawn taps and the Roll Dice button now submit the state version captured by the rendered UI snapshot.
+- LocalGameController rejects callbacks whose expected version is no longer current before requesting a dice value or invoking the engine. This prevents rapid/delayed taps from consuming a second dice result or submitting a duplicate move from an old frame.
+- Controller regressions verify stale roll and pawn callbacks preserve state identity, version, and pending roll; a stale roll does not consume the injected dice source.
+- This is local interaction hardening only. The engine's own expected-version validation remains authoritative, and route/safe-cell topology and the provisional rules profile remain unapproved.
