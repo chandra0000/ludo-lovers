@@ -5,20 +5,16 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_defini
 
 void main() {
   group('ClassicLudoBoardGeometryAudit', () {
-    test('reports every non-orthogonal shared-track transition', () {
+    test('recognizes four documented diagonal corners without geometry errors', () {
       final issues = ClassicLudoBoardGeometryAudit.inspect();
 
       expect(
-        issues.where((issue) => issue.contains('not orthogonally adjacent')),
-        <String>[
-          'Track transition 4 to 5 is not orthogonally adjacent.',
-          'Track transition 17 to 18 is not orthogonally adjacent.',
-          'Track transition 30 to 31 is not orthogonally adjacent.',
-          'Track transition 43 to 44 is not orthogonally adjacent.',
-        ],
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
+        <int>[4, 17, 30, 43],
       );
-      expect(issues, hasLength(4));
-      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isFalse);
+      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(issues, isEmpty);
+      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isTrue);
     });
 
     test('center finish is in bounds and separate from track and lanes', () {
@@ -53,6 +49,8 @@ void main() {
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
+      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(ClassicLudoBoardDefinition.isVisualTopologyApproved, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
   });
