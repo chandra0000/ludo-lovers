@@ -648,4 +648,47 @@ void main() {
     },
   );
 
+
+  testWidgets('explains provisional rules and returns safely to the match', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byTooltip('How to play'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('How to play'), findsOneWidget);
+    expect(find.text('Quick guide for this local prototype'), findsOneWidget);
+    expect(find.text('Roll the dice'), findsOneWidget);
+    expect(find.text('Choose a glowing pawn'), findsOneWidget);
+    expect(find.text('Reach home exactly'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'The board route and safe-cell positions are still provisional',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Back to match'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Quick guide for this local prototype'), findsNothing);
+    expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+    expect(controller.state.currentPlayerId, 'orange');
+    expect(controller.state.pendingRoll, isNull);
+  });
+
 }
