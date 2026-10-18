@@ -251,6 +251,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     return null;
   }
 
+  void _showLocalActionNotice(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
+  }
+
   void _showRules() {
     showModalBottomSheet<void>(
       context: context,
@@ -419,7 +425,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // each side, so size the board against its usable content width.
             final boardSize = math.min(
               math.max(0.0, constraints.maxWidth - 20),
-              constraints.maxHeight * 0.62,
+              constraints.maxHeight * 0.70,
             );
             return AnimatedBuilder(
               animation: _controller,
@@ -646,9 +652,34 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               ),
                       ),
                       const SizedBox(height: 8),
-                      _PlayerTurnStrip(
-                        currentPlayerId: current,
-                        pawns: state.pawns,
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: _MatchPlayerCard(
+                              title: 'OPPONENT',
+                              name: _playAgainstAi ? 'Ludo Bot' : 'Green Player',
+                              color: _colors['green']!,
+                              avatar: Icons.smart_toy_rounded,
+                              isActive: current == 'green',
+                              pawnsOut: state.pawns.where((pawn) =>
+                                pawn.playerId == 'green' &&
+                                pawn.position.section != PawnRouteSection.yard).length,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _MatchPlayerCard(
+                              title: 'YOU',
+                              name: 'Player One',
+                              color: _colors['orange']!,
+                              avatar: Icons.person_rounded,
+                              isActive: current == _humanPlayerId,
+                              pawnsOut: state.pawns.where((pawn) =>
+                                pawn.playerId == _humanPlayerId &&
+                                pawn.position.section != PawnRouteSection.yard).length,
+                            ),
+                          ),
+                        ],
                       ),
                       if (_playAgainstAi) ...<Widget>[
                         const SizedBox(height: 6),
@@ -664,32 +695,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ],
                       const SizedBox(height: 8),
-                      Container(
-                        key: const ValueKey('local_playtest_status'),
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.gold.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppTheme.gold.withValues(alpha: 0.32),
-                          ),
-                        ),
-                        child: const Text(
-                          'LOCAL PLAYTEST · Board route and safe cells are provisional. '
-                          'Use this build to test interactions, not competitive rules.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppTheme.readableText,
-                            fontSize: 11,
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 4),
                       Center(
                         child: SizedBox(
                           key: const ValueKey('local_game_board'),
@@ -766,37 +772,83 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Semantics(
-                          key: const ValueKey('roll_dice_button_semantics'),
-                          hint: state.completed
-                              ? 'The match is finished. Choose Play Again to start a new match.'
-                              : isAiTurn
-                              ? 'The AI is choosing its move. Please wait.'
-                              : state.pendingRoll != null
-                              ? 'Choose a highlighted pawn to use the current roll.'
-                              : 'Roll a die to begin the current player’s turn.',
-                          child: Tooltip(
-                            message: state.pendingRoll != null
-                                ? 'Choose a highlighted pawn to use the current roll.'
-                                : isAiTurn
-                                ? 'AI is choosing its move…'
-                                : 'Roll a die to begin the current player’s turn.',
-                            child: ElevatedButton.icon(
-                            key: const ValueKey('roll_dice_button'),
-                            onPressed: state.completed ||
-                                    isAiTurn ||
-                                    state.pendingRoll != null
-                                ? null
-                                : () => _controller.rollDice(
-                                      expectedVersion: state.version,
-                                    ),
-                            icon: const Icon(Icons.casino_rounded),
-                              label: const Text('Roll Dice'),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
+                        child: Row(
+                          children: <Widget>[
+                            _RoundActionButton(
+                              icon: Icons.chat_bubble_rounded,
+                              label: 'Chat',
+                              color: AppTheme.gold,
+                              onPressed: () => _showLocalActionNotice('Chat will be available in online rooms.'),
                             ),
-                          ),
+                            const Spacer(),
+                            Semantics(
+                              key: const ValueKey('roll_dice_button_semantics'),
+                              hint: state.completed
+                                  ? 'The match is finished. Choose Play Again to start a new match.'
+                                  : isAiTurn
+                                      ? 'The AI is choosing its move. Please wait.'
+                                      : state.pendingRoll != null
+                                          ? 'Choose a highlighted pawn to use the current roll.'
+                                          : 'Roll a die to begin the current player’s turn.',
+                              child: Tooltip(
+                                message: state.pendingRoll != null
+                                    ? 'Choose a highlighted pawn to use the current roll.'
+                                    : isAiTurn
+                                        ? 'AI is choosing its move…'
+                                        : 'Roll a die to begin the current player’s turn.',
+                                child: InkWell(
+                                  key: const ValueKey('roll_dice_button'),
+                                  borderRadius: BorderRadius.circular(22),
+                                  onTap: state.completed || isAiTurn || state.pendingRoll != null
+                                      ? null
+                                      : () => _controller.rollDice(expectedVersion: state.version),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    width: 78,
+                                    height: 78,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(22),
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: <Color>[Color(0xFFFFF0A6), Color(0xFFFFC928), Color(0xFFB97808)],
+                                      ),
+                                      border: Border.all(color: const Color(0xFFFFF4C4), width: 1.5),
+                                      boxShadow: <BoxShadow>[
+                                        BoxShadow(color: AppTheme.gold.withValues(alpha: 0.42), blurRadius: 24, spreadRadius: 1),
+                                        BoxShadow(color: AppTheme.gold.withValues(alpha: 0.18), blurRadius: 6, offset: const Offset(0, 4)),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: AnimatedSwitcher(
+                                        duration: const Duration(milliseconds: 260),
+                                        child: state.pendingRoll == null
+                                            ? const Icon(Icons.casino_rounded, key: ValueKey('dice_idle'), size: 44, color: Color(0xFF3B2600))
+                                            : Text('${state.pendingRoll}', key: ValueKey('dice_value_${state.pendingRoll}'), style: const TextStyle(color: Color(0xFF3B2600), fontSize: 36, fontWeight: FontWeight.w900)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            _RoundActionButton(
+                              icon: Icons.emoji_emotions_rounded,
+                              label: 'React',
+                              color: AppTheme.magenta,
+                              onPressed: () => _showLocalActionNotice('Reactions will be available in online rooms.'),
+                            ),
+                          ],
                         ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        state.completed ? 'MATCH COMPLETE' : isAiTurn ? 'OPPONENT’S TURN' : state.pendingRoll == null ? 'TAP TO ROLL' : 'YOUR TURN · MOVE A GLOWING PAWN',
+                        key: const ValueKey('match_turn_caption'),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: state.completed ? AppTheme.gold : (_colors[current] ?? AppTheme.gold), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.4),
                       ),
                       if (state.completed) ...<Widget>[
                         const SizedBox(height: 8),
@@ -1093,6 +1145,119 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             : Offset.zero,
       );
     }).toList(growable: false);
+  }
+}
+
+class _MatchPlayerCard extends StatelessWidget {
+  const _MatchPlayerCard({
+    required this.title,
+    required this.name,
+    required this.color,
+    required this.avatar,
+    required this.isActive,
+    required this.pawnsOut,
+  });
+
+  final String title;
+  final String name;
+  final Color color;
+  final IconData avatar;
+  final bool isActive;
+  final int pawnsOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            color.withValues(alpha: isActive ? 0.20 : 0.10),
+            AppTheme.panel,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withValues(alpha: isActive ? 0.9 : 0.35), width: isActive ? 1.5 : 1),
+        boxShadow: isActive ? <BoxShadow>[BoxShadow(color: color.withValues(alpha: 0.16), blurRadius: 16)] : null,
+      ),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: <Color>[color.withValues(alpha: 0.95), color.withValues(alpha: 0.42)]),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.75), width: 1.2),
+              boxShadow: <BoxShadow>[BoxShadow(color: color.withValues(alpha: 0.24), blurRadius: 10, offset: const Offset(0, 3))],
+            ),
+            child: Icon(avatar, color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(title, style: TextStyle(color: color, fontSize: 9, letterSpacing: 1.1, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 2),
+                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppTheme.cream, fontSize: 12, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 3),
+                Row(children: <Widget>[
+                  Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF00E676), shape: BoxShape.circle)),
+                  const SizedBox(width: 4),
+                  Text('READY  ·  $pawnsOut/4 OUT', style: const TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
+                ]),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoundActionButton extends StatelessWidget {
+  const _RoundActionButton({required this.icon, required this.label, required this.color, required this.onPressed});
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(18),
+        child: SizedBox(
+          width: 62,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(17),
+                  border: Border.all(color: color.withValues(alpha: 0.65)),
+                  boxShadow: <BoxShadow>[BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 12)],
+                ),
+                child: Icon(icon, color: color, size: 23),
+              ),
+              const SizedBox(height: 4),
+              Text(label, style: const TextStyle(color: AppTheme.mutedText, fontSize: 10, fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
