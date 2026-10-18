@@ -104,7 +104,12 @@ class BoardPawnLayout {
         return BoardPawnVisualPosition(
           playerId: playerId,
           pawnId: pawnId,
-          point: const BoardPoint(x: 0.5, y: 0.5),
+          point: BoardPoint(
+            x: (ClassicLudoBoardDefinition.centerFinishCell.column + 0.5) /
+                ClassicLudoBoardDefinition.gridSize,
+            y: (ClassicLudoBoardDefinition.centerFinishCell.row + 0.5) /
+                ClassicLudoBoardDefinition.gridSize,
+          ),
           state: position.section,
           stackIndex: stackIndex,
         );
