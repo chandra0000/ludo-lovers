@@ -682,6 +682,15 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Board geometry review'), findsOneWidget);
+    expect(find.text('Provisional entries'), findsOneWidget);
+    expect(find.text('ORANGE · track entry 0'), findsOneWidget);
+    expect(find.text('GREEN · track entry 13'), findsOneWidget);
+    expect(find.text('BLUE · track entry 39'), findsOneWidget);
+    expect(find.text('MAGENTA · track entry 26'), findsOneWidget);
+    expect(
+      find.text('Provisional safe-cell IDs: 0, 8, 13, 21, 26, 34, 39, 47'),
+      findsOneWidget,
+    );
     for (final transition in <String>[
       '4 (5,6) → 5 (6,5)',
       '17 (8,5) → 18 (9,6)',
