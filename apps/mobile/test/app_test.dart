@@ -128,9 +128,10 @@ void main() {
       'ORANGE player turn.',
     );
     expect(find.text('YOU'), findsOneWidget);
-    expect(find.text('OPPONENT'), findsNothing);
-    expect(find.text('YOU'), findsOneWidget);
-    expect(find.text('BOT'), findsNWidgets(3));
+    expect(find.text('GREEN'), findsOneWidget);
+    expect(find.text('BLUE'), findsOneWidget);
+    expect(find.text('MAGENTA'), findsOneWidget);
+    expect(find.text('BOT'), findsNothing);
     expect(find.text('OUT 0/4'), findsNWidgets(2));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
