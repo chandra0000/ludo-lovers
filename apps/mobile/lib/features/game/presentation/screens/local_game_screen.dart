@@ -500,62 +500,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 ],
                               ),
                             ),
-                            if (state.pendingRoll != null)
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                switchInCurve: Curves.easeOutBack,
-                                switchOutCurve: Curves.easeIn,
-                                transitionBuilder: (child, animation) =>
-                                    FadeTransition(
-                                  opacity: animation,
-                                  child: ScaleTransition(
-                                    scale: Tween<double>(
-                                      begin: 0.55,
-                                      end: 1,
-                                    ).animate(animation),
-                                    child: RotationTransition(
-                                      turns: Tween<double>(
-                                        begin: -0.08,
-                                        end: 0,
-                                      ).animate(animation),
-                                      child: child,
-                                    ),
-                                  ),
-                                ),
-                                child: Container(
-                                  key: ValueKey<String>(
-                                    'dice_result_${state.pendingRoll}',
-                                  ),
-                                  width: 42,
-                                  height: 42,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.panelRaised,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AppTheme.gold),
-                                    boxShadow: <BoxShadow>[
-                                      BoxShadow(
-                                        color: AppTheme.gold.withValues(alpha: 0.18),
-                                        blurRadius: 10,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Semantics(
-                                    key: const ValueKey('dice_result_semantics'),
-                                    label: 'Dice result: ${state.pendingRoll}',
-                                    liveRegion: true,
-                                    excludeSemantics: true,
-                                    child: Text(
-                                      '${state.pendingRoll}',
-                                      style: const TextStyle(
-                                        color: AppTheme.gold,
-                                        fontSize: 23,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
                       ),
@@ -798,12 +742,21 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     : isAiTurn
                                         ? 'AI is choosing its move…'
                                         : 'Roll a die to begin the current player’s turn.',
-                                child: InkWell(
+                                child: ElevatedButton(
                                   key: const ValueKey('roll_dice_button'),
-                                  borderRadius: BorderRadius.circular(22),
-                                  onTap: state.completed || isAiTurn || state.pendingRoll != null
+                                  onPressed: state.completed || isAiTurn || state.pendingRoll != null
                                       ? null
                                       : () => _controller.rollDice(expectedVersion: state.version),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    disabledBackgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    disabledForegroundColor: const Color(0xFF3B2600),
+                                    foregroundColor: const Color(0xFF3B2600),
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(78, 78),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                                  ),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 180),
                                     width: 78,
@@ -855,7 +808,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        state.completed ? 'MATCH COMPLETE' : isAiTurn ? 'OPPONENT’S TURN' : state.pendingRoll == null ? 'TAP TO ROLL' : 'YOUR TURN · MOVE A GLOWING PAWN',
+                        state.completed ? 'PLAY AGAIN' : isAiTurn ? 'OPPONENT’S TURN' : 'YOUR TURN',
                         key: const ValueKey('match_turn_caption'),
                         textAlign: TextAlign.center,
                         style: TextStyle(color: state.completed ? AppTheme.gold : (_colors[current] ?? AppTheme.gold), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.4),
@@ -1218,8 +1171,10 @@ class _MatchPlayerCard extends StatelessWidget {
                 Row(children: <Widget>[
                   Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF00E676), shape: BoxShape.circle)),
                   const SizedBox(width: 4),
-                  Text('READY  ·  $pawnsOut/4 OUT', style: const TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
+                  const Text('READY', style: TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
                 ]),
+                const SizedBox(height: 2),
+                Text('OUT $pawnsOut/4', style: const TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
               ],
             ),
           ),
