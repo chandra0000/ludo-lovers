@@ -269,6 +269,81 @@ void main() {
   );
 
   testWidgets(
+    'keeps an opponent pawn safe and advances the turn without a capture bonus',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final orangePath = setup.paths.forPlayer('orange');
+      final bluePath = setup.paths.forPlayer('blue');
+      final safeCell = setup.engine.safeCellIndexes.first;
+      final orangeDestinationProgress = orangePath.mainTrackCells.indexOf(safeCell);
+      final blueProgress = bluePath.mainTrackCells.indexOf(safeCell);
+      expect(orangeDestinationProgress, greaterThan(0));
+      expect(blueProgress, greaterThanOrEqualTo(0));
+
+      final initialState = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id == 'orange_pawn_1') {
+            return pawn.copyWith(
+              position: PawnRoutePosition(
+                section: PawnRouteSection.mainTrack,
+                progress: orangeDestinationProgress - 1,
+              ),
+            );
+          }
+          if (pawn.id == 'blue_pawn_1') {
+            return pawn.copyWith(
+              position: PawnRoutePosition(
+                section: PawnRouteSection.mainTrack,
+                progress: blueProgress,
+              ),
+            );
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+      final controller = LocalGameController(
+        nextDiceValue: () => 1,
+        gameSetup: setup,
+        initialState: initialState,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+      await tester.pumpAndSettle();
+
+      final orangePawn = controller.state.pawns.firstWhere(
+        (pawn) => pawn.id == 'orange_pawn_1',
+      );
+      final bluePawn = controller.state.pawns.firstWhere(
+        (pawn) => pawn.id == 'blue_pawn_1',
+      );
+      expect(orangePath.cellAtProgress(orangePawn.position.progress!), safeCell);
+      expect(bluePath.cellAtProgress(bluePawn.position.progress!), safeCell);
+      expect(bluePawn.position.section, PawnRouteSection.mainTrack);
+      expect(controller.state.currentPlayerId, 'green');
+      expect(controller.state.pendingRoll, isNull);
+      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.textContaining('PawnCaptured'), findsNothing);
+      expect(find.textContaining('ExtraRollGranted'), findsNothing);
+      expect(find.textContaining('TurnEnded'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'rejects a home-lane overshoot and advances the turn in the UI',
     (tester) async {
       tester.view.physicalSize = const Size(900, 1600);
