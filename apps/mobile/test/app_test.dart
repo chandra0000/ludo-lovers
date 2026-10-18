@@ -26,7 +26,7 @@ void main() {
     expect(find.text('Classic Board'), findsOneWidget);
     expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
     expect(find.text('GAMEPLAY LOCKED · ROUTE REVIEW REQUIRED'), findsOneWidget);
-    expect(find.text('4 route blockers · 8 provisional safe cells'), findsOneWidget);
+    expect(find.text('0 invalid transitions · 8 provisional safe cells'), findsOneWidget);
     expect(find.byKey(const ValueKey('board_route_gate_summary')), findsOneWidget);
     expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
 
@@ -60,10 +60,8 @@ void main() {
 
     expect(find.text('Route & safe-cell audit'), findsOneWidget);
     expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
-    expect(find.textContaining('Track transition 4 to 5 is not orthogonally adjacent.'), findsOneWidget);
-    expect(find.textContaining('Track transition 17 to 18 is not orthogonally adjacent.'), findsOneWidget);
-    expect(find.textContaining('Track transition 30 to 31 is not orthogonally adjacent.'), findsOneWidget);
-    expect(find.textContaining('Track transition 43 to 44 is not orthogonally adjacent.'), findsOneWidget);
+    expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
+    expect(find.textContaining('Structural geometry checks pass'), findsOneWidget);
     expect(find.text('Provisional safe track IDs'), findsOneWidget);
     expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
     expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
@@ -74,7 +72,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('The four diagonal route transitions still block gameplay.'),
+      find.textContaining('The four diagonal corner links pass structural checks'),
       findsOneWidget,
     );
   });
