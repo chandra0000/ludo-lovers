@@ -71,6 +71,10 @@ void main() {
         reason: 'The extra turn should allow a fresh roll after the move resolves.',
       );
       expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
+      expect(
+        find.text('Bonus roll unlocked — it is still your turn.'),
+        findsOneWidget,
+      );
     },
   );
 
@@ -257,6 +261,10 @@ void main() {
       expect(find.text('ORANGE’S TURN'), findsOneWidget);
       expect(find.text('OUT 1/4'), findsOneWidget);
       expect(find.textContaining('PawnCaptured'), findsOneWidget);
+      expect(
+        find.text('Brilliant capture! An opponent pawn returns to the yard.'),
+        findsOneWidget,
+      );
       expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
       expect(
         tester.widget<ElevatedButton>(
