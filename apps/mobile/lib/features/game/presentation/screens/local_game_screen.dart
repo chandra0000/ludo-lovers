@@ -202,6 +202,20 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     return bestPawnId;
   }
 
+  String _accessiblePawnName(String pawnId) {
+    final parts = pawnId.split('_');
+    final playerId = parts.isNotEmpty ? parts.first : pawnId;
+    final pawnNumber = parts.isNotEmpty ? parts.last : '';
+    final playerName = switch (playerId) {
+      'orange' => 'Orange',
+      'green' => 'Green',
+      'blue' => 'Blue',
+      'magenta' => 'Magenta',
+      _ => playerId,
+    };
+    return '$playerName pawn $pawnNumber';
+  }
+
   String? _friendlyActionFeedback(LocalGameState state) {
     final message = _controller.lastMessage;
     if (message == null) return null;
@@ -726,8 +740,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           height: cellSize * 0.96,
                                           child: Semantics(
                                             button: true,
-                                            label: 'Move pawn ${visual.pawnId}',
-                                            hint: 'Moves this pawn using the current dice roll.',
+                                            label: _accessiblePawnName(visual.pawnId),
+                                            hint: 'Moves this pawn ${state.pendingRoll} spaces using the current dice roll.',
                                             child: GestureDetector(
                                               key: ValueKey<String>(
                                                 'legal_pawn_${visual.pawnId}',

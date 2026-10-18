@@ -58,6 +58,19 @@ void main() {
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsOneWidget,
       );
+      final pawnSemantics = tester.widget<Semantics>(
+        find.ancestor(
+          of: find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
+          matching: find.byType(Semantics),
+        ).first,
+      );
+      expect(pawnSemantics.properties.button, isTrue);
+      expect(pawnSemantics.properties.label, 'Orange pawn 1');
+      expect(
+        pawnSemantics.properties.hint,
+        'Moves this pawn 6 spaces using the current dice roll.',
+      );
+
       expect(
         find.byKey(const ValueKey('destination_cell_0_orange_pawn_1')),
         findsOneWidget,
