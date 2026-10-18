@@ -420,6 +420,51 @@ void main() {
     expect(moved.state.currentPlayerId, 'blue');
   });
 
+  test('protects a safe entry cell when a pawn leaves its yard', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 4,
+          ),
+        ),
+      ],
+    );
+
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 6,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns.first.position.progress, 0);
+    expect(moved.state.pawns.first.position.section, PawnRouteSection.mainTrack);
+    expect(moved.state.pawns[1].position.section, PawnRouteSection.mainTrack);
+    expect(
+      moved.events.map((event) => event.type),
+      isNot(contains('PawnCaptured')),
+      reason: 'The entry cell is safe even when an opponent occupies it.',
+    );
+    expect(moved.state.currentPlayerId, 'orange');
+  });
+
   test('protects a stacked pair of opponent pawns under the default rule', () {
     final state = LocalGameState(
       players: initial.players,
