@@ -790,6 +790,12 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
     await tester.pumpAndSettle();
 
+    // Advance the fake clock for the three independently scheduled AI turns.
+    for (var turn = 0; turn < 3; turn++) {
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+    }
+
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
     expect(rollIndex, 5);
