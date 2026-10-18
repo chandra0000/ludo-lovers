@@ -187,6 +187,61 @@ void main() {
     },
   );
 
+  testWidgets(
+    'rejects a home-lane overshoot and advances the turn in the UI',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final finishProgress = setup.paths.forPlayer('orange').finishProgress;
+      final initialState = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id != 'orange_pawn_1') return pawn;
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: finishProgress - 1,
+            ),
+          );
+        }).toList(growable: false),
+      );
+      final controller = LocalGameController(
+        nextDiceValue: () => 2,
+        gameSetup: setup,
+        initialState: initialState,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+
+      expect(controller.state.pendingRoll, isNull);
+      expect(controller.state.currentPlayerId, 'green');
+      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
+        findsNothing,
+        reason: 'A roll that overshoots the finish must not make the pawn selectable.',
+      );
+      final pawn = controller.state.pawns.firstWhere(
+        (item) => item.id == 'orange_pawn_1',
+      );
+      expect(pawn.position.section, PawnRouteSection.homeLane);
+      expect(pawn.position.progress, finishProgress - 1);
+    },
+  );
+
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
