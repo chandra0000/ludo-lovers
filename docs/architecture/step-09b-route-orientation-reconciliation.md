@@ -7,7 +7,7 @@
 - Extended `ClassicLudoBoardDefinition` with immutable grid-cell anchors for each player's home lane and start marker.
 - Preserved the approved quadrant/color order: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
 - Added `ClassicLudoBoardCoordinateFactory` with 52 provisional 15×15 shared-track cells and normalized coordinates for the private lanes.
-- Defined each six-cell home lane explicitly as grid-cell centers rather than interpolating between endpoints.
+- Defined each five-cell home lane explicitly as grid-cell centers rather than interpolating between endpoints.
 - Updated `ClassicLudoBoardPainter` to render shared-track and home-lane cells from the same coordinate map.
 - Added value equality for grid cells so uniqueness and overlap tests compare coordinates rather than object identity.
 - Added tests for home-lane bounds, unique cells and separation from the shared track.
@@ -46,7 +46,7 @@ When the route is approved, update the local-game fixture and movement tests tog
 
 - All 52 physical track cells are unique and connected, including wraparound.
 - Four start cells are distinct and align with the four visual quadrants.
-- Each player's six-cell home lane points inward to the central finish.
+- Each player's five-cell home lane points inward to the separate central finish cell.
 - Safe cells and start-cell safety are explicit, tested rules metadata.
 - Painter consumes the shared track coordinate map; lane anchors are centralized in the seat definition.
 - Existing movement tests remain green after fixture migration.
