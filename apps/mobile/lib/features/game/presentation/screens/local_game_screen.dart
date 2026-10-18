@@ -142,6 +142,35 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     ),
                   ),
                 ),
+              const SizedBox(height: 10),
+              Text(
+                'Provisional entries',
+                style: Theme.of(sheetContext).textTheme.titleSmall?.copyWith(
+                      color: AppTheme.gold,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 6),
+              for (final seat in ClassicLudoBoardDefinition.seats)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '${seat.id.toUpperCase()} · track entry ${seat.provisionalTrackEntryIndex}',
+                    style: const TextStyle(
+                      color: AppTheme.readableText,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 6),
+              Text(
+                'Provisional safe-cell IDs: ${(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.toList()..sort()).join(', ')}',
+                key: const ValueKey('provisional_safe_cell_ids'),
+                style: const TextStyle(
+                  color: AppTheme.readableText,
+                  fontSize: 12,
+                ),
+              ),
               const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
