@@ -114,7 +114,8 @@ void main() {
     expect(pawn.position.progress, 0);
     expect(controller.state.pendingRoll, isNull);
     expect(controller.lastError?.error, LocalActionError.staleVersion);
-  });
+    },
+  );
 
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
