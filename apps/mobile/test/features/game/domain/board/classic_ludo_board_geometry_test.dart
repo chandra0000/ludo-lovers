@@ -8,7 +8,7 @@ void main() {
     test('defines the classic grid and provisional safe cells', () {
       expect(ClassicLudoBoardGeometry.gridSize, 15);
       expect(ClassicLudoBoardGeometry.trackLength, 52);
-      expect(ClassicLudoBoardGeometry.homeLaneLength, 6);
+      expect(ClassicLudoBoardGeometry.homeLaneLength, 5);
       expect(ClassicLudoBoardGeometry.safeTrackCellIds, hasLength(8));
       expect(
         ClassicLudoBoardGeometry.safeTrackCellIds,
@@ -42,7 +42,7 @@ void main() {
         for (var cell = 0; cell < 52; cell++)
           cell: BoardPoint(x: (cell % 15) / 14, y: (cell ~/ 15) / 14),
         for (final start in ClassicLudoBoardGeometry.homeLaneStartByPlayer.values)
-          for (var offset = 0; offset < 6; offset++)
+          for (var offset = 0; offset < 5; offset++)
             start + offset: BoardPoint(
               x: ((start + offset) % 15) / 14,
               y: (((start + offset) ~/ 15) % 15) / 14,
@@ -63,7 +63,7 @@ void main() {
           cell: const BoardPoint(x: 0.5, y: 0.5),
         for (final start in ClassicLudoBoardGeometry.homeLaneStartByPlayer.values)
           for (var offset = 0; offset < 6; offset++)
-            if (start + offset != 235)
+            if (start + offset != 234)
               start + offset: const BoardPoint(x: 0.5, y: 0.5),
       };
 
