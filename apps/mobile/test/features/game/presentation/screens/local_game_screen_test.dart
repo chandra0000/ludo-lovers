@@ -802,4 +802,60 @@ void main() {
     expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
   });
 
+
+  testWidgets('celebrates a completed local match with the winner banner', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+    final orangePath = setup.paths.forPlayer('orange');
+    final initialState = setup.initialState.copyWith(
+      pawns: setup.initialState.pawns.map((pawn) {
+        if (pawn.id != 'orange_pawn_1') return pawn;
+        return pawn.copyWith(
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: orangePath.finishProgress - 1,
+          ),
+        );
+      }).toList(growable: false),
+    );
+    final controller = LocalGameController(
+      nextDiceValue: () => 1,
+      gameSetup: setup,
+      initialState: initialState,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.completed, isTrue);
+    expect(controller.state.winnerPlayerId, 'orange');
+    expect(find.byKey(const ValueKey('match_finish_banner')), findsOneWidget);
+    expect(find.text('MATCH WON'), findsOneWidget);
+    expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
+    expect(find.byKey(const ValueKey('play_again_button')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('play_again_button')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.completed, isFalse);
+    expect(controller.state.currentPlayerId, 'orange');
+    expect(find.byKey(const ValueKey('match_finish_banner')), findsNothing);
+  });
+
 }
