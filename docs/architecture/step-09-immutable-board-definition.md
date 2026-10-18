@@ -7,7 +7,7 @@
 - One typed, immutable definition of the four visible seats and their quadrants.
 - Exact reference palette: Orange `#FF8928`, Green `#33FF28`, Blue `#289EFF`, Magenta `#F428FF`.
 - Required quadrant order: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
-- Separate yard-zone grid origins and six-cell private-lane ID ranges.
+- Separate yard-zone grid origins and five-cell private-lane ID ranges plus a separate center-finish state.
 - Validation for unique seats, in-bounds 6×6 yard zones, distinct home-lane IDs, and safe-cell IDs within the shared track.
 
 ## Deliberate limits
