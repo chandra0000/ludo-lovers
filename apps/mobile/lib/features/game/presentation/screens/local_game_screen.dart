@@ -518,12 +518,18 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       ),
                                     ],
                                   ),
-                                  child: Text(
-                                    '${state.pendingRoll}',
-                                    style: const TextStyle(
-                                      color: AppTheme.gold,
-                                      fontSize: 23,
-                                      fontWeight: FontWeight.w900,
+                                  child: Semantics(
+                                    key: const ValueKey('dice_result_semantics'),
+                                    label: 'Dice result: ${state.pendingRoll}',
+                                    liveRegion: true,
+                                    excludeSemantics: true,
+                                    child: Text(
+                                      '${state.pendingRoll}',
+                                      style: const TextStyle(
+                                        color: AppTheme.gold,
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.w900,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -829,14 +835,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 ),
                                 const SizedBox(width: 9),
                                 Expanded(
-                                  child: Text(
-                                    actionFeedback,
-                                    key: const ValueKey('local_action_feedback'),
-                                    style: const TextStyle(
-                                      color: AppTheme.cream,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.35,
+                                  child: Semantics(
+                                    key: const ValueKey('local_action_feedback_semantics'),
+                                    label: actionFeedback,
+                                    liveRegion: true,
+                                    child: Text(
+                                      actionFeedback,
+                                      key: const ValueKey('local_action_feedback'),
+                                      style: const TextStyle(
+                                        color: AppTheme.cream,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.35,
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -34,6 +34,11 @@ void main() {
 
       expect(controller.state.pendingRoll, 6);
       expect(find.byKey(const ValueKey('dice_result_6')), findsOneWidget);
+      final diceSemantics = tester.widget<Semantics>(
+        find.byKey(const ValueKey('dice_result_semantics')),
+      );
+      expect(diceSemantics.properties.label, 'Dice result: 6');
+      expect(diceSemantics.properties.liveRegion, isTrue);
       final diceSwitcher = tester.widget<AnimatedSwitcher>(
         find.ancestor(
           of: find.byKey(const ValueKey('dice_result_6')),
@@ -83,6 +88,14 @@ void main() {
         find.text('Bonus roll unlocked — it is still your turn.'),
         findsOneWidget,
       );
+      final feedbackSemantics = tester.widget<Semantics>(
+        find.byKey(const ValueKey('local_action_feedback_semantics')),
+      );
+      expect(
+        feedbackSemantics.properties.label,
+        'Bonus roll unlocked — it is still your turn.',
+      );
+      expect(feedbackSemantics.properties.liveRegion, isTrue);
     },
   );
 
