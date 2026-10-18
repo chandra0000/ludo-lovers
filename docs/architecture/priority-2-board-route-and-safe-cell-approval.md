@@ -5,15 +5,15 @@
 ## What is now checked automatically
 
 - Exactly 52 unique, in-bounds shared-track coordinates.
-- Every sequential transition, including wraparound, is orthogonally adjacent.
+- Every sequential transition, including wraparound, is orthogonally adjacent or one of the four explicitly documented diagonal corner links.
 - Four distinct player entries align with their physical start-marker coordinates.
-- Home lanes have six unique, in-bounds, consecutive cells and do not overlap the shared track or one another.
+- Home lanes have five unique, in-bounds, consecutive cells and do not overlap the shared track or one another; the centre finish is a separate position.
 - The provisional safe-cell profile equals the four player start IDs plus the cell eight track steps after each start.
 - Gameplay readiness remains false while any route or profile check fails.
 
 ## Current result
 
-The route audit reports four diagonal transitions: 4→5, 17→18, 30→31 and 43→44. The current route therefore fails the topology gate. Safe IDs {0, 8, 13, 21, 26, 34, 39, 47} match the currently selected *provisional* rule profile, but this does not prove that those IDs land on the intended printed start/star squares in the final board artwork.
+The route audit accepts exactly four documented diagonal corner transitions: 4→5, 17→18, 30→31 and 43→44. Structural validation passes for these transitions, but visual topology approval remains the release blocker. Safe IDs {0, 8, 13, 21, 26, 34, 39, 47} match the currently selected *provisional* rule profile, but this does not prove that those IDs land on the intended printed start/star squares in the final board artwork.
 
 The safe-square pattern is based on a common Ludo variant in which each start square and a star square eight track steps later are safe. Rules vary by board and implementation; the source links below are supporting references, not authority for the custom Ludo Lovers board.
 
