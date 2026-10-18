@@ -78,42 +78,42 @@ void main() {
   testWidgets(
     'ignores a duplicate pawn tap from an outdated board frame',
     (tester) async {
-    tester.view.physicalSize = const Size(900, 1600);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = LocalGameController(nextDiceValue: () => 6);
-    addTearDown(controller.dispose);
+      final controller = LocalGameController(nextDiceValue: () => 6);
+      addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
-    );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
 
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
 
-    final pawnFinder = find.byKey(
-      const ValueKey('legal_pawn_orange_pawn_1'),
-    );
-    final stalePawnWidget = tester.widget<GestureDetector>(pawnFinder);
-    final versionBeforeMove = controller.state.version;
+      final pawnFinder = find.byKey(
+        const ValueKey('legal_pawn_orange_pawn_1'),
+      );
+      final stalePawnWidget = tester.widget<GestureDetector>(pawnFinder);
+      final versionBeforeMove = controller.state.version;
 
-    stalePawnWidget.onTap!();
-    stalePawnWidget.onTap!();
-    await tester.pumpAndSettle();
+      stalePawnWidget.onTap!();
+      stalePawnWidget.onTap!();
+      await tester.pumpAndSettle();
 
-    final pawn = controller.state.pawns.firstWhere(
-      (item) => item.id == 'orange_pawn_1',
-    );
-    expect(controller.state.version, versionBeforeMove + 1);
-    expect(pawn.position.section, PawnRouteSection.mainTrack);
-    expect(pawn.position.progress, 0);
-    expect(controller.state.pendingRoll, isNull);
-    expect(controller.lastError?.error, LocalActionError.staleVersion);
+      final pawn = controller.state.pawns.firstWhere(
+        (item) => item.id == 'orange_pawn_1',
+      );
+      expect(controller.state.version, versionBeforeMove + 1);
+      expect(pawn.position.section, PawnRouteSection.mainTrack);
+      expect(pawn.position.progress, 0);
+      expect(controller.state.pendingRoll, isNull);
+      expect(controller.lastError?.error, LocalActionError.staleVersion);
     },
   );
 
