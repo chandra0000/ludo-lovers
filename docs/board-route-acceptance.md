@@ -6,6 +6,14 @@
 
 This checklist deliberately records the current defects without guessing which grid cells should replace them. The current board art/reference does not provide enough cell-by-cell evidence to safely infer those corrections.
 
+## Independent reference cross-check (2026-10-18)
+
+A read-only comparison against the public `rojanparajuli/Flutter_ludo` board constants found that its 52-cell shared-track sequence, start indexes `0, 13, 26, 39`, and safe-cell indexes `0, 8, 13, 21, 26, 34, 39, 47` match this repository's current values when row/column coordinates are normalized. Reference: https://github.com/rojanparajuli/Flutter_ludo/blob/master/lib/constant/board_constants.dart
+
+This is useful corroboration, not approval to enable gameplay: the reference uses a different home-stretch/finish indexing model (five shared-to-center stretch cells plus a separate finished position), while this app currently models six physical home-lane cells. Confirm the intended lane/finish convention against the supplied board design and this app's rules before changing the release gate. Do not copy third-party code into this repository.
+
+The four diagonal coordinate transitions listed below also occur in that reference sequence. They may represent intentional corner connections rather than incorrect route order; review the rendered cell/track artwork before deciding whether the geometry audit should permit these specific transitions. Keep `isGameplayReady` false until the entire visual route, home-lane model, and rules profile are reconciled and tested.
+
 ## Known shared-track discontinuities
 
 The current 52-cell loop has four non-orthogonal transitions:
