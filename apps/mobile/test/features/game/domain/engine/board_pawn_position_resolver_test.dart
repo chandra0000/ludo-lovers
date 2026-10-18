@@ -43,6 +43,16 @@ void main() {
     );
   });
 
+  test('uses five physical lane cells and a separate finish state', () {
+    for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
+      final path = resolver.paths.forPlayer(playerId);
+      expect(path.homeLaneLength, 5, reason: playerId);
+      expect(path.finishProgress, 57, reason: playerId);
+      expect(path.cellAtProgress(56), path.homeLaneCells.last, reason: playerId);
+      expect(path.cellAtProgress(57), isNull, reason: playerId);
+    }
+  });
+
   test('projects player-relative track progress to physical logical cell', () {
     expect(
       resolver.cellIdFor(
