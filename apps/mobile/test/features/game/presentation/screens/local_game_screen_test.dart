@@ -33,6 +33,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.state.pendingRoll, 6);
+      expect(find.byKey(const ValueKey('dice_result_6')), findsOneWidget);
+      final diceSwitcher = tester.widget<AnimatedSwitcher>(
+        find.ancestor(
+          of: find.byKey(const ValueKey('dice_result_6')),
+          matching: find.byType(AnimatedSwitcher),
+        ).first,
+      );
+      expect(diceSwitcher.duration, const Duration(milliseconds: 300));
       final rollButtonWhileMovePending =
           tester.widget<ElevatedButton>(find.byKey(const ValueKey('roll_dice_button')));
       expect(

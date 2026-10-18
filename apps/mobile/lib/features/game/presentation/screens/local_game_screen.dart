@@ -479,21 +479,52 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               ),
                             ),
                             if (state.pendingRoll != null)
-                              Container(
-                                width: 42,
-                                height: 42,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.panelRaised,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppTheme.gold),
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                switchInCurve: Curves.easeOutBack,
+                                switchOutCurve: Curves.easeIn,
+                                transitionBuilder: (child, animation) =>
+                                    FadeTransition(
+                                  opacity: animation,
+                                  child: ScaleTransition(
+                                    scale: Tween<double>(
+                                      begin: 0.55,
+                                      end: 1,
+                                    ).animate(animation),
+                                    child: RotationTransition(
+                                      turns: Tween<double>(
+                                        begin: -0.08,
+                                        end: 0,
+                                      ).animate(animation),
+                                      child: child,
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  '${state.pendingRoll}',
-                                  style: const TextStyle(
-                                    color: AppTheme.gold,
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.w900,
+                                child: Container(
+                                  key: ValueKey<String>(
+                                    'dice_result_${state.pendingRoll}',
+                                  ),
+                                  width: 42,
+                                  height: 42,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.panelRaised,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: AppTheme.gold),
+                                    boxShadow: <BoxShadow>[
+                                      BoxShadow(
+                                        color: AppTheme.gold.withValues(alpha: 0.18),
+                                        blurRadius: 10,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    '${state.pendingRoll}',
+                                    style: const TextStyle(
+                                      color: AppTheme.gold,
+                                      fontSize: 23,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                   ),
                                 ),
                               ),
