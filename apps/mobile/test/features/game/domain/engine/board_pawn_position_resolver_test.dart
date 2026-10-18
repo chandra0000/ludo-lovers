@@ -11,25 +11,25 @@ void main() {
     final orangePath = LudoPlayerPath(
       playerId: 'orange',
       mainTrackCells: List<int>.generate(52, (index) => index),
-      homeLaneCells: const <int>[200, 201, 202, 203, 204, 205],
+      homeLaneCells: const <int>[200, 201, 202, 203, 204],
       trackLength: 52,
     );
     final greenPath = LudoPlayerPath(
       playerId: 'green',
       mainTrackCells: List<int>.generate(52, (index) => (index + 13) % 52),
-      homeLaneCells: const <int>[220, 221, 222, 223, 224, 225],
+      homeLaneCells: const <int>[220, 221, 222, 223, 224],
       trackLength: 52,
     );
     final bluePath = LudoPlayerPath(
       playerId: 'blue',
       mainTrackCells: List<int>.generate(52, (index) => (index + 39) % 52),
-      homeLaneCells: const <int>[210, 211, 212, 213, 214, 215],
+      homeLaneCells: const <int>[210, 211, 212, 213, 214],
       trackLength: 52,
     );
     final magentaPath = LudoPlayerPath(
       playerId: 'magenta',
       mainTrackCells: List<int>.generate(52, (index) => (index + 26) % 52),
-      homeLaneCells: const <int>[230, 231, 232, 233, 234, 235],
+      homeLaneCells: const <int>[230, 231, 232, 233, 234],
       trackLength: 52,
     );
     resolver = BoardPawnPositionResolver(
@@ -126,7 +126,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.finished,
-          progress: 58,
+          progress: 57,
         ),
       ),
       isNull,
