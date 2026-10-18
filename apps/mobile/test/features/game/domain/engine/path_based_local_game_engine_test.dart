@@ -131,8 +131,8 @@ void main() {
 
   test('transition events are copied, frozen, and stamped in deterministic order', () {
     final sourceEvents = <LocalGameEvent>[
-      DiceRolled(playerId: 'orange', value: 6),
-      TurnEnded(playerId: 'orange'),
+      const DiceRolled(playerId: 'orange', value: 6),
+      const TurnEnded(playerId: 'orange'),
     ];
     final transition = LocalGameTransition(initial, sourceEvents);
 
@@ -145,7 +145,7 @@ void main() {
     );
     expect(transition.events.map((event) => event.sequence), <int?>[0, 1]);
     expect(
-      () => transition.events.add(TurnEnded(playerId: 'orange')),
+      () => transition.events.add(const TurnEnded(playerId: 'orange')),
       throwsUnsupportedError,
     );
   });
