@@ -86,7 +86,9 @@ void main() {
 
     expect(find.text('Ludo Lovers · Match'), findsOneWidget);
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
-    expect(find.text('Roll Dice'), findsOneWidget);
+    expect(find.text('YOUR TURN'), findsOneWidget);
+    expect(find.text('Chat'), findsOneWidget);
+    expect(find.text('React'), findsOneWidget);
     expect(
       find.byTooltip('Roll a die to begin the current player’s turn.'),
       findsOneWidget,
@@ -125,8 +127,9 @@ void main() {
       tester.getSemantics(find.byKey(const ValueKey('turn_status_semantics'))).label,
       'ORANGE player turn.',
     );
-    expect(find.text('TURN ORDER'), findsOneWidget);
-    expect(find.text('OUT 0/4'), findsNWidgets(4));
+    expect(find.text('YOU'), findsOneWidget);
+    expect(find.text('OPPONENT'), findsOneWidget);
+    expect(find.text('OUT 0/4'), findsNWidgets(2));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
@@ -153,7 +156,7 @@ void main() {
     expect(controller.state.currentPlayerId, 'orange');
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('OUT 1/4'), findsOneWidget);
-    expect(find.text('OUT 0/4'), findsNWidgets(3));
+    expect(find.text('OUT 0/4'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       findsNothing,
