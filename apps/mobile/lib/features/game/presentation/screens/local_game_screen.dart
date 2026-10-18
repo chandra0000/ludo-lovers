@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -36,6 +37,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   late final _paths = ClassicLudoBoardFixture.create();
   static const LudoPathMovement _movement = LudoPathMovement();
 
+  Timer? _aiTimer;
+  bool _playAgainstAi = false;
+  bool _aiThinking = false;
+  static const String _humanPlayerId = 'orange';
+
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
     'green': AppTheme.green,
@@ -45,8 +51,120 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   @override
   void dispose() {
+    _aiTimer?.cancel();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
+  }
+
+  void _toggleAiMode() {
+    setState(() {
+      _playAgainstAi = !_playAgainstAi;
+      _aiTimer?.cancel();
+      _aiTimer = null;
+    });
+    _scheduleAiTurn(_controller.state);
+  }
+
+  void _scheduleAiTurn(dynamic state) {
+    if (!_playAgainstAi ||
+        state.completed ||
+        state.currentPlayerId == _humanPlayerId ||
+        _aiThinking ||
+        _aiTimer != null) {
+      return;
+    }
+
+    final expectedPlayerId = state.currentPlayerId as String;
+    _aiTimer = Timer(const Duration(milliseconds: 420), () {
+      _aiTimer = null;
+      if (!mounted ||
+          !_playAgainstAi ||
+          _controller.state.completed ||
+          _controller.state.currentPlayerId != expectedPlayerId) {
+        return;
+      }
+
+      _aiThinking = true;
+      try {
+        final beforeRoll = _controller.state;
+        if (beforeRoll.pendingRoll == null) {
+          _controller.rollDice(expectedVersion: beforeRoll.version);
+        }
+
+        final afterRoll = _controller.state;
+        if (!afterRoll.completed &&
+            afterRoll.currentPlayerId == expectedPlayerId &&
+            afterRoll.pendingRoll != null) {
+          final legalIds = _controller.legalPawnIds;
+          if (legalIds.isNotEmpty) {
+            final selectedPawnId = _chooseAiPawn(legalIds, afterRoll);
+            _controller.movePawn(
+              selectedPawnId,
+              expectedVersion: afterRoll.version,
+            );
+          }
+        }
+      } finally {
+        _aiThinking = false;
+        _scheduleAiTurn(_controller.state);
+      }
+    });
+  }
+
+  String _chooseAiPawn(List<String> legalPawnIds, dynamic state) {
+    String bestPawnId = legalPawnIds.first;
+    var bestScore = -1 << 30;
+
+    for (final pawnId in legalPawnIds) {
+      final pawn = state.pawns.firstWhere((item) => item.id == pawnId);
+      final path = _paths.forPlayer(pawn.playerId);
+      final resolution = _movement.resolve(
+        path: path,
+        current: pawn.position,
+        diceValue: state.pendingRoll as int,
+        sixRequiredToEnter: _controller.setup.engine.sixRequiredToEnter,
+        requireExactFinishRoll:
+            _controller.setup.engine.requireExactFinishRoll,
+      );
+      final move = resolution.resolution;
+      if (move == null) continue;
+
+      var score = 0;
+      if (move.finishes) {
+        score += 10000;
+      } else if (pawn.position.section == PawnRouteSection.yard) {
+        score += 1500;
+      } else if (move.position.section == PawnRouteSection.homeLane) {
+        score += 1200 + (move.position.progress ?? 0);
+      } else {
+        score += (move.position.progress ?? 0) * 10;
+      }
+
+      final destinationCell = move.destinationCell;
+      if (destinationCell != null &&
+          move.position.section == PawnRouteSection.mainTrack &&
+          !_controller.setup.engine.safeCellIndexes.contains(destinationCell)) {
+        final captures = state.pawns.where((opponent) {
+          if (opponent.playerId == pawn.playerId ||
+              opponent.position.section != PawnRouteSection.mainTrack) {
+            return false;
+          }
+          final opponentProgress = opponent.position.progress;
+          if (opponentProgress == null) return false;
+          return _paths
+                  .forPlayer(opponent.playerId)
+                  .cellAtProgress(opponentProgress) ==
+              destinationCell;
+        }).length;
+        score += captures * 5000;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestPawnId = pawnId;
+      }
+    }
+    return bestPawnId;
   }
 
   void _showRules() {
@@ -192,6 +310,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         title: const Text('Ludo Lovers · Match'),
         actions: <Widget>[
           IconButton(
+            key: const ValueKey('toggle_ai_button'),
+            tooltip: _playAgainstAi ? 'Disable AI opponents' : 'Play against AI',
+            onPressed: _toggleAiMode,
+            color: _playAgainstAi ? AppTheme.gold : null,
+            icon: const Icon(Icons.smart_toy_rounded),
+          ),
+          IconButton(
             tooltip: 'How to play',
             onPressed: _showRules,
             icon: const Icon(Icons.help_outline_rounded),
@@ -214,6 +339,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               animation: _controller,
               builder: (context, _) {
                 final state = _controller.state;
+                _scheduleAiTurn(state);
                 final current = state.currentPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
                 final visuals = _visuals(state.pawns);
@@ -306,6 +432,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         currentPlayerId: current,
                         pawns: state.pawns,
                       ),
+                      if (_playAgainstAi) ...<Widget>[
+                        const SizedBox(height: 6),
+                        const Text(
+                          'AI OPPONENTS ON · YOU PLAY ORANGE',
+                          key: ValueKey('ai_mode_status'),
+                          style: TextStyle(
+                            color: AppTheme.gold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 8),
                       Container(
                         key: const ValueKey('local_playtest_status'),
