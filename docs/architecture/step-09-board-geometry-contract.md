@@ -5,7 +5,7 @@
 ## Implemented
 
 - A shared 15×15 grid contract.
-- Explicit 52-cell shared-track and six-cell-per-player home-lane dimensions.
+- Explicit 52-cell shared-track, five physical home-lane cells per player, and a separate center-finish state.
 - Provisional safe-cell IDs (four start cells plus four star cells).
 - A validation helper that rejects a renderer layout missing any logical track or home-lane cell.
 - Unit tests for the contract and missing-cell detection.
