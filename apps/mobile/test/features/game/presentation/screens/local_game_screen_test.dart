@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
+import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_engine.dart';
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
@@ -72,6 +73,49 @@ void main() {
       expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
     },
   );
+
+
+  testWidgets('ignores a duplicate pawn tap from an outdated board frame', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+
+    final pawnFinder = find.byKey(
+      const ValueKey('legal_pawn_orange_pawn_1'),
+    );
+    final stalePawnWidget = tester.widget<GestureDetector>(pawnFinder);
+    final versionBeforeMove = controller.state.version;
+
+    stalePawnWidget.onTap!();
+    stalePawnWidget.onTap!();
+    await tester.pumpAndSettle();
+
+    final pawn = controller.state.pawns.firstWhere(
+      (item) => item.id == 'orange_pawn_1',
+    );
+    expect(controller.state.version, versionBeforeMove + 1);
+    expect(pawn.position.section, PawnRouteSection.mainTrack);
+    expect(pawn.position.progress, 0);
+    expect(controller.state.pendingRoll, isNull);
+    expect(controller.lastError?.error, LocalActionError.staleVersion);
+  });
+
 
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
