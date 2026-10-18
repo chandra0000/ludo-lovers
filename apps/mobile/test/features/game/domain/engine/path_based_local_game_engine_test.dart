@@ -379,6 +379,53 @@ void main() {
     );
   });
 
+  test('does not capture a friendly pawn on the destination cell', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 1,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 6,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns[1].position.section, PawnRouteSection.mainTrack);
+    expect(moved.state.pawns[1].position.progress, 6);
+    expect(moved.events.map((event) => event.type), isNot(contains('PawnCaptured')));
+  });
+
   test('does not capture an opponent on a safe cell', () {
     final state = LocalGameState(
       players: initial.players,
