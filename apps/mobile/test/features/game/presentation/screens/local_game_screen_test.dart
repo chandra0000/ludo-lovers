@@ -219,8 +219,16 @@ void main() {
         'Roll a die to begin the current player’s turn.',
       );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
-      expect(find.text('OPPONENT'), findsOneWidget);
       expect(find.text('YOU'), findsOneWidget);
+      expect(find.text('GREEN'), findsOneWidget);
+      expect(find.text('BLUE'), findsOneWidget);
+      expect(find.text('MAGENTA'), findsOneWidget);
+      for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
+        expect(
+          find.byKey(ValueKey('match_player_$playerId')),
+          findsOneWidget,
+        );
+      }
       expect(find.byKey(const ValueKey('match_turn_caption')), findsOneWidget);
       expect(find.text('Chat'), findsOneWidget);
       expect(find.text('React'), findsOneWidget);
