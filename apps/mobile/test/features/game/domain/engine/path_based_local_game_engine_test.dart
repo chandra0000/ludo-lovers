@@ -734,6 +734,73 @@ void main() {
     expect(moved.events.map((event) => event.type), isNot(contains('TurnEnded')));
   });
 
+  test('captures every pawn in a stack when the rule profile allows it', () {
+    final stackCaptureEngine = PathBasedLocalGameEngine(
+      paths: paths,
+      profile: LudoRuleProfile(
+        safeCellIndexes: const <int>{0, 4},
+        captureOnlySingleOpponentPawn: false,
+      ),
+    );
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 1,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 6,
+          ),
+        ),
+        const LocalPawn(
+          id: 'b2',
+          playerId: 'blue',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 6,
+          ),
+        ),
+      ],
+    );
+
+    final rolled = stackCaptureEngine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = stackCaptureEngine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(
+      moved.state.pawns
+          .where((pawn) => pawn.playerId == 'blue')
+          .every((pawn) => pawn.position.section == PawnRouteSection.yard),
+      isTrue,
+    );
+    final captures = moved.events.whereType<PawnCaptured>().toList();
+    expect(captures.map((event) => event.capturedPawnId), <String>['b1', 'b2']);
+    expect(moved.state.currentPlayerId, 'orange');
+    expect(
+      moved.events.map((event) => event.sequence),
+      List<int>.generate(moved.events.length, (index) => index),
+    );
+  });
+
   test('declares the winner when the last pawn reaches finish', () {
     final state = LocalGameState(
       players: initial.players,
