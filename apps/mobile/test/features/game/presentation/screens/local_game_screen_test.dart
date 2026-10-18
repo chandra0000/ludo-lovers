@@ -282,8 +282,11 @@ void main() {
       final safeCell = setup.engine.safeCellIndexes.first;
       final orangeDestinationProgress = orangePath.mainTrackCells.indexOf(safeCell);
       final blueProgress = bluePath.mainTrackCells.indexOf(safeCell);
-      expect(orangeDestinationProgress, greaterThan(0));
+      expect(orangeDestinationProgress, greaterThanOrEqualTo(0));
       expect(blueProgress, greaterThanOrEqualTo(0));
+      final orangeStartProgress =
+          (orangeDestinationProgress + orangePath.trackLength - 1) %
+          orangePath.trackLength;
 
       final initialState = setup.initialState.copyWith(
         pawns: setup.initialState.pawns.map((pawn) {
@@ -291,7 +294,7 @@ void main() {
             return pawn.copyWith(
               position: PawnRoutePosition(
                 section: PawnRouteSection.mainTrack,
-                progress: orangeDestinationProgress - 1,
+                progress: orangeStartProgress,
               ),
             );
           }
