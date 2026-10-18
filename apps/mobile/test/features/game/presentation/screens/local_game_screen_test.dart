@@ -218,8 +218,12 @@ void main() {
         initialRollSemantics.properties.hint,
         'Roll a die to begin the current player’s turn.',
       );
-      expect(find.byKey(const ValueKey('local_playtest_status')), findsOneWidget);
-      expect(find.textContaining('Board route and safe cells are provisional'), findsOneWidget);
+      expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
+      expect(find.text('OPPONENT'), findsOneWidget);
+      expect(find.text('YOU'), findsOneWidget);
+      expect(find.byKey(const ValueKey('match_turn_caption')), findsOneWidget);
+      expect(find.text('Chat'), findsOneWidget);
+      expect(find.text('React'), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
