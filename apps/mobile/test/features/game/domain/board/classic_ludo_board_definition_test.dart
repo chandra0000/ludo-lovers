@@ -23,14 +23,19 @@ void main() {
       ]);
     });
 
-    test('defines separate, unique six-cell home lanes', () {
+    test('defines separate, unique five-cell home lanes', () {
       final allLaneIds = ClassicLudoBoardDefinition.seats
           .expand((seat) => seat.homeLaneCellIds)
           .toList();
-      expect(allLaneIds, hasLength(24));
+      expect(allLaneIds, hasLength(20));
       expect(allLaneIds.toSet(), hasLength(24));
       expect(ClassicLudoBoardDefinition.seatFor('orange').homeLaneCellIds,
-          <int>[200, 201, 202, 203, 204, 205]);
+          <int>[200, 201, 202, 203, 204]);
+    });
+
+    test('defines a separate center finish outside the home lanes', () {
+      expect(ClassicLudoBoardDefinition.centerFinishCell, const BoardGridCell(column: 7, row: 7));
+      expect(ClassicLudoBoardDefinition.seats.every((seat) => !seat.homeLaneCells.contains(ClassicLudoBoardDefinition.centerFinishCell)), isTrue);
     });
 
     test('defines four unique in-bounds visual anchors', () {
