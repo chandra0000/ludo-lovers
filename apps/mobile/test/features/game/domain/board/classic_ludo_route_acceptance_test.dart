@@ -58,7 +58,7 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.homeLane,
-            progress: 57,
+            progress: 55,
           ),
           diceValue: 1,
           sixRequiredToEnter: true,
