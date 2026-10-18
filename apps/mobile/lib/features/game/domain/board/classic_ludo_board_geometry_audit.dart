@@ -25,7 +25,7 @@ class ClassicLudoBoardGeometryAudit {
     }
 
     final trackCells = track.toSet();
-    final finishCell = ClassicLudoBoardDefinition.centerFinishCell;
+    const finishCell = ClassicLudoBoardDefinition.centerFinishCell;
     if (!finishCell.isInsideBoard) {
       issues.add('Center finish cell is outside the 15x15 grid.');
     }
