@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/board_pawn_layout.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordinate_factory.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
 
 void main() {
@@ -70,12 +71,20 @@ void main() {
         pawnId: 'blue-1',
         position: const PawnRoutePosition(
           section: PawnRouteSection.finished,
-          progress: 58,
+          progress: 57,
         ),
       );
 
-      expect(pawn.point.x, 0.5);
-      expect(pawn.point.y, 0.5);
+      expect(
+        pawn.point.x,
+        (ClassicLudoBoardDefinition.centerFinishCell.column + 0.5) /
+            ClassicLudoBoardDefinition.gridSize,
+      );
+      expect(
+        pawn.point.y,
+        (ClassicLudoBoardDefinition.centerFinishCell.row + 0.5) /
+            ClassicLudoBoardDefinition.gridSize,
+      );
     });
 
     test('rejects invalid yard slots, negative stack index and invalid progress', () {
