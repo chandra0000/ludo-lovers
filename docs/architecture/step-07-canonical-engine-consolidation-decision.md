@@ -186,5 +186,5 @@ A step is complete only when all relevant gates pass:
 
 - Board pawn taps and the Roll Dice button now submit the state version captured by the rendered UI snapshot.
 - LocalGameController rejects callbacks whose expected version is no longer current before requesting a dice value or invoking the engine. This prevents rapid/delayed taps from consuming a second dice result or submitting a duplicate move from an old frame.
-- Controller regressions verify stale roll and pawn callbacks preserve state identity, version, and pending roll; a stale roll does not consume the injected dice source.
+- Controller regressions verify stale roll and pawn callbacks preserve state identity, version, and pending roll; a stale roll does not consume the injected dice source. A widget regression invokes the same rendered pawn callback twice before a rebuild and verifies only one state transition is accepted.
 - This is local interaction hardening only. The engine's own expected-version validation remains authoritative, and route/safe-cell topology and the provisional rules profile remain unapproved.
