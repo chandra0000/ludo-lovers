@@ -75,9 +75,9 @@ void main() {
   );
 
 
-  testWidgets('ignores a duplicate pawn tap from an outdated board frame', (
-    tester,
-  ) async {
+  testWidgets(
+    'ignores a duplicate pawn tap from an outdated board frame',
+    (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -115,7 +115,6 @@ void main() {
     expect(controller.state.pendingRoll, isNull);
     expect(controller.lastError?.error, LocalActionError.staleVersion);
   });
-
 
   testWidgets('restart resets the local match state', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
