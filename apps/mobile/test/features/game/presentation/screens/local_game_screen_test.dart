@@ -279,14 +279,14 @@ void main() {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       final orangePath = setup.paths.forPlayer('orange');
       final bluePath = setup.paths.forPlayer('blue');
-      final safeCell = setup.engine.safeCellIndexes.first;
+      final safeCell = setup.engine.safeCellIndexes.firstWhere(
+        (cell) => orangePath.mainTrackCells.indexOf(cell) > 0,
+      );
       final orangeDestinationProgress = orangePath.mainTrackCells.indexOf(safeCell);
       final blueProgress = bluePath.mainTrackCells.indexOf(safeCell);
       expect(orangeDestinationProgress, greaterThanOrEqualTo(0));
       expect(blueProgress, greaterThanOrEqualTo(0));
-      final orangeStartProgress =
-          (orangeDestinationProgress + orangePath.trackLength - 1) %
-          orangePath.trackLength;
+      final orangeStartProgress = orangeDestinationProgress - 1;
 
       final initialState = setup.initialState.copyWith(
         pawns: setup.initialState.pawns.map((pawn) {
