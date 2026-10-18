@@ -342,6 +342,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 final state = _controller.state;
                 _scheduleAiTurn(state);
                 final current = state.currentPlayerId;
+                final isAiTurn =
+                    _playAgainstAi && current != _humanPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
                 final visuals = _visuals(state.pawns);
                 return SingleChildScrollView(
@@ -514,7 +516,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                             cellSize: cellSize,
                                           ),
                                     for (final visual in visuals)
-                                      if (legalIds.contains(visual.pawnId))
+                                      if (!isAiTurn &&
+                                          legalIds.contains(visual.pawnId))
                                         Positioned(
                                           left: visual.point.x * size.width -
                                               cellSize * 0.48,
@@ -552,10 +555,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         child: Tooltip(
                           message: state.pendingRoll != null
                               ? 'Choose a highlighted pawn to use the current roll.'
+                              : isAiTurn
+                              ? 'AI is choosing its move…'
                               : 'Roll a die to begin the current player’s turn.',
                           child: ElevatedButton.icon(
                             key: const ValueKey('roll_dice_button'),
                             onPressed: state.completed ||
+                                    isAiTurn ||
                                     state.pendingRoll != null
                                 ? null
                                 : () => _controller.rollDice(
