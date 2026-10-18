@@ -168,6 +168,41 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     return bestPawnId;
   }
 
+  String? _friendlyActionFeedback(LocalGameState state) {
+    final message = _controller.lastMessage;
+    if (message == null) return null;
+    if (state.completed || message.contains('GameCompleted')) {
+      return '${(state.winnerPlayerId ?? state.currentPlayerId).toUpperCase()} wins the match!';
+    }
+    if (message.contains('PawnCaptured')) {
+      return 'Brilliant capture! An opponent pawn returns to the yard.';
+    }
+    if (message.contains('PawnFinished')) {
+      return 'Home at last! Your pawn reached the centre.';
+    }
+    if (message.contains('NoLegalMove') && message.contains('ExtraRollGranted')) {
+      return 'No legal move this time, but you earned another roll.';
+    }
+    if (message.contains('ExtraRollGranted')) {
+      return 'Bonus roll unlocked — it is still your turn.';
+    }
+    if (message.contains('NoLegalMove')) {
+      return 'No legal moves. Your turn has passed.';
+    }
+    if (message.contains('DiceRolled')) {
+      return state.pendingRoll == null
+          ? 'No move available for that roll.'
+          : 'You rolled ${state.pendingRoll}. Choose a glowing pawn.';
+    }
+    if (message.contains('PawnMoved')) {
+      return 'Pawn moved. Keep the momentum going!';
+    }
+    if (message.contains('TurnEnded')) {
+      return 'Turn complete. The next player is up.';
+    }
+    return null;
+  }
+
   void _showRules() {
     showModalBottomSheet<void>(
       context: context,
@@ -346,6 +381,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     _playAgainstAi && current != _humanPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
                 final visuals = _visuals(state.pawns);
+                final actionFeedback = _friendlyActionFeedback(state);
                 return SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   child: Column(
@@ -688,6 +724,49 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             style: const TextStyle(
                               color: AppTheme.mutedText,
                               fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (actionFeedback != null) ...<Widget>[
+                        const SizedBox(height: 8),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 220),
+                          child: Container(
+                            key: ValueKey<String>('local_action_feedback_$actionFeedback'),
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.gold.withValues(alpha: 0.09),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppTheme.gold.withValues(alpha: 0.4),
+                              ),
+                            ),
+                            child: Row(
+                              children: <Widget>[
+                                const Icon(
+                                  Icons.auto_awesome_rounded,
+                                  color: AppTheme.gold,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 9),
+                                Expanded(
+                                  child: Text(
+                                    actionFeedback,
+                                    key: const ValueKey('local_action_feedback'),
+                                    style: const TextStyle(
+                                      color: AppTheme.cream,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
