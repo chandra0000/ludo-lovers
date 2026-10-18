@@ -793,7 +793,7 @@ void main() {
     // Advance the fake clock for the three independently scheduled AI turns.
     for (var turn = 0; turn < 3; turn++) {
       await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 300));
     }
 
     expect(controller.state.currentPlayerId, 'orange');
@@ -906,7 +906,7 @@ void main() {
 
     // Green rolls six, leaves the yard, and must retain the turn for its bonus.
     await tester.pump(const Duration(milliseconds: 500));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
     expect(
