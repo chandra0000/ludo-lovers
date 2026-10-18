@@ -159,7 +159,7 @@ void main() {
     expect(controller.state.currentPlayerId, 'orange');
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('OUT 1/4'), findsOneWidget);
-    expect(find.text('OUT 0/4'), findsOneWidget);
+    expect(find.text('OUT 0/4'), findsNWidgets(3));
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       findsNothing,
