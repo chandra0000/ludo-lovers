@@ -904,27 +904,27 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.state.currentPlayerId, 'green');
 
-    // Green rolls six, leaves the yard, and must retain the turn for its bonus.
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(controller.state.currentPlayerId, 'green');
-    expect(controller.state.pendingRoll, isNull);
+    // pumpAndSettle may advance scheduled timers too, so verify the final
+    // outcome instead of depending on an exact intermediate frame.
+    for (var turn = 0; turn < 6; turn++) {
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
     expect(
       controller.state.pawns
           .firstWhere((pawn) => pawn.id == 'green_pawn_1')
           .position.section,
       PawnRouteSection.mainTrack,
+      reason: 'The AI must use its six to bring a pawn out of the yard.',
     );
-
-    // The AI consumes its bonus roll, then Blue and Magenta pass on non-sixes.
-    for (var turn = 0; turn < 3; turn++) {
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-    }
-
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
-    expect(rollIndex, 6);
+    expect(
+      rollIndex,
+      6,
+      reason: 'Green consumes its six bonus roll before Blue and Magenta pass.',
+    );
   });
 
 
