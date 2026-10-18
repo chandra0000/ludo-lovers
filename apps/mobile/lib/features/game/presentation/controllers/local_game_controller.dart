@@ -33,13 +33,14 @@ class LocalGameController extends ChangeNotifier {
 
   List<String> get legalPawnIds => setup.engine.legalPawnIds(_state);
 
-  void rollDice() {
+  void rollDice({int? expectedVersion}) {
+    if (_rejectStaleInteraction(expectedVersion)) return;
     lastError = null;
     try {
       final transition = setup.engine.roll(
         _state,
         playerId: _state.currentPlayerId,
-        expectedVersion: _state.version,
+        expectedVersion: expectedVersion ?? _state.version,
         value: _nextDiceValue(),
       );
       _state = transition.state;
@@ -52,13 +53,14 @@ class LocalGameController extends ChangeNotifier {
     }
   }
 
-  void movePawn(String pawnId) {
+  void movePawn(String pawnId, {int? expectedVersion}) {
+    if (_rejectStaleInteraction(expectedVersion)) return;
     lastError = null;
     try {
       final transition = setup.engine.move(
         _state,
         playerId: _state.currentPlayerId,
-        expectedVersion: _state.version,
+        expectedVersion: expectedVersion ?? _state.version,
         pawnId: pawnId,
       );
       _state = transition.state;
@@ -69,6 +71,18 @@ class LocalGameController extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  /// Rejects callbacks created from an older rendered state before they can
+  /// consume a dice value or submit a duplicate move.
+  bool _rejectStaleInteraction(int? expectedVersion) {
+    if (expectedVersion == null || expectedVersion == _state.version) {
+      return false;
+    }
+    lastError = const LocalGameException(LocalActionError.staleVersion);
+    lastMessage = LocalActionError.staleVersion.name;
+    notifyListeners();
+    return true;
   }
 
   void reset() {
