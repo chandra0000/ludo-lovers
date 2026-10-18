@@ -425,7 +425,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // each side, so size the board against its usable content width.
             final boardSize = math.min(
               math.max(0.0, constraints.maxWidth - 20),
-              constraints.maxHeight * 0.70,
+              constraints.maxHeight * 0.78,
             );
             return AnimatedBuilder(
               animation: _controller,
@@ -444,7 +444,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     children: <Widget>[
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
                           color: AppTheme.panel,
                           borderRadius: BorderRadius.circular(16),
@@ -455,8 +455,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         child: Row(
                           children: <Widget>[
                             Container(
-                              width: 12,
-                              height: 42,
+                              width: 8,
+                              height: 34,
                               decoration: BoxDecoration(
                                 color: _colors[current] ?? AppTheme.cream,
                                 borderRadius: BorderRadius.circular(8),
@@ -595,7 +595,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 key: ValueKey('match_finish_banner_hidden'),
                               ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Row(
                         children: <Widget>[
                           for (final player in <({String id, String name, String title, IconData avatar})>[
@@ -637,7 +637,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 8),
                       const SizedBox(height: 4),
                       Center(
                         child: SizedBox(
@@ -714,7 +713,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
                         child: Row(
