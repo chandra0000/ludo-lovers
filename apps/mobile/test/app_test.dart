@@ -179,12 +179,13 @@ void main() {
     );
     await tester.pump();
 
+    final versionBeforeRestart = controller.state.version;
     await tester.tap(find.byTooltip('Restart match'));
     await tester.pump();
 
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
-    expect(controller.state.version, 0);
+    expect(controller.state.version, versionBeforeRestart + 1);
     expect(
       controller.state.pawns.every(
         (pawn) => pawn.position.section == PawnRouteSection.yard,
