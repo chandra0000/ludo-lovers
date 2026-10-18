@@ -21,6 +21,20 @@ void main() {
       expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isFalse);
     });
 
+    test('center finish is in bounds and separate from track and lanes', () {
+      final finish = ClassicLudoBoardDefinition.centerFinishCell;
+      expect(finish.isInsideBoard, isTrue);
+      expect(ClassicLudoBoardCoordinateFactory.sharedTrack, isNot(contains(finish)));
+      expect(
+        ClassicLudoBoardDefinition.seats.every((seat) => !seat.homeLaneCells.contains(finish)),
+        isTrue,
+      );
+      expect(
+        ClassicLudoBoardGeometryAudit.inspect().where((issue) => issue.contains('center finish')),
+        isEmpty,
+      );
+    });
+
     test('every provisional player start is included in the safe-cell set', () {
       const safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
       expect(safeCells, hasLength(8));
