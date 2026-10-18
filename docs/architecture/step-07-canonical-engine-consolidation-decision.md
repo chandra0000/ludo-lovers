@@ -155,3 +155,12 @@ A step is complete only when all relevant gates pass:
 - This protects the engine contract independently of UI button disabling, so a stale or direct command cannot continue a finished match.
 - Pipeline #227 passed on commit `8630a859061634ada1577ceb49f3dd710b079a55`; this new regression requires its own CI run.
 - Board topology and safe-cell IDs remain provisional. Next gameplay work should prioritize a clear topology reference and route approval; do not enable production readiness or infer cell order from style imagery.
+
+
+## Winner and rematch widget regression — 2026-10-18
+
+- Added deterministic initial-state injection to `LocalGameController` for focused widget tests; normal construction and reset continue to use the factory's fresh-game state.
+- Added a board-backed widget regression that starts one orange pawn two steps from finish, completes the match with a deterministic roll, and verifies the winner banner, disabled roll action, hidden pawn targets, and visible Play Again control.
+- The same test taps Play Again and checks that completion/winner/pending roll clear, all pawns return to the yard, the first turn returns to orange, and rolling is re-enabled.
+- This test verifies UI behavior for the engine's terminal state without changing or approving the provisional route. Board topology and safe-cell positions remain provisional.
+- Pipeline #228 passed on commit `216ab248a2bc9f3039fd8ded04cd02f90e7db327`; this regression requires its own CI run.

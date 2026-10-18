@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
+import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_engine.dart';
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
@@ -102,6 +104,92 @@ void main() {
         (pawn) => pawn.position.section == PawnRouteSection.yard,
       ),
       isTrue,
+    );
+  });
+
+  testWidgets('shows the winner, locks completed play, and rematches cleanly', (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+    final finishProgress = setup.paths.forPlayer('orange').finishProgress;
+    final winningState = setup.initialState.copyWith(
+      pawns: setup.initialState.pawns.map((pawn) {
+        if (pawn.playerId != 'orange') return pawn;
+        if (pawn.id == 'orange_pawn_4') {
+          return pawn.copyWith(
+            position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: finishProgress - 2,
+            ),
+          );
+        }
+        return pawn.copyWith(
+          position: PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: finishProgress,
+          ),
+        );
+      }).toList(growable: false),
+    );
+    final controller = LocalGameController(
+      nextDiceValue: () => 2,
+      gameSetup: setup,
+      initialState: winningState,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.completed, isTrue);
+    expect(controller.state.winnerPlayerId, 'orange');
+    expect(find.text('MATCH COMPLETE'), findsOneWidget);
+    expect(find.text('ORANGE wins!'), findsOneWidget);
+    expect(find.byKey(const ValueKey('play_again_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsNothing);
+    expect(
+      tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('roll_dice_button')),
+      ).onPressed,
+      isNull,
+      reason: 'A completed match must not accept another roll.',
+    );
+
+    await tester.tap(find.byKey(const ValueKey('play_again_button')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.completed, isFalse);
+    expect(controller.state.winnerPlayerId, isNull);
+    expect(controller.state.currentPlayerId, 'orange');
+    expect(controller.state.pendingRoll, isNull);
+    expect(
+      controller.state.pawns.every(
+        (pawn) => pawn.position.section == PawnRouteSection.yard,
+      ),
+      isTrue,
+      reason: 'Rematch must restore the canonical fresh-game state.',
+    );
+    expect(find.text('ORANGE’S TURN'), findsOneWidget);
+    expect(find.byKey(const ValueKey('play_again_button')), findsNothing);
+    expect(
+      tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('roll_dice_button')),
+      ).onPressed,
+      isNotNull,
     );
   });
 

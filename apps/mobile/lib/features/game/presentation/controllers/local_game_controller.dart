@@ -11,15 +11,20 @@ import '../../domain/engine/path_based_local_game_engine.dart';
 /// Uses an injectable dice source so tests can be deterministic. It is not
 /// suitable for competitive online play and labels the route provisional.
 class LocalGameController extends ChangeNotifier {
-  LocalGameController({int Function()? nextDiceValue})
-      : _nextDiceValue = nextDiceValue ?? _randomDiceValue,
-        setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+  LocalGameController({
+    int Function()? nextDiceValue,
+    LocalGameSetup? gameSetup,
+    LocalGameState? initialState,
+  })  : _nextDiceValue = nextDiceValue ?? _randomDiceValue,
+        setup = gameSetup ?? LocalGameFactory.create(allowProvisionalRoutes: true),
+        _initialStateOverride = initialState;
 
   final int Function() _nextDiceValue;
   final LocalGameSetup setup;
+  final LocalGameState? _initialStateOverride;
 
   LocalGameState get state => _state;
-  late LocalGameState _state = setup.initialState;
+  late LocalGameState _state = _initialStateOverride ?? setup.initialState;
 
   String? lastMessage;
   LocalGameException? lastError;
