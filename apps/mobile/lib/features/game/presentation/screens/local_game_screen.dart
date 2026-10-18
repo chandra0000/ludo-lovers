@@ -418,7 +418,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // The scroll view applies 10 px of horizontal padding on
             // each side, so size the board against its usable content width.
             final boardSize = math.min(
-              math.max(0, constraints.maxWidth - 20),
+              math.max(0.0, constraints.maxWidth - 20),
               constraints.maxHeight * 0.62,
             );
             return AnimatedBuilder(
