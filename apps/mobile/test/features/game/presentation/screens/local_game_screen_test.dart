@@ -43,6 +43,51 @@ void main() {
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
+  testWidgets('keeps the board square on compact and landscape screens', (
+    tester,
+  ) async {
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    const viewports = <Size>[
+      Size(320, 568),
+      Size(360, 640),
+      Size(800, 360),
+    ];
+
+    for (final viewport in viewports) {
+      tester.view.physicalSize = viewport;
+      tester.view.devicePixelRatio = 1;
+      final controller = LocalGameController(nextDiceValue: () => 6);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      final boardFinder = find.byKey(const ValueKey('local_game_board'));
+      expect(boardFinder, findsOneWidget, reason: 'Viewport: $viewport');
+      final boardSize = tester.getSize(boardFinder);
+      expect(boardSize.width, greaterThan(0), reason: 'Viewport: $viewport');
+      expect(
+        boardSize.width,
+        closeTo(boardSize.height, 0.01),
+        reason: 'The board must remain square at $viewport.',
+      );
+      expect(
+        boardSize.width,
+        lessThanOrEqualTo(viewport.width - 20),
+        reason: 'The whole board must fit the available width at $viewport.',
+      );
+      expect(tester.takeException(), isNull, reason: 'Viewport: $viewport');
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      controller.dispose();
+    }
+  });
+
   testWidgets(
     'rolls, highlights a legal pawn, moves it, and preserves prototype warning',
     (tester) async {
