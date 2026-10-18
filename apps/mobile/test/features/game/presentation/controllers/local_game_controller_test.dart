@@ -107,5 +107,49 @@ void main() {
       expect(controller.lastError, isNotNull);
       expect(controller.lastMessage, isNotNull);
     });
+
+    test('rejects stale rendered callbacks before consuming a dice value', () {
+      var diceCalls = 0;
+      final controller = LocalGameController(nextDiceValue: () {
+        diceCalls++;
+        return 6;
+      });
+      addTearDown(controller.dispose);
+
+      controller.rollDice();
+      final afterRoll = controller.state;
+      expect(diceCalls, 1);
+      expect(afterRoll.pendingRoll, 6);
+
+      controller.rollDice(expectedVersion: 0);
+
+      expect(identical(controller.state, afterRoll), isTrue);
+      expect(controller.state.version, afterRoll.version);
+      expect(controller.state.pendingRoll, 6);
+      expect(diceCalls, 1,
+          reason: 'A stale roll callback must not consume the dice source.');
+      expect(controller.lastError?.error, LocalActionError.staleVersion);
+    });
+
+    test('rejects a stale pawn callback without consuming the pending roll', () {
+      final controller = LocalGameController(nextDiceValue: () => 6);
+      addTearDown(controller.dispose);
+
+      controller.rollDice();
+      final afterRoll = controller.state;
+      controller.movePawn('orange_pawn_1', expectedVersion: 0);
+
+      expect(identical(controller.state, afterRoll), isTrue);
+      expect(controller.state.version, afterRoll.version);
+      expect(controller.state.pendingRoll, 6);
+      expect(
+        controller.state.pawns
+            .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+            .position.section,
+        PawnRouteSection.yard,
+      );
+      expect(controller.lastError?.error, LocalActionError.staleVersion);
+    });
+
   });
 }
