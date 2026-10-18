@@ -31,6 +31,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.state.pendingRoll, 6);
+      final rollButtonWhileMovePending =
+          tester.widget<ElevatedButton>(find.byKey(const ValueKey('roll_dice_button')));
+      expect(
+        rollButtonWhileMovePending.onPressed,
+        isNull,
+        reason: 'A second roll must not be available before the pending move is used.',
+      );
       expect(find.text('Rolled 6 · Tap a glowing pawn.'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
@@ -54,6 +61,13 @@ void main() {
       expect(pawn.position.progress, 0);
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'orange');
+      final rollButtonAfterMove =
+          tester.widget<ElevatedButton>(find.byKey(const ValueKey('roll_dice_button')));
+      expect(
+        rollButtonAfterMove.onPressed,
+        isNotNull,
+        reason: 'The extra turn should allow a fresh roll after the move resolves.',
+      );
       expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
     },
   );

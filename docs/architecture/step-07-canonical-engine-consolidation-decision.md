@@ -139,3 +139,10 @@ A step is complete only when all relevant gates pass:
 - The widget test also checks that the visible current-turn label and `OUT 1/4` pawn counter reflect the controller state after movement.
 - This validates synchronization between engine state, legal pawn hit targets, and the board HUD in a deterministic widget environment. It is not a substitute for a physical-device playtest.
 - Board route and safe cells remain provisional; no production readiness flag is enabled by this test.
+
+
+## Pending-roll interaction guard — 2026-10-18
+
+- Extended the board-backed widget test to assert that the Roll Dice button is disabled while a roll is waiting for a legal pawn selection.
+- After the pawn move resolves and an extra turn is granted, the test asserts that Roll Dice becomes available again.
+- This guards against duplicate-roll UI actions and verifies the roll control follows the engine's pending-roll state. The provisional board route remains unapproved.
