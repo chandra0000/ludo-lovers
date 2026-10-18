@@ -172,3 +172,12 @@ A step is complete only when all relevant gates pass:
 - Asserted the six bonus-turn behavior at the state boundary.
 - Added a collection-immutability regression: constructor inputs are defensively copied, and exposed player/pawn lists reject mutation.
 - This is engine-level coverage only; the route topology and safe-cell map remain provisional. Capture and finish cases are covered by existing focused tests and will continue to be extended without treating the provisional topology as approved.
+
+
+## Transition event immutability and ordering — 2026-10-18
+
+- Confirmed pipeline #231 succeeded on commit `dfe1dc6d9a88623041ed902cc11df358b08bcc2c`; formatting, analysis, automated tests, and Android debug APK build all completed successfully.
+- Added a regression proving `LocalGameTransition` copies the supplied event list, exposes an unmodifiable list, and stamps each event with the transition's state version and deterministic sequence order.
+- Extended the no-legal-move flow to assert all three events share the accepted command's resulting version and have sequence indexes `0, 1, 2`.
+- This protects the event contract that future board animations/replay consumers will rely on; it does not change game rules or board geometry.
+- Keep board topology and safe-cell IDs provisional and `isGameplayReady = false` until the route is checked against a clear cell-by-cell reference or an explicit v1 topology is approved.

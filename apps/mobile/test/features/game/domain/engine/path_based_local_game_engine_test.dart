@@ -129,6 +129,27 @@ void main() {
     );
   });
 
+  test('transition events are copied, frozen, and stamped in deterministic order', () {
+    final sourceEvents = <LocalGameEvent>[
+      DiceRolled(playerId: 'orange', value: 6),
+      TurnEnded(playerId: 'orange'),
+    ];
+    final transition = LocalGameTransition(initial, sourceEvents);
+
+    sourceEvents.clear();
+
+    expect(transition.events, hasLength(2));
+    expect(
+      transition.events.map((event) => event.stateVersion),
+      <int?>[initial.version, initial.version],
+    );
+    expect(transition.events.map((event) => event.sequence), <int?>[0, 1]);
+    expect(
+      () => transition.events.add(TurnEnded(playerId: 'orange')),
+      throwsUnsupportedError,
+    );
+  });
+
   test('rejects pawn progress that does not match its route section', () {
     final malformed = LocalGameState(
       players: const <String>['orange', 'blue'],
@@ -253,6 +274,14 @@ void main() {
     expect(result.state.version, initial.version + 1,
         reason: 'A roll command advances the state version exactly once.');
     expect(result.events.map((event) => event.type), contains('NoLegalMove'));
+    expect(
+      result.events.map((event) => event.stateVersion),
+      everyElement(result.state.version),
+    );
+    expect(
+      result.events.map((event) => event.sequence),
+      <int?>[0, 1, 2],
+    );
   });
 
   test('third consecutive six ends the turn without a move', () {
