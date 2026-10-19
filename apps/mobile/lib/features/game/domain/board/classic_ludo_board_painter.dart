@@ -167,6 +167,42 @@ class ClassicLudoBoardPainter extends CustomPainter {
         seat.color,
       );
     }
+
+    // A restrained metallic frame ties the board to the approved black-and-gold
+    // visual direction without changing any logical cell coordinates.
+    final outerFrame = boardRect.deflate(cell * 0.045);
+    final outerFrameRRect = RRect.fromRectAndRadius(
+      outerFrame,
+      Radius.circular(cell * 0.38),
+    );
+    canvas.drawRRect(
+      outerFrameRRect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = cell * 0.10
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFFFFF2B0),
+            Color(0xFFFFD700),
+            Color(0xFF9B6200),
+            Color(0xFFFFE78A),
+          ],
+          stops: <double>[0, 0.34, 0.70, 1],
+        ).createShader(outerFrame),
+    );
+    final innerFrame = boardRect.deflate(cell * 0.20);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        innerFrame,
+        Radius.circular(cell * 0.28),
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = cell * 0.025
+        ..color = LudoBoardPalette.cream.withValues(alpha: 0.32),
+    );
   }
 
   void _drawStar(Canvas canvas, Offset center, double radius) {
