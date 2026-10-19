@@ -74,7 +74,7 @@ void main() {
       final expectedStarCells = <BoardGridCell>{
         BoardGridCell(column: 6, row: 2),
         BoardGridCell(column: 12, row: 6),
-        BoardGridCell(column: 6, row: 12),
+        BoardGridCell(column: 8, row: 12),
         BoardGridCell(column: 2, row: 8),
       };
       final starCellIds = expectedSafeIds
@@ -83,6 +83,14 @@ void main() {
         starCellIds.map((id) => ClassicLudoBoardDefinition.sharedTrackCells[id]).toSet(),
         expectedStarCells,
       );
+    });
+
+    test('the route has 52 unique in-bounds cells and the finish stays outside the route', () {
+      final track = ClassicLudoBoardDefinition.sharedTrackCells;
+      expect(track, hasLength(ClassicLudoBoardDefinition.sharedTrackLength));
+      expect(track.toSet(), hasLength(track.length));
+      expect(track.every((cell) => cell.isInsideBoard), isTrue);
+      expect(track, isNot(contains(ClassicLudoBoardDefinition.centerFinishCell)));
     });
 
     test('home lanes are five unique consecutive cells and never overlap shared track', () {
