@@ -87,7 +87,7 @@ void main() {
     });
 
     test('the route has 52 unique in-bounds cells and the finish stays outside the route', () {
-      final track = ClassicLudoBoardDefinition.sharedTrackCells;
+      const track = ClassicLudoBoardDefinition.sharedTrackCells;
       expect(track, hasLength(ClassicLudoBoardDefinition.sharedTrackLength));
       expect(track.toSet(), hasLength(track.length));
       expect(track.every((cell) => cell.isInsideBoard), isTrue);
