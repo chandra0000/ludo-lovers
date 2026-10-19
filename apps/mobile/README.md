@@ -27,10 +27,11 @@ flutter build apk --debug
 ## Implementation priorities
 
 ### Priority 1 — Board correctness gate
-1. Compare the 52-cell route, all four start cells, home lanes and safe cells against the approved board reference.
-2. Correct route coordinates, player-relative path rotations and painter mapping together.
-3. Add/keep acceptance tests for every seat's wraparound, lane entry, exact finish, overshoot, safe cells and legal destinations.
-4. Only set gameplay readiness to true when the evidence and tests support it.
+1. Keep the v1 geometry contract explicit: the only non-orthogonal transitions are the documented one-cell diagonals at indexes 4, 17, 30 and 43; these are documented provisional topology, not visual approval.
+2. Compare the 52-cell route, all four start cells, home lanes and safe cells against the approved board reference, including the four star coordinates.
+3. Correct route coordinates, player-relative path rotations and painter mapping together if visual review identifies a mismatch.
+4. Keep acceptance tests for every seat's wraparound, lane entry, exact finish, overshoot, safe cells, legal destinations, and visual-topology contract.
+5. Only set gameplay readiness to true when the approved reference and test evidence support it.
 
 ### Priority 2 — Local gameplay polish after route approval
 1. Add clear destination feedback and restrained pawn movement animation driven by engine state.
