@@ -71,17 +71,18 @@ void main() {
       expect(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
           expectedSafeIds);
 
-      const expectedStarCells = <BoardGridCell>{
+      const expectedStarCells = <BoardGridCell>[
         BoardGridCell(column: 6, row: 2),
-        const BoardGridCell(column: 12, row: 6),
-        const BoardGridCell(column: 8, row: 12),
-        const BoardGridCell(column: 2, row: 8),
-      };
-      final starCellIds = expectedSafeIds
-          .difference(<int>{0, 13, 26, 39});
+        BoardGridCell(column: 12, row: 6),
+        BoardGridCell(column: 8, row: 12),
+        BoardGridCell(column: 2, row: 8),
+      ];
+      final starCellIds = expectedSafeIds.difference(<int>{0, 13, 26, 39});
       expect(
-        starCellIds.map((id) => ClassicLudoBoardDefinition.sharedTrackCells[id]).toSet(),
-        expectedStarCells,
+        starCellIds.map(
+          (id) => ClassicLudoBoardDefinition.sharedTrackCells[id],
+        ),
+        unorderedEquals(expectedStarCells),
       );
     });
 
