@@ -71,7 +71,7 @@ void main() {
       expect(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
           expectedSafeIds);
 
-      const expectedStarCells = <BoardGridCell>{
+      final expectedStarCells = <BoardGridCell>{
         BoardGridCell(column: 6, row: 2),
         BoardGridCell(column: 12, row: 6),
         BoardGridCell(column: 6, row: 12),
