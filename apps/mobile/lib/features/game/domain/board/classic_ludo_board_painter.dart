@@ -118,10 +118,43 @@ class ClassicLudoBoardPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[Color(0xFFFFF2A8), Color(0xFFFFD700), Color(0xFFC98500)],
+          colors: <Color>[
+            Color(0xFFFFF4B8),
+            Color(0xFFFFD700),
+            Color(0xFFE4A900),
+            Color(0xFF9D6500),
+          ],
+          stops: <double>[0, 0.34, 0.72, 1],
         ).createShader(centerPath.getBounds()),
     );
-    canvas.drawPath(centerPath, linePaint);
+    canvas.drawPath(
+      centerPath,
+      Paint()
+        ..color = const Color(0xFFFFF4C4)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = cell * 0.055,
+    );
+    // A small crowned-home emblem gives the finish a clear visual focal point.
+    final crown = Path()
+      ..moveTo(center.dx - cell * 0.68, center.dy - cell * 0.20)
+      ..lineTo(center.dx - cell * 0.54, center.dy + cell * 0.34)
+      ..lineTo(center.dx + cell * 0.54, center.dy + cell * 0.34)
+      ..lineTo(center.dx + cell * 0.68, center.dy - cell * 0.20)
+      ..lineTo(center.dx + cell * 0.32, center.dy + cell * 0.02)
+      ..lineTo(center.dx, center.dy - cell * 0.42)
+      ..lineTo(center.dx - cell * 0.32, center.dy + cell * 0.02)
+      ..close();
+    canvas.drawPath(
+      crown,
+      Paint()..color = const Color(0xFF6B4700),
+    );
+    canvas.drawPath(
+      crown,
+      Paint()
+        ..color = const Color(0xFFFFF4C4)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = cell * 0.045,
+    );
 
     for (final seat in ClassicLudoBoardDefinition.seats) {
       _drawStart(
@@ -177,18 +210,45 @@ class ClassicLudoBoardPainter extends CustomPainter {
       cell * 6,
       cell * 6,
     );
-    canvas.drawRect(rect, Paint()..color = color.withValues(alpha: 0.24));
-    canvas.drawRect(
-      rect,
+    // Premium enamel quadrant: a deep color field, subtle inner glow and
+    // crisp metallic edge. The logical board coordinates remain unchanged.
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, Radius.circular(cell * 0.08)),
       Paint()
-        ..color = color
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color.lerp(color, Colors.white, 0.12)!,
+            Color.lerp(color, Colors.black, 0.62)!,
+          ],
+        ).createShader(rect),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect.deflate(cell * 0.06), Radius.circular(cell * 0.06)),
+      Paint()
+        ..color = color.withValues(alpha: 0.95)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = cell * 0.12,
+        ..strokeWidth = cell * 0.055,
     );
     final inner = rect.deflate(cell * 1.05);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(inner, Radius.circular(cell * 0.6)),
-      Paint()..color = color.withValues(alpha: 0.22),
+      RRect.fromRectAndRadius(inner, Radius.circular(cell * 0.62)),
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-0.35, -0.4),
+          colors: <Color>[
+            Color.lerp(color, Colors.white, 0.16)!.withValues(alpha: 0.72),
+            Color.lerp(color, Colors.black, 0.36)!.withValues(alpha: 0.78),
+          ],
+        ).createShader(inner),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(inner.deflate(cell * 0.035), Radius.circular(cell * 0.58)),
+      Paint()
+        ..color = LudoBoardPalette.cream.withValues(alpha: 0.10)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = cell * 0.025,
     );
     for (final point in <Offset>[
       Offset(inner.left + inner.width * 0.3, inner.top + inner.height * 0.3),
