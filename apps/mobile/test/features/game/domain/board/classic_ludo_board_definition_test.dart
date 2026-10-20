@@ -12,8 +12,8 @@ void main() {
       expect(seats.map((seat) => seat.quadrant).toList(), <BoardQuadrant>[
         BoardQuadrant.topLeft,
         BoardQuadrant.topRight,
-        BoardQuadrant.bottomLeft,
         BoardQuadrant.bottomRight,
+        BoardQuadrant.bottomLeft,
       ]);
       expect(seats.map((seat) => seat.color).toList(), <Color>[
         const Color(0xFFFF8928),
