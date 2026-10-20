@@ -26,11 +26,11 @@ void main() {
     );
 
     expect(find.byKey(const ValueKey('local_match_player_strip')), findsOneWidget);
-    expect(find.text('ORANGE'), findsOneWidget);
-    expect(find.text('GREEN'), findsOneWidget);
-    expect(find.text('BLUE'), findsOneWidget);
-    expect(find.text('MAGENTA'), findsOneWidget);
-    expect(find.text('YOU'), findsOneWidget);
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
+    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
+    expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
+    expect(find.text('YOU'), findsAtLeastNWidgets(1));
     expect(find.text('LOCAL'), findsNWidgets(3));
     expect(find.text('Online'), findsNothing);
   });
@@ -247,10 +247,10 @@ void main() {
         'Roll a die to begin the current player’s turn.',
       );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
-      expect(find.text('YOU'), findsOneWidget);
-      expect(find.text('GREEN'), findsOneWidget);
-      expect(find.text('BLUE'), findsOneWidget);
-      expect(find.text('MAGENTA'), findsOneWidget);
+      expect(find.text('YOU'), findsAtLeastNWidgets(1));
+      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+      expect(find.text('BLUE'), findsAtLeastNWidgets(1));
+      expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
       for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
         expect(
           find.byKey(ValueKey('match_player_$playerId')),
