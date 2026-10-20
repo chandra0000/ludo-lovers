@@ -172,6 +172,91 @@ void main() {
     expect(moved.state.currentPlayerId, 'blue');
   });
 
+  test('stacked opponents on an unsafe cell are protected by the configured rule', () {
+    final state = stateWith(<LocalPawn>[
+      const LocalPawn(
+        id: 'o1',
+        playerId: 'orange',
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 1,
+        ),
+      ),
+      const LocalPawn(
+        id: 'b1',
+        playerId: 'blue',
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 6,
+        ),
+      ),
+      const LocalPawn(
+        id: 'b2',
+        playerId: 'blue',
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 6,
+        ),
+      ),
+    ]);
+
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns[1].position.section, PawnRouteSection.mainTrack);
+    expect(moved.state.pawns[2].position.section, PawnRouteSection.mainTrack);
+    expect(
+      moved.events.map((event) => event.type),
+      isNot(contains('PawnCaptured')),
+      reason: 'The default classic-v1 profile protects a stacked pair.',
+    );
+  });
+
+  test('main-track pawn enters its private home lane at the route branch', () {
+    final state = stateWith(<LocalPawn>[
+      const LocalPawn(
+        id: 'o1',
+        playerId: 'orange',
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 50,
+        ),
+      ),
+      const LocalPawn(
+        id: 'b1',
+        playerId: 'blue',
+        position: PawnRoutePosition(section: PawnRouteSection.yard),
+      ),
+    ]);
+
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 1,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns.first.position.section, PawnRouteSection.homeLane);
+    expect(moved.state.pawns.first.position.progress, 51);
+    expect(paths.forPlayer('orange').cellAtProgress(51), 100);
+  });
+
   test('exact-finish overshoot is rejected without consuming the roll', () {
     final state = stateWith(<LocalPawn>[
       const LocalPawn(
