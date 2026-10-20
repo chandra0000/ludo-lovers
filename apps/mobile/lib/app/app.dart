@@ -103,7 +103,27 @@ class AppFoundationScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 340),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final screenWidth = MediaQuery.sizeOf(context).width;
+                            final logoWidth = (screenWidth - 48).clamp(180.0, 340.0);
+                            return Image.asset(
+                              'assets/images/ludo_lovers_logo.jpg',
+                              key: const ValueKey('ludo_lovers_home_logo'),
+                              width: logoWidth,
+                              height: logoWidth * 0.9,
+                              fit: BoxFit.contain,
+                              semanticLabel: 'Ludo Lovers — Play and Win',
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
