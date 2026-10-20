@@ -922,8 +922,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                               ),
                                             )
                                             .rotate(
-                                              begin: const Offset(-0.12, 0),
-                                              end: Offset.zero,
+                                              begin: -0.12, 0,
+                                              end: 0,
                                               duration: 360.ms,
                                               curve: Curves.easeOutBack,
                                             )
