@@ -71,7 +71,7 @@ void main() {
         pawnId: 'blue-1',
         position: const PawnRoutePosition(
           section: PawnRouteSection.finished,
-          progress: 57,
+          progress: 56,
         ),
       );
 
