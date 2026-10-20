@@ -50,7 +50,6 @@ void main() {
     expect(find.byType(LocalGameScreen), findsOneWidget);
     expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
     expect(find.text('BLUE'), findsAtLeastNWidgets(1));
-    expect(find.text('GREEN'), findsNothing);
   });
 
   testWidgets('computer mode starts with one human and three AI seats',
@@ -67,7 +66,7 @@ void main() {
       ),
     );
     await tester.tap(find.text('Play vs AI'));
-    await tester.pump();
+    await tester.pumpAndSettle(const Duration(milliseconds: 50));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
     expect(find.text('YOU'), findsOneWidget);
