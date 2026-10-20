@@ -14,7 +14,7 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.sharedTrack.toSet(), hasLength(52));
     });
 
-    test('fixture entry indexes and home lanes derive from canonical seats', () {
+    test('reference entry indexes and home lanes derive from canonical seats', () {
       final paths = ClassicLudoBoardFixture.create();
       expect(ClassicLudoBoardFixture.sharedTrackLength,
           ClassicLudoBoardDefinition.sharedTrackLength);
@@ -34,10 +34,20 @@ void main() {
       expect(
         ClassicLudoBoardFixture.provisionalEntryCellByPlayer,
         <String, int>{
-          for (final seat in ClassicLudoBoardDefinition.seats)
-            seat.id: seat.provisionalTrackEntryIndex,
+          'orange': 0,
+          'green': 13,
+          'magenta': 26,
+          'blue': 39,
         },
       );
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(
+          ClassicLudoBoardDefinition.sharedTrackCells[
+              seat.provisionalTrackEntryIndex],
+          seat.startMarker,
+          reason: '${seat.id} marker must occupy its specified route index',
+        );
+      }
     });
 
     test('geometry and rules profile use the same provisional safe-cell IDs', () {
