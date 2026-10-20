@@ -17,6 +17,8 @@ void main() {
     expect(find.byKey(const ValueKey('local_game_lab_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('preview_board_button')), findsOneWidget);
 
+    await tester.ensureVisible(find.byKey(const ValueKey('local_game_lab_button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
