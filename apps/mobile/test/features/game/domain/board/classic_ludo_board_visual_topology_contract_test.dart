@@ -143,7 +143,7 @@ void main() {
       for (final seat in ClassicLudoBoardDefinition.seats) {
         expect(seat.quadrant, expectedSeats[seat.id],
             reason: '${seat.id} must remain in its reference quadrant');
-        expect(seat.color.value, expectedColors[seat.id],
+        expect(seat.color.toARGB32(), expectedColors[seat.id],
             reason: '${seat.id} must use the exact Ludo Lovers brand color');
         expect(seat.homeLaneCells, hasLength(5));
         expect(seat.homeLaneCells.toSet(), hasLength(5));
