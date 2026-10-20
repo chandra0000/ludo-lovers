@@ -55,6 +55,12 @@ void main() {
     final rollSemantics = tester.widget<Semantics>(
       find.byKey(const ValueKey('roll_dice_button_semantics')),
     );
+    expect(rollSemantics.properties.button, isTrue);
+    expect(rollSemantics.properties.enabled, isFalse);
+    expect(
+      rollSemantics.properties.label,
+      'Dice unavailable. Match complete.',
+    );
     expect(
       rollSemantics.properties.hint,
       'The match is finished. Choose Play Again to start a new match.',
