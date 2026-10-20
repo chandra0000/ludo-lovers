@@ -38,7 +38,7 @@ void main() {
 
     test('maps late shared-track progress using the 52-cell physical loop', () {
       for (final seat in ClassicLudoBoardDefinition.seats) {
-        final progress = 50;
+        const progress = 50;
         final expectedCell =
             (seat.provisionalTrackEntryIndex + progress) %
             ClassicLudoBoardDefinition.sharedTrackLength;
