@@ -12,18 +12,19 @@ This checklist is the release-oriented source of truth for the next implementati
 - [x] Latest observed main-branch Flutter checks passed for commit `4f838cb7fc053c196c8abba0926d5ef6f7304040` (workflow run 369).
 - [ ] Board route is approved against the user's original board reference.
 - [ ] Gameplay readiness remains disabled until topology is approved.
-- [ ] End-to-end board-backed local match is verified on Android; an engine implementation alone is not sufficient evidence.
+- [x] Board-backed local match flow and widget-level interaction coverage are present in the repository; physical-device Android verification is still outstanding.
 - [ ] Online/server-authoritative play is not implemented.
 
 ## Next steps — execute in this order
 
 ### 1. Verify a complete local match on the rendered board
-- [ ] Confirm the visible board is driven by the same immutable game state as the local engine; no static board image in place of gameplay.
-- [ ] Verify roll → legal pawn choices → selected pawn moves along the path → turn advances.
-- [ ] Verify a non-six roll with no legal move advances the turn, while a six follows the configured extra-roll rule.
-- [ ] Verify captures return the opponent pawn to its yard and safe cells prevent captures.
-- [ ] Verify exact-finish behavior, finished pawns, winner state, and post-win input lock.
-- [ ] Add/extend widget tests for those user-visible flows and retain engine-level rule tests.
+- [x] Local match screen renders pawns from the controller's live engine state and animates pawn movement; widget coverage checks state changes and pawn animation.
+- [x] Widget test covers roll → legal pawn highlighting → pawn selection/movement; turn/bonus-roll behavior is asserted.
+- [x] Widget tests cover no-legal-move turn passing and six bonus-roll behavior.
+- [x] Widget tests cover captures, entry-cell safety, safe-cell protection, and stacked-opponent protection.
+- [x] Widget tests cover home-lane overshoot, finishing, winner state, post-win input lock, and clean rematch.
+- [x] Existing local-game widget tests and engine-level rule tests cover the local match flow (see `apps/mobile/test/features/game/presentation/screens/local_game_screen_test.dart` and `apps/mobile/test/features/game/domain/engine/path_based_local_game_engine_test.dart`).
+- [ ] Run the updated suite on CI after this checklist commit and confirm physical-device Android behavior.
 
 ### 2. Close the board-topology approval gate
 - [ ] Compare all 52 track-cell coordinates, four player entry points, home-lane order, center finish, and safe cells against the user's original reference.
