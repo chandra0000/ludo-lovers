@@ -859,6 +859,63 @@ void main() {
   });
 
 
+  test('keeps the roll available when an exact-finish move overshoots', () {
+    final state = LocalGameState(
+      players: initial.players,
+      currentPlayerIndex: 0,
+      pawns: <LocalPawn>[
+        const LocalPawn(
+          id: 'o1',
+          playerId: 'orange',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.homeLane,
+            progress: 9,
+          ),
+        ),
+        const LocalPawn(
+          id: 'o2',
+          playerId: 'orange',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+        const LocalPawn(
+          id: 'b1',
+          playerId: 'blue',
+          position: PawnRoutePosition(section: PawnRouteSection.yard),
+        ),
+      ],
+    );
+
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 3,
+    );
+
+    expect(
+      () => engine.move(
+        rolled.state,
+        playerId: 'orange',
+        expectedVersion: rolled.state.version,
+        pawnId: 'o1',
+      ),
+      throwsA(
+        isA<LocalGameException>().having(
+          (error) => error.error,
+          'error',
+          LocalActionError.illegalMove,
+        ),
+      ),
+    );
+    expect(rolled.state.pendingRoll, 3);
+    expect(rolled.state.version, state.version + 1);
+    expect(
+      rolled.state.pawns.firstWhere((pawn) => pawn.id == 'o1').position.progress,
+      9,
+      reason: 'A rejected overshoot must not mutate the pawn position.',
+    );
+  });
+
   test('rejects a second roll while a move is pending', () {
     final rolled = engine.roll(
       initial,
