@@ -110,15 +110,16 @@ void main() {
         expect(path.mainTrackCells, hasLength(52), reason: seat.id);
         expect(path.mainTrackCells.toSet(), hasLength(52), reason: seat.id);
         expect(path.homeLaneCells, hasLength(5), reason: seat.id);
+        expect(path.trackLength, ClassicLudoBoardDefinition.playerTrackLength, reason: seat.id);
         expect(path.entryCell, seat.provisionalTrackEntryIndex, reason: seat.id);
         expect(path.cellAtProgress(0), seat.provisionalTrackEntryIndex);
         expect(
-          path.cellAtProgress(51),
-          (seat.provisionalTrackEntryIndex + 51) % 52,
+          path.cellAtProgress(50),
+          (seat.provisionalTrackEntryIndex + 50) % 52,
         );
-        expect(path.cellAtProgress(52), seat.homeLaneStartCellId);
-        expect(path.cellAtProgress(56), seat.homeLaneStartCellId + 4);
-        expect(path.cellAtProgress(57), isNull);
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId);
+        expect(path.cellAtProgress(55), seat.homeLaneStartCellId + 4);
+        expect(path.cellAtProgress(56), isNull);
       }
     });
 
