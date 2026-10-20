@@ -130,6 +130,48 @@ void main() {
     expect(moved.state.currentPlayerId, 'blue');
   });
 
+  test('passing over an opponent without landing on its cell does not capture', () {
+    final state = stateWith(<LocalPawn>[
+      const LocalPawn(
+        id: 'o1',
+        playerId: 'orange',
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 0,
+        ),
+      ),
+      const LocalPawn(
+        id: 'b1',
+        playerId: 'blue',
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: 5,
+        ),
+      ),
+    ]);
+
+    // Orange's route is 0,1,2,...; Blue's rotated route places b1 on cell 1.
+    // A roll of 2 passes cell 1 but lands on cell 2.
+    final rolled = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 2,
+    );
+    final moved = engine.move(
+      rolled.state,
+      playerId: 'orange',
+      expectedVersion: rolled.state.version,
+      pawnId: 'o1',
+    );
+
+    expect(moved.state.pawns.first.position.progress, 2);
+    expect(moved.state.pawns[1].position.section, PawnRouteSection.mainTrack);
+    expect(moved.events.map((event) => event.type),
+        isNot(contains('PawnCaptured')));
+    expect(moved.state.currentPlayerId, 'blue');
+  });
+
   test('exact-finish overshoot is rejected without consuming the roll', () {
     final state = stateWith(<LocalPawn>[
       const LocalPawn(
