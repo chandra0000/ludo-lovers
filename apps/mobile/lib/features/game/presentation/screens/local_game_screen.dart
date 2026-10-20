@@ -425,7 +425,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // each side, so size the board against its usable content width.
             final boardSize = math.min(
               math.max(0.0, constraints.maxWidth - 20),
-              constraints.maxHeight * 0.88,
+              constraints.maxHeight * 0.78,
             );
             return AnimatedBuilder(
               animation: _controller,
