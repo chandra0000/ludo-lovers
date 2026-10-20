@@ -99,6 +99,14 @@ class ClassicLudoBoardCoordinateFactory {
           !safeCells.contains(entry)) {
         return false;
       }
+      final approach = sharedTrack[
+        (entry + ClassicLudoBoardDefinition.playerTrackLength - 1) %
+            sharedTrack.length
+      ];
+      final firstLane = seat.homeLaneCells.first;
+      final distance = (approach.column - firstLane.column).abs() +
+          (approach.row - firstLane.row).abs();
+      if (distance != 1) return false;
     }
 
     // A track must not reuse a physical cell as part of a private home lane.
