@@ -84,6 +84,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
     expect(find.text('Pick your way to play'), findsOneWidget);
+    await tester.ensureVisible(find.text('Start 4-player game'));
     await tester.tap(find.text('Start 4-player game'));
     await tester.pumpAndSettle();
 
