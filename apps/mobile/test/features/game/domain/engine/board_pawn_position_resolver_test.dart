@@ -12,25 +12,25 @@ void main() {
       playerId: 'orange',
       mainTrackCells: List<int>.generate(52, (index) => index),
       homeLaneCells: const <int>[200, 201, 202, 203, 204],
-      trackLength: 52,
+      trackLength: 51,
     );
     final greenPath = LudoPlayerPath(
       playerId: 'green',
       mainTrackCells: List<int>.generate(52, (index) => (index + 13) % 52),
       homeLaneCells: const <int>[220, 221, 222, 223, 224],
-      trackLength: 52,
+      trackLength: 51,
     );
     final bluePath = LudoPlayerPath(
       playerId: 'blue',
       mainTrackCells: List<int>.generate(52, (index) => (index + 39) % 52),
       homeLaneCells: const <int>[210, 211, 212, 213, 214],
-      trackLength: 52,
+      trackLength: 51,
     );
     final magentaPath = LudoPlayerPath(
       playerId: 'magenta',
       mainTrackCells: List<int>.generate(52, (index) => (index + 26) % 52),
       homeLaneCells: const <int>[230, 231, 232, 233, 234],
-      trackLength: 52,
+      trackLength: 51,
     );
     resolver = BoardPawnPositionResolver(
       paths: LudoBoardPaths(<LudoPlayerPath>[
@@ -47,9 +47,9 @@ void main() {
     for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
       final path = resolver.paths.forPlayer(playerId);
       expect(path.homeLaneLength, 5, reason: playerId);
-      expect(path.finishProgress, 57, reason: playerId);
-      expect(path.cellAtProgress(56), path.homeLaneCells.last, reason: playerId);
-      expect(path.cellAtProgress(57), isNull, reason: playerId);
+      expect(path.finishProgress, 56, reason: playerId);
+      expect(path.cellAtProgress(55), path.homeLaneCells.last, reason: playerId);
+      expect(path.cellAtProgress(56), isNull, reason: playerId);
     }
   });
 
@@ -106,7 +106,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.homeLane,
-          progress: 52,
+          progress: 51,
         ),
       ),
       200,
@@ -116,7 +116,7 @@ void main() {
         playerId: 'green',
         position: const PawnRoutePosition(
           section: PawnRouteSection.homeLane,
-          progress: 54,
+          progress: 53,
         ),
       ),
       222,
@@ -136,7 +136,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.finished,
-          progress: 57,
+          progress: 56,
         ),
       ),
       isNull,
@@ -166,26 +166,26 @@ void main() {
     );
   });
 
-  test('maps the final shared-track step before entering the home lane', () {
+  test('maps the last traversed shared-track step before entering the home lane', () {
     expect(
       resolver.cellIdFor(
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 51,
+          progress: 50,
         ),
       ),
-      51,
+      50,
     );
     expect(
       resolver.cellIdFor(
         playerId: 'green',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 51,
+          progress: 50,
         ),
       ),
-      12,
+      11,
     );
   });
 
