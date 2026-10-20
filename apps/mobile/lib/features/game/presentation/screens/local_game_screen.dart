@@ -369,6 +369,103 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     );
   }
 
+  Future<void> _showPlayerSetup() async {
+    final currentPlayers = _controller.state.players;
+    final selectedPlayers = <String>[
+      if (currentPlayers.length == 2) ...currentPlayers else ...<String>['orange', 'green'],
+    ];
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: AppTheme.panel,
+          title: const Text('Two-player local match'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'Choose two different pawn colours. Players take turns on this device.',
+                style: TextStyle(color: AppTheme.readableText),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: LocalGameFactory.playerIds.map((playerId) {
+                  final selected = selectedPlayers.contains(playerId);
+                  final color = _colors[playerId] ?? AppTheme.cream;
+                  return ChoiceChip(
+                    key: ValueKey('player_colour_$playerId'),
+                    label: Text(playerId.toUpperCase()),
+                    selected: selected,
+                    avatar: CircleAvatar(backgroundColor: color, radius: 8),
+                    selectedColor: color.withValues(alpha: 0.22),
+                    side: BorderSide(
+                      color: selected ? color : Colors.white24,
+                      width: selected ? 1.5 : 1,
+                    ),
+                    labelStyle: TextStyle(
+                      color: selected ? color : AppTheme.readableText,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    onSelected: (_) {
+                      setDialogState(() {
+                        if (selected) {
+                          selectedPlayers.remove(playerId);
+                        } else if (selectedPlayers.length < 2) {
+                          selectedPlayers.add(playerId);
+                        }
+                      });
+                    },
+                  );
+                }).toList(growable: false),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                selectedPlayers.length == 2
+                    ? 'Player 1: ${selectedPlayers[0].toUpperCase()} · Player 2: ${selectedPlayers[1].toUpperCase()}'
+                    : 'Select exactly two colours (${selectedPlayers.length}/2 selected).',
+                key: const ValueKey('selected_player_colours_summary'),
+                style: const TextStyle(
+                  color: AppTheme.readableText,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              key: const ValueKey('start_two_player_match_button'),
+              onPressed: selectedPlayers.length != 2
+                  ? null
+                  : () {
+                      _aiTimer?.cancel();
+                      _aiTimer = null;
+                      _aiThinking = false;
+                      _pawnStepTimer?.cancel();
+                      _pawnStepTimer = null;
+                      _pawnAnimationGeneration++;
+                      _animatedPawnPoints.clear();
+                      _playAgainstAi = false;
+                      _controller.configurePlayers(
+                        List<String>.of(selectedPlayers),
+                      );
+                      Navigator.of(dialogContext).pop();
+                    },
+              child: const Text('Start match'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showRules() {
     showModalBottomSheet<void>(
       context: context,
@@ -512,9 +609,20 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         title: const Text('Ludo Lovers · Match'),
         actions: <Widget>[
           IconButton(
+            key: const ValueKey('player_setup_button'),
+            tooltip: 'Choose two player colours',
+            onPressed: _showPlayerSetup,
+            icon: const Icon(Icons.people_alt_rounded),
+          ),
+          IconButton(
             key: const ValueKey('toggle_ai_button'),
             tooltip: _playAgainstAi ? 'Disable AI opponents' : 'Play against AI',
-            onPressed: _toggleAiMode,
+            onPressed: _controller.state.players.length == 4 &&
+                    _controller.state.players.every(
+                      (playerId) => LocalGameFactory.playerIds.contains(playerId),
+                    )
+                ? _toggleAiMode
+                : null,
             color: _playAgainstAi ? AppTheme.gold : null,
             icon: const Icon(Icons.smart_toy_rounded),
           ),
@@ -638,7 +746,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             final playerColor =
                                 _colors[playerId] ?? AppTheme.cream;
                             final isCurrent = playerId == current;
-                            final isHuman = playerId == _humanPlayerId;
+                            final isHuman = _playAgainstAi && playerId == _humanPlayerId;
                             final seatLabel = isHuman
                                 ? 'YOU'
                                 : _playAgainstAi
