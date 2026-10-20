@@ -229,7 +229,7 @@ void main() {
         playerId: 'orange',
         position: PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 50,
+          progress: 7,
         ),
       ),
       const LocalPawn(
@@ -253,8 +253,8 @@ void main() {
     );
 
     expect(moved.state.pawns.first.position.section, PawnRouteSection.homeLane);
-    expect(moved.state.pawns.first.position.progress, 51);
-    expect(paths.forPlayer('orange').cellAtProgress(51), 100);
+    expect(moved.state.pawns.first.position.progress, 8);
+    expect(paths.forPlayer('orange').cellAtProgress(8), 100);
   });
 
   test('exact-finish overshoot is rejected without consuming the roll', () {
