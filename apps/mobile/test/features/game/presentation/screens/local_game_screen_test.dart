@@ -1190,6 +1190,66 @@ void main() {
   });
 
 
+  testWidgets('animates a multi-cell move through intermediate route cells', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+    final initialState = setup.initialState.copyWith(
+      pawns: setup.initialState.pawns.map((pawn) {
+        if (pawn.id != 'orange_pawn_1') return pawn;
+        return pawn.copyWith(
+          position: const PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 0,
+          ),
+        );
+      }).toList(growable: false),
+    );
+    final controller = LocalGameController(
+      gameSetup: setup,
+      initialState: initialState,
+      nextDiceValue: () => 3,
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    final marker = find.byKey(
+      const ValueKey('pawn_marker_orange_pawn_1'),
+    );
+    final start = tester.getTopLeft(marker);
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+
+    // The pawn should advance one route cell at a time, not jump directly
+    // to the final engine position.
+    await tester.pump(const Duration(milliseconds: 210));
+    final intermediate = tester.getTopLeft(marker);
+    await tester.pumpAndSettle();
+    final end = tester.getTopLeft(marker);
+
+    expect(intermediate, isNot(start));
+    expect(intermediate, isNot(end));
+    expect(
+      controller.state.pawns
+          .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+          .position.progress,
+      3,
+    );
+  });
+
   testWidgets('AI opponents take turns and return control to orange', (
     tester,
   ) async {
