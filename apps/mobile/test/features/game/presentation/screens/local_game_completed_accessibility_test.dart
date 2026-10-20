@@ -21,7 +21,7 @@ void main() {
             (pawn) => pawn.copyWith(
               position: const PawnRoutePosition(
                 section: PawnRouteSection.finished,
-                progress: 57,
+                progress: 56,
               ),
             ),
           )
