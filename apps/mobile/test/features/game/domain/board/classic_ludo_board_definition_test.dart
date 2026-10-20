@@ -23,6 +23,43 @@ void main() {
       ]);
     });
 
+    test('keeps blue bottom-left and magenta bottom-right after seat correction', () {
+      final blue = ClassicLudoBoardDefinition.seatFor('blue');
+      final magenta = ClassicLudoBoardDefinition.seatFor('magenta');
+
+      expect(blue.quadrant, BoardQuadrant.bottomLeft);
+      expect(blue.yardColumn, 0);
+      expect(blue.yardRow, 9);
+      expect(blue.provisionalTrackEntryIndex, 39);
+      expect(blue.startMarker, const BoardGridCell(column: 6, row: 13));
+      expect(
+        blue.homeLaneCells,
+        const <BoardGridCell>[
+          BoardGridCell(column: 7, row: 13),
+          BoardGridCell(column: 7, row: 12),
+          BoardGridCell(column: 7, row: 11),
+          BoardGridCell(column: 7, row: 10),
+          BoardGridCell(column: 7, row: 9),
+        ],
+      );
+
+      expect(magenta.quadrant, BoardQuadrant.bottomRight);
+      expect(magenta.yardColumn, 9);
+      expect(magenta.yardRow, 9);
+      expect(magenta.provisionalTrackEntryIndex, 26);
+      expect(magenta.startMarker, const BoardGridCell(column: 13, row: 8));
+      expect(
+        magenta.homeLaneCells,
+        const <BoardGridCell>[
+          BoardGridCell(column: 13, row: 7),
+          BoardGridCell(column: 12, row: 7),
+          BoardGridCell(column: 11, row: 7),
+          BoardGridCell(column: 10, row: 7),
+          BoardGridCell(column: 9, row: 7),
+        ],
+      );
+    });
+
     test('defines separate, unique five-cell home lanes', () {
       final allLaneIds = ClassicLudoBoardDefinition.seats
           .expand((seat) => seat.homeLaneCellIds)
