@@ -752,8 +752,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 return Stack(
                                   fit: StackFit.expand,
                                   children: <Widget>[
-                                    const CustomPaint(
-                                      painter: ClassicLudoBoardPainter(),
+                                    // Keep the static board artwork on its own
+                                    // layer while pawns and destination markers animate.
+                                    const RepaintBoundary(
+                                      child: CustomPaint(
+                                        painter: ClassicLudoBoardPainter(),
+                                      ),
                                     ),
                                     for (final visual in visuals)
                                       _buildAnimatedPawnMarker(
