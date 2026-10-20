@@ -8,6 +8,56 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
+  testWidgets('starts a local two-player match with user-selected colours', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('player_setup_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Two-player local match'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('start_two_player_match_button')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('player_colour_orange')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('player_colour_green')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('player_colour_blue')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('player_colour_magenta')));
+    await tester.pump();
+
+    expect(find.text('Player 1: BLUE · Player 2: MAGENTA'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('start_two_player_match_button')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.players, <String>['blue', 'magenta']);
+    expect(controller.state.pawns, hasLength(8));
+    expect(
+      controller.state.pawns.every(
+        (pawn) => <String>['blue', 'magenta'].contains(pawn.playerId),
+      ),
+      isTrue,
+    );
+  });
+
   testWidgets('local match strip labels seats without implying online status', (
     tester,
   ) async {
