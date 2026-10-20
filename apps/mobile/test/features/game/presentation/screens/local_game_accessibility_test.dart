@@ -51,6 +51,12 @@ void main() {
     final rollSemantics = tester.widget<Semantics>(
       find.byKey(const ValueKey('roll_dice_button_semantics')),
     );
+    expect(rollSemantics.properties.button, isTrue);
+    expect(rollSemantics.properties.enabled, isFalse);
+    expect(
+      rollSemantics.properties.label,
+      'Dice unavailable. AI opponent turn.',
+    );
     expect(
       rollSemantics.properties.hint,
       'The AI is choosing its move. Please wait.',
