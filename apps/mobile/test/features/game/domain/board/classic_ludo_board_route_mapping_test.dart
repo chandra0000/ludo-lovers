@@ -27,8 +27,8 @@ void main() {
         containsAll(<(String, BoardQuadrant, Color)>[
           ('orange', BoardQuadrant.topLeft, LudoBoardPalette.orange),
           ('green', BoardQuadrant.topRight, LudoBoardPalette.green),
-          ('blue', BoardQuadrant.bottomRight, LudoBoardPalette.blue),
-          ('magenta', BoardQuadrant.bottomLeft, LudoBoardPalette.magenta),
+          ('blue', BoardQuadrant.bottomLeft, LudoBoardPalette.blue),
+          ('magenta', BoardQuadrant.bottomRight, LudoBoardPalette.magenta),
         ]),
       );
     });
@@ -57,14 +57,14 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('blue and magenta yards and home lanes match their swapped quadrants', () {
-      final blue = ClassicLudoBoardDefinition.seatFor('blue');
-      expect(blue.quadrant, BoardQuadrant.bottomRight);
-      expect((blue.yardColumn, blue.yardRow), (9, 9));
-      expect(blue.startMarker, const BoardGridCell(column: 13, row: 8));
-      expect(blue.provisionalTrackEntryIndex, 26);
+    test('magenta starts at track 26 and blue starts at track 39', () {
+      final magenta = ClassicLudoBoardDefinition.seatFor('magenta');
+      expect(magenta.quadrant, BoardQuadrant.bottomRight);
+      expect((magenta.yardColumn, magenta.yardRow), (9, 9));
+      expect(magenta.startMarker, const BoardGridCell(column: 13, row: 8));
+      expect(magenta.provisionalTrackEntryIndex, 26);
       expect(
-        blue.homeLaneCells,
+        magenta.homeLaneCells,
         const <BoardGridCell>[
           BoardGridCell(column: 13, row: 7),
           BoardGridCell(column: 12, row: 7),
@@ -74,13 +74,13 @@ void main() {
         ],
       );
 
-      final magenta = ClassicLudoBoardDefinition.seatFor('magenta');
-      expect(magenta.quadrant, BoardQuadrant.bottomLeft);
-      expect((magenta.yardColumn, magenta.yardRow), (0, 9));
-      expect(magenta.startMarker, const BoardGridCell(column: 6, row: 13));
-      expect(magenta.provisionalTrackEntryIndex, 39);
+      final blue = ClassicLudoBoardDefinition.seatFor('blue');
+      expect(blue.quadrant, BoardQuadrant.bottomLeft);
+      expect((blue.yardColumn, blue.yardRow), (0, 9));
+      expect(blue.startMarker, const BoardGridCell(column: 6, row: 13));
+      expect(blue.provisionalTrackEntryIndex, 39);
       expect(
-        magenta.homeLaneCells,
+        blue.homeLaneCells,
         const <BoardGridCell>[
           BoardGridCell(column: 7, row: 13),
           BoardGridCell(column: 7, row: 12),
@@ -98,7 +98,7 @@ void main() {
         for (final seat in ClassicLudoBoardDefinition.seats)
           seat.id: seat.provisionalTrackEntryIndex,
       });
-      expect(entries, {'orange': 0, 'green': 13, 'blue': 26, 'magenta': 39});
+      expect(entries, {'orange': 0, 'green': 13, 'magenta': 26, 'blue': 39});
     });
 
     test('each seat route has 52 unique cells and a five-cell home lane', () {
