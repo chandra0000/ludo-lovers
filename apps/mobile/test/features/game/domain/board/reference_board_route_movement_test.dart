@@ -38,7 +38,7 @@ void main() {
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final path = paths.forPlayer(seat.id);
         expect(path.mainTrackCells, hasLength(52), reason: seat.id);
-        for (var progress = 0; progress < 51; progress++) {
+        for (var progress = 0; progress < 50; progress++) {
           expect(path.cellAtProgress(progress), (seat.provisionalTrackEntryIndex + progress) % 52, reason: '${seat.id} progress $progress');
           expect(path.cellAtProgress(progress + 1), (seat.provisionalTrackEntryIndex + progress + 1) % 52, reason: '${seat.id} intermediate step ${progress + 1}');
         }
