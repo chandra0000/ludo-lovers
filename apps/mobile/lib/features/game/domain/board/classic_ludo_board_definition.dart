@@ -78,7 +78,10 @@ class ClassicLudoBoardDefinition {
   const ClassicLudoBoardDefinition._();
 
   static const int gridSize = 15;
+  /// Physical cells in the shared loop. Each player's movement route exits
+  /// into its home lane from the cell immediately before the start marker.
   static const int sharedTrackLength = 52;
+  static const int playerTrackLength = sharedTrackLength - 1;
   static const int homeLaneLength = 5;
   /// Explicit release gate; geometry agreement alone cannot approve the visual board.
   static const bool isVisualTopologyApproved = false;
