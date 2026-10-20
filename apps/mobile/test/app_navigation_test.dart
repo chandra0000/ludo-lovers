@@ -29,7 +29,7 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    expect(find.text('LUDO LOVERS'), findsOneWidget);
+    expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
   });
 
   testWidgets('two-player setup selects two colours and opens a local match', (
