@@ -122,5 +122,35 @@ void main() {
       expect(ClassicLudoBoardDefinition.isVisualTopologyApproved, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
+    test('locks the reference quadrant palette and five-cell lane proportions', () {
+      const expectedSeats = <String, BoardQuadrant>{
+        'orange': BoardQuadrant.topLeft,
+        'green': BoardQuadrant.topRight,
+        'blue': BoardQuadrant.bottomLeft,
+        'magenta': BoardQuadrant.bottomRight,
+      };
+      const expectedColors = <String, int>{
+        'orange': 0xFFFF8928,
+        'green': 0xFF33FF28,
+        'blue': 0xFF289EFF,
+        'magenta': 0xFFF428FF,
+      };
+
+      expect(ClassicLudoBoardDefinition.gridSize, 15);
+      expect(ClassicLudoBoardDefinition.centerFinishCell,
+          const BoardGridCell(column: 7, row: 7));
+      expect(ClassicLudoBoardDefinition.homeLaneLength, 5);
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(seat.quadrant, expectedSeats[seat.id],
+            reason: '${seat.id} must remain in its reference quadrant');
+        expect(seat.color.value, expectedColors[seat.id],
+            reason: '${seat.id} must use the exact Ludo Lovers brand color');
+        expect(seat.homeLaneCells, hasLength(5));
+        expect(seat.homeLaneCells.toSet(), hasLength(5));
+      }
+      expect(ClassicLudoBoardDefinition.isVisualTopologyApproved, isFalse,
+          reason: 'A geometry contract is not a substitute for visual sign-off.');
+    });
+
   });
 }
