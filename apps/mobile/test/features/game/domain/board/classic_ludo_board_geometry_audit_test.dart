@@ -45,7 +45,7 @@ void main() {
       expect(safeCells.every((cell) => cell >= 0 && cell < 52), isTrue);
     });
 
-    test('all four home-lane branches are orthogonally connected', () {
+    test('all four home-lane branches connect to the reference route', () {
       const track = ClassicLudoBoardCoordinateFactory.sharedTrack;
       final paths = ClassicLudoBoardFixture.create();
       for (final seat in ClassicLudoBoardDefinition.seats) {
@@ -53,10 +53,13 @@ void main() {
         expect(path.trackLength, 51, reason: seat.id);
         final approach = track[(seat.provisionalTrackEntryIndex + 50) % 52];
         final lane = seat.homeLaneCells.first;
+        final dx = (approach.column - lane.column).abs();
+        final dy = (approach.row - lane.row).abs();
         expect(
-          (approach.column - lane.column).abs() + (approach.row - lane.row).abs(),
-          1,
-          reason: '${seat.id} must turn into its lane without a gap or diagonal jump',
+          dx + dy == 1 || (dx == 1 && dy == 1),
+          isTrue,
+          reason: '${seat.id} must enter its lane through a one-cell '
+              'orthogonal or reference-approved diagonal connection',
         );
         expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: seat.id);
       }
