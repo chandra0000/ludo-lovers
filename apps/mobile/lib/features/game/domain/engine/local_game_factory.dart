@@ -37,7 +37,24 @@ class LocalGameFactory {
   static LocalGameSetup create({
     Set<int>? safeCellIndexes,
     bool allowProvisionalRoutes = false,
+    List<String>? selectedPlayerIds,
   }) {
+    final players = List<String>.unmodifiable(selectedPlayerIds ?? playerIds);
+    if (players.length < 2 || players.length > playerIds.length) {
+      throw ArgumentError.value(
+        players.length,
+        'selectedPlayerIds',
+        'Choose between two and four players.',
+      );
+    }
+    if (players.toSet().length != players.length ||
+        players.any((playerId) => !playerIds.contains(playerId))) {
+      throw ArgumentError.value(
+        players,
+        'selectedPlayerIds',
+        'Player colours must be unique supported colours.',
+      );
+    }
     if (!allowProvisionalRoutes) {
       throw StateError(
         'Classic board routes are provisional. Explicitly opt in only for '
@@ -54,7 +71,7 @@ class LocalGameFactory {
       ),
     );
     final pawns = <LocalPawn>[
-      for (final playerId in playerIds)
+      for (final playerId in players)
         for (var index = 0; index < 4; index++)
           LocalPawn(
             id: '${playerId}_pawn_${index + 1}',
@@ -67,7 +84,7 @@ class LocalGameFactory {
       paths: paths,
       engine: engine,
       initialState: LocalGameState(
-        players: playerIds,
+        players: players,
         pawns: pawns,
         currentPlayerIndex: 0,
       ),
