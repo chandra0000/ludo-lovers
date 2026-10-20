@@ -118,6 +118,37 @@ class AppFoundationScreen extends StatelessWidget {
                               height: logoWidth * 0.9,
                               fit: BoxFit.contain,
                               semanticLabel: 'Ludo Lovers — Play and Win',
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                width: logoWidth,
+                                height: logoWidth * 0.9,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.panel,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(color: AppTheme.gold),
+                                ),
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Icon(Icons.favorite_rounded,
+                                        color: AppTheme.magenta, size: 54),
+                                    SizedBox(height: 8),
+                                    Text('LUDO LOVERS',
+                                        style: TextStyle(
+                                          color: AppTheme.gold,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 2,
+                                        )),
+                                    Text('PLAY • CONNECT • LOVE',
+                                        style: TextStyle(
+                                          color: AppTheme.readableText,
+                                          fontSize: 10,
+                                          letterSpacing: 1.2,
+                                        )),
+                                  ],
+                                ),
+                              ),
                             );
                           },
                         ),
