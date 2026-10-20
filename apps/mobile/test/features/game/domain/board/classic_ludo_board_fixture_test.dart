@@ -3,12 +3,12 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixtur
 
 void main() {
   group('ClassicLudoBoardFixture', () {
-    test('defines four routes with 52 shared-track cells and five home cells', () {
+    test('keeps 52 physical loop cells but traverses 51 before five home cells', () {
       final board = ClassicLudoBoardFixture.create();
 
       expect(board.pathsByPlayer.length, 4);
       for (final route in board.pathsByPlayer.values) {
-        expect(route.trackLength, 52);
+        expect(route.trackLength, 51);
         expect(route.homeLaneLength, 5);
         expect(route.mainTrackCells.length, 52);
         expect(route.mainTrackCells.toSet().length, 52);
@@ -52,16 +52,16 @@ void main() {
       final green = board.forPlayer('green');
       final blue = board.forPlayer('blue');
 
-      expect(green.finishProgress, 57);
+      expect(green.finishProgress, 56);
       expect(green.cellAtProgress(0), 13);
-      expect(green.cellAtProgress(51), 12);
-      expect(green.cellAtProgress(52), 220);
-      expect(green.cellAtProgress(56), 224);
-      expect(green.cellAtProgress(57), isNull);
+      expect(green.cellAtProgress(50), 11);
+      expect(green.cellAtProgress(51), 220);
+      expect(green.cellAtProgress(55), 224);
+      expect(green.cellAtProgress(56), isNull);
 
       expect(blue.cellAtProgress(0), 39);
-      expect(blue.cellAtProgress(51), 38);
-      expect(blue.cellAtProgress(52), 210);
+      expect(blue.cellAtProgress(50), 37);
+      expect(blue.cellAtProgress(51), 210);
     });
 
     test('all four entries are distinct rotations of the same shared track', () {
