@@ -10,6 +10,12 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
 
     expect(find.text('LUDO LOVERS'), findsOneWidget);
+    final logo = tester.widget<Image>(
+      find.byKey(const ValueKey('ludo_lovers_home_logo')),
+    );
+    expect(logo.image, isA<AssetImage>());
+    expect((logo.image as AssetImage).assetName,
+        'assets/images/ludo_lovers_logo.jpg');
     expect(find.text('PLAY • CONNECT • LOVE'), findsOneWidget);
     expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
     expect(find.text('Love Mode'), findsOneWidget);
