@@ -727,6 +727,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             const Spacer(),
                             Semantics(
                               key: const ValueKey('roll_dice_button_semantics'),
+                              button: true,
+                              enabled: !state.completed &&
+                                  !isAiTurn &&
+                                  state.pendingRoll == null,
+                              label: state.completed
+                                  ? 'Dice unavailable. Match complete.'
+                                  : isAiTurn
+                                      ? 'Dice unavailable. AI opponent turn.'
+                                      : state.pendingRoll != null
+                                          ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
+                                          : 'Roll dice',
                               hint: state.completed
                                   ? 'The match is finished. Choose Play Again to start a new match.'
                                   : isAiTurn
