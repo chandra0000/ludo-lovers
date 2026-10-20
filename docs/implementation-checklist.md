@@ -5,6 +5,10 @@
 **App:** `apps/mobile/`  
 **Assessment type:** repository/code review, tests and workflow metadata. This is **not** a visual QA sign-off from a physical Android device.
 
+## Quick project memory
+
+For the current decisions, next-step order, CI rules, board release gate, and definition of done, start with [Project memory and next implementation steps](architecture/next-steps-and-project-memory.md). Keep that document updated as work progresses.
+
 ## Honest product status
 
 **Current classification: engineering prototype / local gameplay alpha, not commercially launch-ready.**
@@ -40,9 +44,9 @@ However, the app currently exposes only a foundation/home screen, board preview,
 
 ### P0 — verify CI before continuing
 
-- [ ] Confirm the latest workflow for the latest `main` commit is fully green, including **Android debug APK build and artifact upload**, not only formatting/analyze/tests.
-- [ ] Fix any red workflow before starting another UI enhancement.
-- [ ] At audit time, workflow [#386](https://github.com/chandra0000/ludo-lovers/actions/runs/39363110817) was still **in progress**: format, dependency resolution, analyze and automated tests had passed; APK build was in progress. Recent workflows #383–#385 had failed during dice-animation changes before #386's follow-up fix. Therefore this audit does **not** certify the latest workflow as green.
+- [x] At the 2026-10-20 audit, workflow [#397](https://github.com/chandra0000/ludo-lovers/actions/runs/39369167976) succeeded for commit `9877971ac95523b5a309b1406d1c035b84a506fd`, including the workflow's complete quality gate.
+- [ ] For each new commit, verify the run attached to that exact commit reaches `completed / success`, including Android debug APK build and artifact upload.
+- [ ] If CI is red, inspect the failing step/log and fix it before continuing feature work. A previous green run does not certify a newer commit.
 
 ## 3. Commercial UI — honest assessment
 
