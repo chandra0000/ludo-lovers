@@ -30,9 +30,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         theme: AppTheme.light,
-        home: GameModeSelectionScreen(),
+        home: const GameModeSelectionScreen(),
       ),
     );
     await tester.tap(find.byKey(const ValueKey('mode_two_players_button')));
