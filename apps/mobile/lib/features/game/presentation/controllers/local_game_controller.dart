@@ -20,7 +20,7 @@ class LocalGameController extends ChangeNotifier {
         _initialStateOverride = initialState;
 
   final int Function() _nextDiceValue;
-  final LocalGameSetup setup;
+  LocalGameSetup setup;
   final LocalGameState? _initialStateOverride;
 
   LocalGameState get state => _state;
@@ -83,6 +83,22 @@ class LocalGameController extends ChangeNotifier {
     lastMessage = LocalActionError.staleVersion.name;
     notifyListeners();
     return true;
+  }
+
+  /// Starts a fresh local match with the selected, distinct player colours.
+  ///
+  /// Versions remain monotonic so callbacks from the previous match are stale.
+  void configurePlayers(List<String> playerIds) {
+    final nextSetup = LocalGameFactory.create(
+      allowProvisionalRoutes: true,
+      selectedPlayerIds: playerIds,
+      safeCellIndexes: setup.engine.safeCellIndexes,
+    );
+    setup = nextSetup;
+    _state = nextSetup.initialState.copyWith(version: _state.version + 1);
+    lastError = null;
+    lastMessage = 'New ' + playerIds.length.toString() + '-player local game';
+    notifyListeners();
   }
 
   void reset() {
