@@ -124,6 +124,44 @@ void main() {
     });
 
 
+    test('all four logical routes align with their physical track and home-lane coordinates', () {
+      final paths = ClassicLudoBoardFixture.create();
+      final layout = ClassicLudoBoardCoordinateFactory.create();
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = paths.forPlayer(seat.id);
+        expect(path.entryCell, seat.provisionalTrackEntryIndex, reason: seat.id);
+
+        for (var progress = 0; progress < path.trackLength; progress++) {
+          final physicalCellId = path.cellAtProgress(progress)!;
+          final gridCell = ClassicLudoBoardDefinition.sharedTrackCells[physicalCellId];
+          final point = layout.forCell(physicalCellId);
+          expect(point.x, (gridCell.column + 0.5) / 15, reason: '${seat.id} track progress $progress x');
+          expect(point.y, (gridCell.row + 0.5) / 15, reason: '${seat.id} track progress $progress y');
+        }
+
+        for (var laneIndex = 0; laneIndex < seat.homeLaneCells.length; laneIndex++) {
+          final logicalCellId = seat.homeLaneStartCellId + laneIndex;
+          final gridCell = seat.homeLaneCells[laneIndex];
+          final point = layout.forCell(logicalCellId);
+          expect(point.x, (gridCell.column + 0.5) / 15, reason: '${seat.id} home lane $laneIndex x');
+          expect(point.y, (gridCell.row + 0.5) / 15, reason: '${seat.id} home lane $laneIndex y');
+        }
+
+        final approachIndex =
+            (seat.provisionalTrackEntryIndex + ClassicLudoBoardDefinition.playerTrackLength - 1) % 52;
+        final approach = ClassicLudoBoardDefinition.sharedTrackCells[approachIndex];
+        final firstLane = seat.homeLaneCells.first;
+        final manhattanDistance =
+            (approach.column - firstLane.column).abs() +
+            (approach.row - firstLane.row).abs();
+        expect(manhattanDistance, 1, reason: '${seat.id} must enter its own lane from an adjacent cell');
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} lane entry');
+        expect(path.cellAtProgress(55), seat.homeLaneStartCellId + 4, reason: '${seat.id} final lane cell');
+        expect(path.cellAtProgress(56), isNull, reason: '${seat.id} finish is not a board cell');
+      }
+    });
+
     test('provisional safe cells are four starts plus four eight-step stars', () {
       final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
           .toList()
