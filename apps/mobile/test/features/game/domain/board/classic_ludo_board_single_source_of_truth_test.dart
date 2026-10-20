@@ -103,7 +103,7 @@ void main() {
     });
 
     test('four diagonal corner links are explicitly accepted structural connectors', () {
-      final track = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      const track = ClassicLudoBoardCoordinateFactory.sharedTrack;
       const expected = <int, (BoardGridCell, BoardGridCell)>{
         4: (BoardGridCell(column: 5, row: 6), BoardGridCell(column: 6, row: 5)),
         17: (BoardGridCell(column: 8, row: 5), BoardGridCell(column: 9, row: 6)),
