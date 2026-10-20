@@ -38,6 +38,48 @@ void main() {
         currentPlayerIndex: 0,
       );
 
+  test('yard pawn cannot enter on five but can enter on six', () {
+    final yardState = stateWith(<LocalPawn>[
+      const LocalPawn(
+        id: 'o1',
+        playerId: 'orange',
+        position: PawnRoutePosition(section: PawnRouteSection.yard),
+      ),
+      const LocalPawn(
+        id: 'b1',
+        playerId: 'blue',
+        position: PawnRoutePosition(section: PawnRouteSection.yard),
+      ),
+    ]);
+
+    final fiveRoll = engine.roll(
+      yardState,
+      playerId: 'orange',
+      expectedVersion: yardState.version,
+      value: 5,
+    );
+    expect(fiveRoll.state.pawns.first.position.section, PawnRouteSection.yard);
+    expect(fiveRoll.events.map((event) => event.type), contains('NoLegalMove'));
+
+    final sixState = yardState.copyWith(version: yardState.version + 1);
+    final sixRoll = engine.roll(
+      sixState,
+      playerId: 'orange',
+      expectedVersion: sixState.version,
+      value: 6,
+    );
+    expect(engine.legalPawnIds(sixRoll.state), contains('o1'));
+    final entered = engine.move(
+      sixRoll.state,
+      playerId: 'orange',
+      expectedVersion: sixRoll.state.version,
+      pawnId: 'o1',
+    );
+    expect(entered.state.pawns.first.position.section, PawnRouteSection.mainTrack);
+    expect(entered.state.pawns.first.position.progress, 0);
+    expect(entered.state.pawns.first.position.progress, isNotNull);
+  });
+
   test('legal movement captures on an unsafe cell and grants a bonus turn', () {
     final state = stateWith(<LocalPawn>[
       const LocalPawn(
