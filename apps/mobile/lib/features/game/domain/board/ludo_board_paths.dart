@@ -62,10 +62,10 @@ class LudoPlayerPath {
     if (progress < 0) {
       throw ArgumentError.value(progress, 'progress', 'Must not be negative.');
     }
-    if (progress < mainTrackCells.length) {
+    if (progress < trackLength) {
       return mainTrackCells[progress];
     }
-    final homeIndex = progress - mainTrackCells.length;
+    final homeIndex = progress - trackLength;
     if (homeIndex < homeLaneCells.length) {
       return homeLaneCells[homeIndex];
     }
@@ -80,13 +80,13 @@ class LudoPlayerPath {
     required bool requireExactFinish,
   }) {
     if (currentProgress < 0 || diceValue < 1 || diceValue > 6) return false;
-    final finishProgress = mainTrackCells.length + homeLaneCells.length;
+    final finishProgress = trackLength + homeLaneCells.length;
     final target = currentProgress + diceValue;
     if (target > finishProgress) return !requireExactFinish;
     return true;
   }
 
-  int get finishProgress => mainTrackCells.length + homeLaneCells.length;
+  int get finishProgress => trackLength + homeLaneCells.length;
 }
 
 /// Holds the independently defined route for each player. It does not invent
