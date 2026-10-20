@@ -41,7 +41,7 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('mode_two_players_button')));
+    await tester.tap(find.text('Set up 2-player game'));
     await tester.pumpAndSettle();
 
     expect(find.text('Choose your colours'), findsOneWidget);
@@ -78,10 +78,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('mode_vs_computer_button')),
-    );
-    await tester.tap(find.byKey(const ValueKey('mode_vs_computer_button')));
+    await tester.tap(find.text('Play vs AI'));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
@@ -89,10 +86,7 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('mode_four_players_button')),
-    );
-    await tester.tap(find.byKey(const ValueKey('mode_four_players_button')));
+    await tester.tap(find.text('Start 4-player game'));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
