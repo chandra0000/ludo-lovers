@@ -85,8 +85,13 @@ class BoardPawnLayout {
             progress < trackLength) {
           throw ArgumentError('Home-lane progress is still on the shared track.');
         }
+        // The physical shared loop has 52 cells, while each pawn traverses
+        // only 51 shared-track steps before branching into its home lane.
+        // Wrap visual cell IDs against the physical loop length, not the
+        // movement distance, or late-route pawns jump to the wrong cell.
         final pathIndex = position.section == PawnRouteSection.mainTrack
-            ? (seat.provisionalTrackEntryIndex + progress) % trackLength
+            ? (seat.provisionalTrackEntryIndex + progress) %
+                ClassicLudoBoardDefinition.sharedTrackLength
             : seat.homeLaneStartCellId +
                 (progress - trackLength);
         final point = layout.pointsByCell[pathIndex];
