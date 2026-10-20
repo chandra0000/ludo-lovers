@@ -22,18 +22,35 @@ import '../controllers/local_game_controller.dart';
 /// but the board route and safe-cell IDs remain provisional and are not
 /// approved for release or competitive play.
 class LocalGameScreen extends StatefulWidget {
-  const LocalGameScreen({super.key, this.controller});
+  const LocalGameScreen({
+    super.key,
+    this.controller,
+    this.selectedPlayerIds,
+    this.playAgainstAi = false,
+  });
 
   /// Optional controller injection for deterministic widget tests.
   final LocalGameController? controller;
+
+  /// Seats chosen on the mode/setup screens. Defaults to four local seats.
+  final List<String>? selectedPlayerIds;
+
+  /// When true, Orange is the human seat and the remaining seats use local AI.
+  final bool playAgainstAi;
 
   @override
   State<LocalGameScreen> createState() => _LocalGameScreenState();
 }
 
 class _LocalGameScreenState extends State<LocalGameScreen> {
-  late final LocalGameController _controller =
-      widget.controller ?? LocalGameController();
+  late final LocalGameController _controller = widget.controller ??
+      LocalGameController(
+        gameSetup: LocalGameFactory.create(
+          allowProvisionalRoutes: true,
+          selectedPlayerIds:
+              widget.selectedPlayerIds ?? LocalGameFactory.playerIds,
+        ),
+      );
   late final BoardPawnLayout _pawnLayout = BoardPawnLayout(
     layout: ClassicLudoBoardCoordinateFactory.create(),
   );
@@ -59,6 +76,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   void initState() {
     super.initState();
+    _playAgainstAi = widget.playAgainstAi;
     _lastObservedState = _controller.state;
     _controller.addListener(_handleControllerChanged);
   }
@@ -748,11 +766,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 _colors[playerId] ?? AppTheme.cream;
                             final isCurrent = playerId == current;
                             final isHuman = _playAgainstAi && playerId == _humanPlayerId;
-                            final seatLabel = isHuman
-                                ? 'YOU'
-                                : _playAgainstAi
-                                    ? 'AI'
-                                    : 'LOCAL';
+                            final isAiSeat = _playAgainstAi && !isHuman;
+                            final seatLabel = _playAgainstAi
+                                ? (isHuman ? 'YOU' : 'AI')
+                                : 'LOCAL';
                             return Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -782,9 +799,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         radius: 13,
                                         backgroundColor: playerColor,
                                         child: Icon(
-                                          isHuman
-                                              ? Icons.person_rounded
-                                              : Icons.smart_toy_rounded,
+                                          isAiSeat
+                                              ? Icons.smart_toy_rounded
+                                              : Icons.person_rounded,
                                           size: 15,
                                           color: Colors.black87,
                                         ),
