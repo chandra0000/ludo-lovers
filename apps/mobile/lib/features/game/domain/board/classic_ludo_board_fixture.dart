@@ -17,6 +17,8 @@ class ClassicLudoBoardFixture {
 
   static const int sharedTrackLength =
       ClassicLudoBoardDefinition.sharedTrackLength;
+  static const int playerTrackLength =
+      ClassicLudoBoardDefinition.playerTrackLength;
   static const int homeLaneLength = ClassicLudoBoardDefinition.homeLaneLength;
 
   /// Derived from the shared seat definition to avoid duplicate entry offsets.
@@ -43,7 +45,7 @@ class ClassicLudoBoardFixture {
         (index) => (index + entry) % sharedTrackLength,
       ),
       homeLaneCells: seat.homeLaneCellIds,
-      trackLength: sharedTrackLength,
+      trackLength: playerTrackLength,
     );
   }
 }
