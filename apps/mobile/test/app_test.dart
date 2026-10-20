@@ -79,6 +79,11 @@ void main() {
 
   testWidgets('opens the local match preview and clearly labels its limitation',
       (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(const LudoLoversApp());
 
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
