@@ -61,6 +61,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   Timer? _pawnStepTimer;
   LocalGameState? _lastObservedState;
   final Map<String, BoardPoint> _animatedPawnPoints = <String, BoardPoint>{};
+  final Map<String, Set<String>> _capturedPawnVisualsByMover = <String, Set<String>>{};
   int _pawnAnimationGeneration = 0;
   bool _playAgainstAi = false;
   bool _aiThinking = false;
@@ -101,10 +102,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
     final movingPlayerId = previous.currentPlayerId;
 
-    // A captured pawn returns to its yard immediately. Clear any cached
-    // animation point, otherwise its previous on-track point can keep it
-    // visually occupying the opponent's destination after the rules engine
-    // has correctly sent it home.
+    final capturedPawnIds = <String>{};
+    for (final oldPawn in previous.pawns) {
+      if (oldPawn.playerId == movingPlayerId) continue;
+      final newPawn = current.pawns.firstWhere(
+        (pawn) => pawn.id == oldPawn.id,
+        orElse: () => oldPawn,
+      );
+      if (oldPawn.position.section != PawnRouteSection.yard &&
+          newPawn.position.section == PawnRouteSection.yard) {
+        capturedPawnIds.add(oldPawn.id);
+      }
+    }
+
     for (final oldPawn in previous.pawns) {
       if (oldPawn.playerId == movingPlayerId) continue;
       final newPawn = current.pawns.firstWhere(
@@ -125,6 +135,18 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       );
       if (oldPawn.position.section != newPawn.position.section ||
           oldPawn.position.progress != newPawn.position.progress) {
+        if (capturedPawnIds.isNotEmpty) {
+          _capturedPawnVisualsByMover[oldPawn.id] = capturedPawnIds;
+          final destination = _pawnLayout.resolve(
+            playerId: newPawn.playerId,
+            pawnId: newPawn.id,
+            position: newPawn.position,
+            yardSlot: 0,
+          ).point;
+          for (final capturedPawnId in capturedPawnIds) {
+            _animatedPawnPoints[capturedPawnId] = destination;
+          }
+        }
         _animatePawnAlongRoute(previous, oldPawn, newPawn);
         return;
       }
@@ -183,7 +205,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       if (!mounted || generation != _pawnAnimationGeneration) return;
       step++;
       if (step >= points.length) {
-        setState(() => _animatedPawnPoints.remove(newPawn.id));
+        setState(() {
+          _animatedPawnPoints.remove(newPawn.id);
+          final capturedPawnIds =
+              _capturedPawnVisualsByMover.remove(newPawn.id) ?? <String>{};
+          for (final capturedPawnId in capturedPawnIds) {
+            _animatedPawnPoints.remove(capturedPawnId);
+          }
+        });
         _pawnStepTimer = null;
         return;
       }
