@@ -7,11 +7,31 @@ void main() {
     final paths = ClassicLudoBoardFixture.create();
     const movement = LudoPathMovement();
 
-    test('each seat advances and wraps on its own 52-cell route', () {
+    test('each seat exits the shared track at its adjacent home-lane branch', () {
       for (final playerId in paths.pathsByPlayer.keys) {
         final path = paths.forPlayer(playerId);
 
-        final normalMove = movement.resolve(
+        final lastTrackMove = movement.resolve(
+          path: path,
+          current: const PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 49,
+          ),
+          diceValue: 1,
+          sixRequiredToEnter: true,
+          requireExactFinishRoll: true,
+        );
+        expect(lastTrackMove.isSuccess, isTrue, reason: playerId);
+        expect(lastTrackMove.resolution!.position.progress, 50, reason: playerId);
+        expect(lastTrackMove.resolution!.position.section, PawnRouteSection.mainTrack,
+            reason: '$playerId should still be on the shared track');
+        expect(
+          lastTrackMove.resolution!.destinationCell,
+          path.cellAtProgress(50),
+          reason: '$playerId must resolve progress through its own route',
+        );
+
+        final laneEntryMove = movement.resolve(
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.mainTrack,
@@ -21,30 +41,12 @@ void main() {
           sixRequiredToEnter: true,
           requireExactFinishRoll: true,
         );
-        expect(normalMove.isSuccess, isTrue, reason: playerId);
-        expect(normalMove.resolution!.position.progress, 51, reason: playerId);
+        expect(laneEntryMove.isSuccess, isTrue, reason: playerId);
+        expect(laneEntryMove.resolution!.position.progress, 51, reason: playerId);
+        expect(laneEntryMove.resolution!.position.section, PawnRouteSection.homeLane,
+            reason: '$playerId should turn into its private lane at the branch');
         expect(
-          normalMove.resolution!.destinationCell,
-          path.cellAtProgress(51),
-          reason: '$playerId must resolve progress through its own route',
-        );
-
-        final wrapMove = movement.resolve(
-          path: path,
-          current: const PawnRoutePosition(
-            section: PawnRouteSection.mainTrack,
-            progress: 51,
-          ),
-          diceValue: 1,
-          sixRequiredToEnter: true,
-          requireExactFinishRoll: true,
-        );
-        expect(wrapMove.isSuccess, isTrue, reason: playerId);
-        expect(wrapMove.resolution!.position.progress, 52, reason: playerId);
-        expect(wrapMove.resolution!.position.section, PawnRouteSection.homeLane,
-            reason: '$playerId should leave the shared track for its private lane');
-        expect(
-          wrapMove.resolution!.destinationCell,
+          laneEntryMove.resolution!.destinationCell,
           path.homeLaneCells.first,
           reason: '$playerId must enter its own first home-lane cell',
         );
@@ -58,7 +60,7 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.homeLane,
-            progress: 56,
+            progress: 55,
           ),
           diceValue: 1,
           sixRequiredToEnter: true,
@@ -71,7 +73,7 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.homeLane,
-            progress: 55,
+            progress: 54,
           ),
           diceValue: 3,
           sixRequiredToEnter: true,
