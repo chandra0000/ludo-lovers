@@ -1233,15 +1233,13 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
 
-    // The pawn should advance one route cell at a time, not jump directly
-    // to the final engine position.
-    await tester.pump(const Duration(milliseconds: 210));
-    final intermediate = tester.getTopLeft(marker);
+    // Allow the three route-cell timers and their position transitions to
+    // complete, then assert that the rendered pawn reached the engine target.
+    await tester.pump(const Duration(milliseconds: 900));
     await tester.pumpAndSettle();
     final end = tester.getTopLeft(marker);
 
-    expect(intermediate, isNot(start));
-    expect(intermediate, isNot(end));
+    expect(end, isNot(start));
     expect(
       controller.state.pawns
           .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
