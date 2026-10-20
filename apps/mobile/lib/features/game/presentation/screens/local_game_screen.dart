@@ -425,7 +425,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // each side, so size the board against its usable content width.
             final boardSize = math.min(
               math.max(0.0, constraints.maxWidth - 20),
-              constraints.maxHeight * 0.78,
+              constraints.maxHeight * 0.88,
             );
             return AnimatedBuilder(
               animation: _controller,
@@ -1142,7 +1142,7 @@ class _MatchPlayerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -1167,8 +1167,8 @@ class _MatchPlayerCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            width: 25,
-            height: 25,
+            width: 27,
+            height: 27,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
@@ -1187,7 +1187,7 @@ class _MatchPlayerCard extends StatelessWidget {
                 BoxShadow(color: color.withValues(alpha: 0.20), blurRadius: 7),
               ],
             ),
-            child: Icon(avatar, color: Colors.white, size: 15),
+            child: Icon(avatar, color: Colors.white, size: 16),
           ),
           const SizedBox(height: 3),
           Text(
@@ -1196,8 +1196,8 @@ class _MatchPlayerCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: color,
-              fontSize: 8,
-              letterSpacing: 0.5,
+              fontSize: 9,
+              letterSpacing: 0.35,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -1206,7 +1206,7 @@ class _MatchPlayerCard extends StatelessWidget {
             maxLines: 1,
             style: const TextStyle(
               color: AppTheme.mutedText,
-              fontSize: 8,
+              fontSize: 8.5,
               fontWeight: FontWeight.w700,
             ),
           ),
