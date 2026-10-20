@@ -36,6 +36,34 @@ void main() {
       expect(green.point.y, pawnLayout.layout.forCell(13).y);
     });
 
+    test('maps late shared-track progress using the 52-cell physical loop', () {
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final progress = 50;
+        final expectedCell =
+            (seat.provisionalTrackEntryIndex + progress) %
+            ClassicLudoBoardDefinition.sharedTrackLength;
+        final pawn = pawnLayout.resolve(
+          playerId: seat.id,
+          pawnId: '${seat.id}-late-track',
+          position: const PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: 50,
+          ),
+        );
+
+        expect(
+          pawn.point.x,
+          pawnLayout.layout.forCell(expectedCell).x,
+          reason: seat.id,
+        );
+        expect(
+          pawn.point.y,
+          pawnLayout.layout.forCell(expectedCell).y,
+          reason: seat.id,
+        );
+      }
+    });
+
     test('maps home-lane progress to the player lane', () {
       final position = pawnLayout.resolve(
         playerId: 'green',
