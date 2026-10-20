@@ -75,8 +75,22 @@ void main() {
         expect(paths.forPlayer(seat.id).entryCell, entry);
         expect(seat.homeLaneCells, hasLength(5));
         expect(seat.homeLaneCells.toSet().length, 5);
-        expect(seat.homeLaneCells.contains(ClassicLudoBoardDefinition.centerFinishCell),
-            isFalse);
+        expect(seat.homeLaneCells.first, seat.laneStart, reason: seat.id);
+        expect(seat.homeLaneCells.last, seat.laneEnd, reason: seat.id);
+        for (var i = 1; i < seat.homeLaneCells.length; i++) {
+          final previous = seat.homeLaneCells[i - 1];
+          final current = seat.homeLaneCells[i];
+          expect(
+            (previous.column - current.column).abs() +
+                (previous.row - current.row).abs(),
+            1,
+            reason: '${seat.id} home-lane cells must be consecutive',
+          );
+        }
+        expect(
+          seat.homeLaneCells.contains(ClassicLudoBoardDefinition.centerFinishCell),
+          isFalse,
+        );
       }
       expect(
         ClassicLudoBoardFixture.provisionalEntryCellByPlayer,
