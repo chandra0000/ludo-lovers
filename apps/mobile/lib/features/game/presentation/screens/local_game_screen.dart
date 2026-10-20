@@ -116,18 +116,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
 
     for (final oldPawn in previous.pawns) {
-      if (oldPawn.playerId == movingPlayerId) continue;
-      final newPawn = current.pawns.firstWhere(
-        (pawn) => pawn.id == oldPawn.id,
-        orElse: () => oldPawn,
-      );
-      if (oldPawn.position.section != PawnRouteSection.yard &&
-          newPawn.position.section == PawnRouteSection.yard) {
-        _animatedPawnPoints.remove(oldPawn.id);
-      }
-    }
-
-    for (final oldPawn in previous.pawns) {
       if (oldPawn.playerId != movingPlayerId) continue;
       final newPawn = current.pawns.firstWhere(
         (pawn) => pawn.id == oldPawn.id,
