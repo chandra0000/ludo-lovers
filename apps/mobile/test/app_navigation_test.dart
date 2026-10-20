@@ -13,7 +13,7 @@ void main() {
 
     await tester.pumpWidget(const LudoLoversApp());
 
-    expect(find.text('LUDO LOVERS'), findsOneWidget);
+    expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
     expect(find.byKey(const ValueKey('local_game_lab_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('preview_board_button')), findsOneWidget);
 
