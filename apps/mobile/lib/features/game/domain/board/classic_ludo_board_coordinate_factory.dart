@@ -104,9 +104,11 @@ class ClassicLudoBoardCoordinateFactory {
             sharedTrack.length
       ];
       final firstLane = seat.homeLaneCells.first;
-      final distance = (approach.column - firstLane.column).abs() +
-          (approach.row - firstLane.row).abs();
-      if (distance != 1) return false;
+      final dx = (approach.column - firstLane.column).abs();
+      final dy = (approach.row - firstLane.row).abs();
+      final distance = dx + dy;
+      final connected = distance == 1 || (dx == 1 && dy == 1);
+      if (!connected) return false;
     }
 
     // A track must not reuse a physical cell as part of a private home lane.
