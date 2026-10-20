@@ -30,8 +30,8 @@ class LocalGameFactory {
   static const List<String> playerIds = <String>[
     'orange',
     'green',
-    'blue',
     'magenta',
+    'blue',
   ];
 
   static LocalGameSetup create({
