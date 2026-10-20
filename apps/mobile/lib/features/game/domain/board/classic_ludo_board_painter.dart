@@ -100,12 +100,18 @@ class ClassicLudoBoardPainter extends CustomPainter {
     }
 
     final center = Offset(left + 7.5 * cell, top + 7.5 * cell);
+    // The common finish should read as a square home zone, not a diamond.
     final centerPath = Path()
-      ..moveTo(center.dx, center.dy - cell * 1.5)
-      ..lineTo(center.dx + cell * 1.5, center.dy)
-      ..lineTo(center.dx, center.dy + cell * 1.5)
-      ..lineTo(center.dx - cell * 1.5, center.dy)
-      ..close();
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(
+            center: center,
+            width: cell * 3,
+            height: cell * 3,
+          ),
+          Radius.circular(cell * 0.12),
+        ),
+      );
     canvas.drawPath(
       centerPath,
       Paint()
