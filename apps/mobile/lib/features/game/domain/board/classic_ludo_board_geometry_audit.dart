@@ -74,6 +74,21 @@ class ClassicLudoBoardGeometryAudit {
         issues.add('${seat.id} has duplicate home-lane coordinates.');
       }
       if (seat.homeLaneCells.isNotEmpty) {
+        final approachIndex =
+            (seat.provisionalTrackEntryIndex +
+                ClassicLudoBoardDefinition.playerTrackLength - 1) %
+            track.length;
+        final approach = track[approachIndex];
+        final firstLane = seat.homeLaneCells.first;
+        final approachDistance =
+            (approach.column - firstLane.column).abs() +
+                (approach.row - firstLane.row).abs();
+        if (approachDistance != 1) {
+          issues.add(
+            '${seat.id} home-lane branch must connect orthogonally from '
+            'track cell $approachIndex to its first lane cell.',
+          );
+        }
         if (seat.homeLaneCells.first != seat.laneStart) {
           issues.add('${seat.id} laneStart does not match the first home-lane cell.');
         }
