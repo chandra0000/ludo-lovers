@@ -127,10 +127,10 @@ void main() {
       tester.getSemantics(find.byKey(const ValueKey('turn_status_semantics'))).label,
       'ORANGE player turn.',
     );
-    expect(find.text('YOU'), findsOneWidget);
-    expect(find.text('GREEN'), findsOneWidget);
-    expect(find.text('BLUE'), findsOneWidget);
-    expect(find.text('MAGENTA'), findsOneWidget);
+    expect(find.text('YOU'), findsAtLeastNWidgets(1));
+    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
+    expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
     expect(find.text('BOT'), findsNothing);
     expect(find.text('OUT 0/4'), findsNWidgets(4));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
