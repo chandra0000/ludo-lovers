@@ -86,7 +86,10 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Start 4-player game'));
+    final fourPlayerAction = find.text('Start 4-player game');
+    await tester.ensureVisible(fourPlayerAction);
+    await tester.pumpAndSettle();
+    await tester.tap(fourPlayerAction);
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
