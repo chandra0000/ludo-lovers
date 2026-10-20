@@ -83,10 +83,17 @@ class ClassicLudoBoardGeometryAudit {
         final approachDistance =
             (approach.column - firstLane.column).abs() +
                 (approach.row - firstLane.row).abs();
-        if (approachDistance != 1) {
+        final approachDx = (approach.column - firstLane.column).abs();
+        final approachDy = (approach.row - firstLane.row).abs();
+        // Option A preserves the reference artwork's diagonal branch into
+        // each private lane. A one-cell orthogonal or one-cell diagonal join
+        // is valid; gaps and longer jumps remain defects.
+        final connected = approachDistance == 1 ||
+            (approachDistance == 2 && approachDx == 1 && approachDy == 1);
+        if (!connected) {
           issues.add(
-            '${seat.id} home-lane branch must connect orthogonally from '
-            'track cell $approachIndex to its first lane cell.',
+            '${seat.id} home-lane branch must connect to its first lane cell '
+            'with a one-cell orthogonal or reference-approved diagonal step.',
           );
         }
         if (seat.homeLaneCells.first != seat.laneStart) {
