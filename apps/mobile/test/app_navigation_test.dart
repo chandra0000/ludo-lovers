@@ -3,10 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/app/app.dart';
 
 void main() {
-  setUp(() {
-    TestWidgetsFlutterBinding.ensureInitialized();
-  });
-
   testWidgets('home opens the game-mode hub and back returns home', (
     tester,
   ) async {
@@ -24,7 +20,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Choose how to play'), findsOneWidget);
+    expect(find.text('Pick your way to play'), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_vs_computer_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_two_players_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_four_players_button')), findsOneWidget);
@@ -48,7 +44,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('mode_two_players_button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Set up 2 players'), findsOneWidget);
+    expect(find.text('Choose your colours'), findsOneWidget);
     expect(find.byKey(const ValueKey('setup_colour_orange')), findsOneWidget);
     expect(find.byKey(const ValueKey('setup_colour_green')), findsOneWidget);
     expect(find.byKey(const ValueKey('setup_colour_blue')), findsOneWidget);
@@ -65,6 +61,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
+    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
     expect(tester.takeException(), isNull);
   });
 
@@ -87,6 +85,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
+    expect(find.text('AI'), findsNWidgets(3));
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -95,11 +94,12 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('mode_four_players_button')));
     await tester.pumpAndSettle();
+
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
-    expect(find.byKey(const ValueKey('match_player_orange')), findsOneWidget);
-    expect(find.byKey(const ValueKey('match_player_green')), findsOneWidget);
-    expect(find.byKey(const ValueKey('match_player_blue')), findsOneWidget);
-    expect(find.byKey(const ValueKey('match_player_magenta')), findsOneWidget);
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
+    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
+    expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
     expect(tester.takeException(), isNull);
   });
 }
