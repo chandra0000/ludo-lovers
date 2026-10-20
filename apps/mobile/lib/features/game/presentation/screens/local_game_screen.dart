@@ -125,14 +125,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           oldPawn.position.progress != newPawn.position.progress) {
         if (capturedPawnIds.isNotEmpty) {
           _capturedPawnVisualsByMover[oldPawn.id] = capturedPawnIds;
-          final destination = _pawnLayout.resolve(
-            playerId: newPawn.playerId,
-            pawnId: newPawn.id,
-            position: newPawn.position,
-            yardSlot: 0,
-          ).point;
+          final previousVisuals = _visuals(previous.pawns);
           for (final capturedPawnId in capturedPawnIds) {
-            _animatedPawnPoints[capturedPawnId] = destination;
+            final capturedVisual = previousVisuals.firstWhere(
+              (visual) => visual.pawnId == capturedPawnId,
+            );
+            // Keep the captured pawn where it was until the attacker reaches
+            // the destination. The game state can already be authoritative;
+            // this cache only stages the presentation sequence.
+            _animatedPawnPoints[capturedPawnId] = capturedVisual.point;
           }
         }
         _animatePawnAlongRoute(previous, oldPawn, newPawn);
