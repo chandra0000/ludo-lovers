@@ -36,31 +36,34 @@ void main() {
       expect(green.point.y, pawnLayout.layout.forCell(13).y);
     });
 
-    test('maps late shared-track progress using the 52-cell physical loop', () {
+    test('maps every shared-track progress to the physical 52-cell loop', () {
       for (final seat in ClassicLudoBoardDefinition.seats) {
-        const progress = 50;
-        final expectedCell =
-            (seat.provisionalTrackEntryIndex + progress) %
-            ClassicLudoBoardDefinition.sharedTrackLength;
-        final pawn = pawnLayout.resolve(
-          playerId: seat.id,
-          pawnId: '${seat.id}-late-track',
-          position: const PawnRoutePosition(
-            section: PawnRouteSection.mainTrack,
-            progress: 50,
-          ),
-        );
+        for (var progress = 0;
+            progress < ClassicLudoBoardDefinition.playerTrackLength;
+            progress++) {
+          final expectedCell =
+              (seat.provisionalTrackEntryIndex + progress) %
+              ClassicLudoBoardDefinition.sharedTrackLength;
+          final pawn = pawnLayout.resolve(
+            playerId: seat.id,
+            pawnId: '${seat.id}-progress-$progress',
+            position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: progress,
+            ),
+          );
 
-        expect(
-          pawn.point.x,
-          pawnLayout.layout.forCell(expectedCell).x,
-          reason: seat.id,
-        );
-        expect(
-          pawn.point.y,
-          pawnLayout.layout.forCell(expectedCell).y,
-          reason: seat.id,
-        );
+          expect(
+            pawn.point.x,
+            pawnLayout.layout.forCell(expectedCell).x,
+            reason: '${seat.id} at progress $progress: x coordinate',
+          );
+          expect(
+            pawn.point.y,
+            pawnLayout.layout.forCell(expectedCell).y,
+            reason: '${seat.id} at progress $progress: y coordinate',
+          );
+        }
       }
     });
 
