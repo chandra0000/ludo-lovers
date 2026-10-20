@@ -922,14 +922,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                               ),
                                             )
                                             .rotate(
-                                              begin: -0.12,
-                                              end: 0,
+                                              begin: const Offset(-0.12, 0),
+                                              end: Offset.zero,
                                               duration: 360.ms,
                                               curve: Curves.easeOutBack,
                                             )
                                             .scale(
-                                              begin: 0.72,
-                                              end: 1,
+                                              begin: const Offset(0.72, 0.72),
+                                              end: const Offset(1, 1),
                                               duration: 280.ms,
                                               curve: Curves.easeOutBack,
                                             ),
