@@ -163,20 +163,6 @@ class AppFoundationScreen extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
-                              key: const ValueKey('preview_board_button'),
-                              onPressed: () => Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const BoardPreviewScreen(),
-                                ),
-                              ),
-                              icon: const Icon(Icons.grid_view_rounded),
-                              label: const Text('Explore the Board'),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
                               key: const ValueKey('local_game_lab_button'),
                               onPressed: () => Navigator.of(context).push(
                                 MaterialPageRoute<void>(
@@ -185,6 +171,20 @@ class AppFoundationScreen extends StatelessWidget {
                               ),
                               icon: const Icon(Icons.play_circle_fill_rounded),
                               label: const Text('Play Now · Choose a Mode'),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              key: const ValueKey('preview_board_button'),
+                              onPressed: () => Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => const BoardPreviewScreen(),
+                                ),
+                              ),
+                              icon: const Icon(Icons.grid_view_rounded),
+                              label: const Text('Explore the Board'),
                             ),
                           ),
                         ],
@@ -369,7 +369,6 @@ class _FoundationNotice extends StatelessWidget {
     );
   }
 }
-
 
 /// The main game-mode hub. Each option opens a deliberate setup flow rather
 /// than dropping players directly into a four-seat development match.
