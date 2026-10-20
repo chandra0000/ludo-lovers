@@ -1263,13 +1263,17 @@ void main() {
     expect(firstCell.dx, closeTo(expectedTopLeft(1).dx, 1.5));
     expect(firstCell.dy, closeTo(expectedTopLeft(1).dy, 1.5));
 
-    await tester.pump(const Duration(milliseconds: 300));
+    // Timer callbacks are delivered at the next test frame; pump that frame,
+    // then let the full 260ms AnimatedPositioned transition finish.
+    await tester.pump(const Duration(milliseconds: 60));
+    await tester.pump(const Duration(milliseconds: 260));
     final secondCell = tester.getTopLeft(marker);
     expect(secondCell.dx, closeTo(expectedTopLeft(2).dx, 1.5));
     expect(secondCell.dy, closeTo(expectedTopLeft(2).dy, 1.5));
     expect(secondCell, isNot(firstCell));
 
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 60));
+    await tester.pump(const Duration(milliseconds: 260));
     final finalCell = tester.getTopLeft(marker);
     expect(finalCell.dx, closeTo(expectedTopLeft(3).dx, 1.5));
     expect(finalCell.dy, closeTo(expectedTopLeft(3).dy, 1.5));
@@ -1281,7 +1285,7 @@ void main() {
       3,
     );
 
-    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pump(const Duration(milliseconds: 60));
     await tester.pumpAndSettle();
     final settled = tester.getTopLeft(marker);
     expect(settled.dx, closeTo(expectedTopLeft(3).dx, 1.5));
