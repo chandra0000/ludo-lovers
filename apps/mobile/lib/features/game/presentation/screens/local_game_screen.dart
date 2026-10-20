@@ -503,6 +503,101 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      // Compact seat strip inspired by the premium match-bar
+                      // direction. Labels stay truthful: this is local play,
+                      // not a claim that these seats are connected online.
+                      Container(
+                        key: const ValueKey('local_match_player_strip'),
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.panel,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: AppTheme.gold.withValues(alpha: 0.24),
+                          ),
+                        ),
+                        child: Row(
+                          children: state.players.map((playerId) {
+                            final playerColor =
+                                _colors[playerId] ?? AppTheme.cream;
+                            final isCurrent = playerId == current;
+                            final isHuman = playerId == _humanPlayerId;
+                            final seatLabel = isHuman
+                                ? 'YOU'
+                                : _playAgainstAi
+                                    ? 'AI'
+                                    : 'LOCAL';
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 2,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                    horizontal: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isCurrent
+                                        ? playerColor.withValues(alpha: 0.12)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: isCurrent
+                                          ? playerColor
+                                          : Colors.white.withValues(alpha: 0.08),
+                                      width: isCurrent ? 1.2 : 0.7,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      CircleAvatar(
+                                        radius: 13,
+                                        backgroundColor: playerColor,
+                                        child: Icon(
+                                          isHuman
+                                              ? Icons.person_rounded
+                                              : Icons.smart_toy_rounded,
+                                          size: 15,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        playerId.toUpperCase(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: playerColor,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                      Text(
+                                        seatLabel,
+                                        style: TextStyle(
+                                          color: isCurrent
+                                              ? playerColor
+                                              : AppTheme.readableText,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(growable: false),
+                        ),
+                      ),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 420),
                         switchInCurve: Curves.easeOutBack,
