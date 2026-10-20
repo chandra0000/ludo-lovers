@@ -157,7 +157,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       } on Object {
         // System sounds are best-effort on platforms that do not expose them.
       }
-      _pawnStepTimer = Timer(const Duration(milliseconds: 190), advanceStep);
+      _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
     }
 
     try {
@@ -166,7 +166,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       // System sounds are best-effort on platforms that do not expose them.
     }
     setState(() => _animatedPawnPoints[newPawn.id] = points.first);
-    _pawnStepTimer = Timer(const Duration(milliseconds: 190), advanceStep);
+    _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
   }
 
   void _toggleAiMode() {
