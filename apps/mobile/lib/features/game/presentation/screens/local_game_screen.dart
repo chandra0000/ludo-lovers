@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../app/theme/app_theme.dart';
 import '../../domain/board/board_coordinate_layout.dart';
@@ -39,6 +40,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   static const LudoPathMovement _movement = LudoPathMovement();
 
   Timer? _aiTimer;
+  Timer? _pawnStepTimer;
+  LocalGameState? _lastObservedState;
+  final Map<String, BoardPoint> _animatedPawnPoints = <String, BoardPoint>{};
+  int _pawnAnimationGeneration = 0;
   bool _playAgainstAi = false;
   bool _aiThinking = false;
   static const String _humanPlayerId = 'orange';
@@ -51,10 +56,117 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    _lastObservedState = _controller.state;
+    _controller.addListener(_handleControllerChanged);
+  }
+
+  @override
   void dispose() {
+    _controller.removeListener(_handleControllerChanged);
     _aiTimer?.cancel();
+    _pawnStepTimer?.cancel();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
+  }
+
+  void _handleControllerChanged() {
+    final previous = _lastObservedState;
+    final current = _controller.state;
+    _lastObservedState = current;
+    if (previous == null ||
+        _controller.lastMessage?.contains('PawnMoved') != true) {
+      return;
+    }
+
+    final movingPlayerId = previous.currentPlayerId;
+    for (final oldPawn in previous.pawns) {
+      if (oldPawn.playerId != movingPlayerId) continue;
+      final newPawn = current.pawns.firstWhere(
+        (pawn) => pawn.id == oldPawn.id,
+        orElse: () => oldPawn,
+      );
+      if (oldPawn.position.section != newPawn.position.section ||
+          oldPawn.position.progress != newPawn.position.progress) {
+        _animatePawnAlongRoute(previous, oldPawn, newPawn);
+        return;
+      }
+    }
+  }
+
+  void _animatePawnAlongRoute(
+    LocalGameState previous,
+    LocalPawn oldPawn,
+    LocalPawn newPawn,
+  ) {
+    _pawnStepTimer?.cancel();
+    final generation = ++_pawnAnimationGeneration;
+    final oldVisual = _visuals(previous.pawns).firstWhere(
+      (visual) => visual.pawnId == oldPawn.id,
+    );
+    final points = <BoardPoint>[];
+    final path = _paths.forPlayer(oldPawn.playerId);
+    final oldProgress = oldPawn.position.progress;
+    final newProgress = newPawn.position.progress;
+
+    if (oldPawn.position.section == PawnRouteSection.yard) {
+      final visual = _pawnLayout.resolve(
+        playerId: newPawn.playerId,
+        pawnId: newPawn.id,
+        position: newPawn.position,
+        yardSlot: 0,
+      );
+      points.add(visual.point);
+    } else if (oldProgress != null && newProgress != null) {
+      for (var progress = oldProgress + 1; progress <= newProgress; progress++) {
+        final position = progress == path.finishProgress
+            ? PawnRoutePosition(
+                section: PawnRouteSection.finished,
+                progress: path.finishProgress,
+              )
+            : PawnRoutePosition(
+                section: progress < path.trackLength
+                    ? PawnRouteSection.mainTrack
+                    : PawnRouteSection.homeLane,
+                progress: progress,
+              );
+        points.add(_pawnLayout.resolve(
+          playerId: newPawn.playerId,
+          pawnId: newPawn.id,
+          position: position,
+          yardSlot: 0,
+        ).point);
+      }
+    }
+
+    if (points.isEmpty) return;
+    setState(() => _animatedPawnPoints[newPawn.id] = oldVisual.point);
+    var step = 0;
+    void advanceStep() {
+      if (!mounted || generation != _pawnAnimationGeneration) return;
+      step++;
+      if (step >= points.length) {
+        setState(() => _animatedPawnPoints.remove(newPawn.id));
+        _pawnStepTimer = null;
+        return;
+      }
+      setState(() => _animatedPawnPoints[newPawn.id] = points[step]);
+      try {
+        unawaited(SystemSound.play(SystemSoundType.click));
+      } on Object {
+        // System sounds are best-effort on platforms that do not expose them.
+      }
+      _pawnStepTimer = Timer(const Duration(milliseconds: 190), advanceStep);
+    }
+
+    try {
+      unawaited(SystemSound.play(SystemSoundType.click));
+    } on Object {
+      // System sounds are best-effort on platforms that do not expose them.
+    }
+    setState(() => _animatedPawnPoints[newPawn.id] = points.first);
+    _pawnStepTimer = Timer(const Duration(milliseconds: 190), advanceStep);
   }
 
   void _toggleAiMode() {
@@ -1135,40 +1247,49 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       width: diameter,
       height: diameter,
       child: IgnorePointer(
-        child: DecoratedBox(
+        child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: _colors[visual.playerId] ?? AppTheme.cream,
+            gradient: RadialGradient(
+              center: const Alignment(-0.35, -0.45),
+              radius: 1.15,
+              colors: <Color>[
+                Color.lerp(_colors[visual.playerId] ?? AppTheme.cream, Colors.white, 0.48)!,
+                _colors[visual.playerId] ?? AppTheme.cream,
+                Color.lerp(_colors[visual.playerId] ?? AppTheme.cream, Colors.black, 0.34)!,
+              ],
+              stops: const <double>[0, 0.48, 1],
+            ),
             border: Border.all(
-              // Make the current player's legal choices unmistakable on a
-              // small phone: a broad gold ring plus a high-contrast halo.
-              color: isLegal ? AppTheme.gold : AppTheme.cream,
+              color: isLegal ? AppTheme.gold : AppTheme.cream.withValues(alpha: 0.9),
               width: cellSize * (isLegal ? 0.105 : 0.055),
             ),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.34),
-                offset: Offset(0, cellSize * 0.07),
-                blurRadius: cellSize * 0.12,
+                color: Colors.black.withValues(alpha: 0.52),
+                offset: Offset(0, cellSize * 0.10),
+                blurRadius: cellSize * 0.14,
               ),
-              if (isLegal) ...<BoxShadow>[
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.28),
+                offset: Offset(-cellSize * 0.035, -cellSize * 0.035),
+                blurRadius: cellSize * 0.045,
+              ),
+              if (isLegal)
                 BoxShadow(
-                  color: AppTheme.gold.withValues(alpha: 0.95),
-                  blurRadius: cellSize * 0.38,
-                  spreadRadius: cellSize * 0.055,
+                  color: AppTheme.gold.withValues(alpha: 0.88),
+                  blurRadius: cellSize * 0.34,
+                  spreadRadius: cellSize * 0.045,
                 ),
-                BoxShadow(
-                  color: AppTheme.cream.withValues(alpha: 0.9),
-                  blurRadius: cellSize * 0.12,
-                  spreadRadius: cellSize * 0.015,
-                ),
-              ],
             ],
           ),
           child: Center(
             child: Icon(
               Icons.favorite_rounded,
               color: AppTheme.cream,
+              shadows: const <Shadow>[
+                Shadow(color: Colors.black38, offset: Offset(0, 1.5), blurRadius: 2),
+              ],
               size: diameter * 0.54,
             ),
           ),
@@ -1207,7 +1328,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         _PawnVisual(
           pawnId: pawnId,
           playerId: playerId,
-          point: visual.point,
+          point: _animatedPawnPoints[pawnId] ?? visual.point,
         ),
       );
     }
