@@ -9,6 +9,32 @@ void main() {
       expect(() => LocalGameFactory.create(), throwsA(isA<StateError>()));
     });
 
+    test('creates a two-player match using the selected distinct colours', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        selectedPlayerIds: const <String>['blue', 'magenta'],
+      );
+
+      expect(setup.initialState.players, <String>['blue', 'magenta']);
+      expect(setup.initialState.pawns, hasLength(8));
+      expect(
+        setup.initialState.pawns.every(
+          (pawn) => <String>['blue', 'magenta'].contains(pawn.playerId),
+        ),
+        isTrue,
+      );
+    });
+
+    test('rejects duplicate player colours', () {
+      expect(
+        () => LocalGameFactory.create(
+          allowProvisionalRoutes: true,
+          selectedPlayerIds: const <String>['orange', 'orange'],
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('creates four players and sixteen unique pawns for development', () {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       final state = setup.initialState;
