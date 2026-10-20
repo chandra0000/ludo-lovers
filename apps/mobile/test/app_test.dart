@@ -63,6 +63,8 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('preview_board_button')));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('board_route_audit_button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('board_route_audit_button')));
     await tester.pumpAndSettle();
 
