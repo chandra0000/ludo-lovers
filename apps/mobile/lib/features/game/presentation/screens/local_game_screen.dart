@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../../app/theme/app_theme.dart';
 import '../../domain/board/board_coordinate_layout.dart';
@@ -881,19 +882,53 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     child: Center(
                                       child: AnimatedSwitcher(
                                         duration: const Duration(milliseconds: 260),
-                                        child: state.pendingRoll == null
-                                            ? const Icon(Icons.casino_rounded, key: ValueKey('dice_idle'), size: 44, color: Color(0xFF3B2600))
-                                            : Container(
-                                                key: ValueKey<String>('dice_result_${state.pendingRoll}'),
-                                                alignment: Alignment.center,
-                                                child: Semantics(
-                                                  key: const ValueKey('dice_result_semantics'),
-                                                  label: 'Dice result: ${state.pendingRoll}',
-                                                  liveRegion: true,
-                                                  excludeSemantics: true,
-                                                  child: Text('${state.pendingRoll}', style: const TextStyle(color: Color(0xFF3B2600), fontSize: 36, fontWeight: FontWeight.w900)),
-                                                ),
+                                        child: (state.pendingRoll == null
+                                                ? const Icon(
+                                                    Icons.casino_rounded,
+                                                    key: ValueKey('dice_idle'),
+                                                    size: 44,
+                                                    color: Color(0xFF3B2600),
+                                                  )
+                                                : Container(
+                                                    key: ValueKey<String>(
+                                                      'dice_result_${state.pendingRoll}',
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Semantics(
+                                                      key: const ValueKey(
+                                                        'dice_result_semantics',
+                                                      ),
+                                                      label:
+                                                          'Dice result: ${state.pendingRoll}',
+                                                      liveRegion: true,
+                                                      excludeSemantics: true,
+                                                      child: Text(
+                                                        '${state.pendingRoll}',
+                                                        style: const TextStyle(
+                                                          color: Color(0xFF3B2600),
+                                                          fontSize: 36,
+                                                          fontWeight: FontWeight.w900,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ))
+                                            .animate(
+                                              key: ValueKey<String>(
+                                                'dice_face_animation_${state.pendingRoll ?? 'idle'}',
                                               ),
+                                            )
+                                            .rotate(
+                                              begin: -0.12,
+                                              end: 0,
+                                              duration: 360.ms,
+                                              curve: Curves.easeOutBack,
+                                            )
+                                            .scale(
+                                              begin: 0.72,
+                                              end: 1,
+                                              duration: 280.ms,
+                                              curve: Curves.easeOutBack,
+                                            ),
                                       ),
                                     ),
                                   ),
