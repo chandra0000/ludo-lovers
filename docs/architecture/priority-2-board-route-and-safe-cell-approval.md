@@ -13,7 +13,22 @@
 
 ## Current result
 
-The route audit accepts exactly four documented diagonal corner transitions: 4→5, 17→18, 30→31 and 43→44. Structural validation passes for these transitions, but visual topology approval remains the release blocker. Safe IDs {0, 8, 13, 21, 26, 34, 39, 47} match the currently selected *provisional* rule profile, but this does not prove that those IDs land on the intended printed start/star squares in the final board artwork.
+### Diagonal corner decision: accepted as explicit connectors in the provisional trace
+
+For the current 15×15 coordinate trace, the four non-orthogonal links are **formally accepted as intentional corner connectors**, not treated as accidental gaps:
+
+| Track transition | From coordinate (column,row) | To coordinate (column,row) |
+| --- | --- | --- |
+| 4 → 5 | (5,6) | (6,5) |
+| 17 → 18 | (8,5) | (9,6) |
+| 30 → 31 | (9,8) | (8,9) |
+| 43 → 44 | (6,9) | (5,8) |
+
+The test suite locks these exact endpoints and requires every other sequential transition to be orthogonally adjacent. This is a **structural decision for the current provisional route**, not a claim that the artwork has been visually approved. If the straight-on reference contradicts a connector, update the canonical definition and its fixtures together rather than adding a renderer-only workaround.
+
+The canonical contract is: 52 shared cells; entry offsets Orange 0, Green 13, Blue 39, Magenta 26; five private home-lane cells per seat; a separate centre finish at grid cell (7,7); and provisional safe IDs {0, 8, 13, 21, 26, 34, 39, 47}. Automated checks now assert that the coordinate factory, player-path fixture, entry markers, home lanes and default rule profile agree on these values. The safe-cell pattern remains a provisional rules hypothesis until the printed start/star squares are verified against the final artwork.
+
+**Gameplay remains blocked.** The current straight-on board reference is not sufficiently legible in the available context to approve the physical cell order or safe-square markings. Do not set `isVisualTopologyApproved` to true or enable `isGameplayReady` based only on passing structural tests.
 
 The safe-square pattern is based on a common Ludo variant in which each start square and a star square eight track steps later are safe. Rules vary by board and implementation; the source links below are supporting references, not authority for the custom Ludo Lovers board.
 
