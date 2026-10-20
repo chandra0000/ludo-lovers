@@ -52,11 +52,63 @@ void main() {
           throwsArgumentError);
     });
 
-    test('route remains provisional while diagonal jumps remain unresolved', () {
+    test('canonical definition validates entries, lanes, safe cells and finish', () {
+      expect(ClassicLudoBoardDefinition.validate, returnsNormally);
+      expect(ClassicLudoBoardDefinition.centerFinishCell,
+          const BoardGridCell(column: 7, row: 7));
+      expect(
+        ClassicLudoBoardDefinition.sharedTrackCells
+            .contains(ClassicLudoBoardDefinition.centerFinishCell),
+        isFalse,
+        reason: 'The centre finish is separate from the 52-cell track.',
+      );
+
+      final paths = ClassicLudoBoardFixture.create();
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final entry = seat.provisionalTrackEntryIndex;
+        expect(
+          seat.startMarker,
+          ClassicLudoBoardCoordinateFactory.sharedTrack[entry],
+          reason: '${seat.id} entry marker and route index must match.',
+        );
+        expect(LudoRuleProfile().safeCellIndexes.contains(entry), isTrue);
+        expect(paths.forPlayer(seat.id).entryCell, entry);
+        expect(seat.homeLaneCells, hasLength(5));
+        expect(seat.homeLaneCells.toSet().length, 5);
+        expect(seat.homeLaneCells.contains(ClassicLudoBoardDefinition.centerFinishCell),
+            isFalse);
+      }
+      expect(
+        ClassicLudoBoardFixture.provisionalEntryCellByPlayer,
+        <String, int>{'orange': 0, 'green': 13, 'blue': 39, 'magenta': 26},
+      );
+      expect(
+        LudoRuleProfile().safeCellIndexes,
+        <int>{0, 8, 13, 21, 26, 34, 39, 47},
+      );
+    });
+
+    test('four diagonal corner links are explicitly accepted structural connectors', () {
+      final track = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      const expected = <int, (BoardGridCell, BoardGridCell)>{
+        4: (BoardGridCell(column: 5, row: 6), BoardGridCell(column: 6, row: 5)),
+        17: (BoardGridCell(column: 8, row: 5), BoardGridCell(column: 9, row: 6)),
+        30: (BoardGridCell(column: 9, row: 8), BoardGridCell(column: 8, row: 9)),
+        43: (BoardGridCell(column: 6, row: 9), BoardGridCell(column: 5, row: 8)),
+      };
+
       expect(
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
+      for (final entry in expected.entries) {
+        expect(track[entry.key], entry.value.$1, reason: 'transition ${entry.key}');
+        expect(track[(entry.key + 1) % track.length], entry.value.$2,
+            reason: 'transition ${entry.key}');
+      }
+      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      // Accepted for the provisional trace only. Artwork approval remains a
+      // separate release gate; this test must not enable gameplay by itself.
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
   });
