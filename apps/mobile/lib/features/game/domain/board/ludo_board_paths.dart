@@ -20,16 +20,22 @@ class LudoPlayerPath {
     if (trackLength <= 0) {
       throw ArgumentError.value(trackLength, 'trackLength', 'Must be positive.');
     }
-    if (this.mainTrackCells.length != trackLength) {
+    // Keep all physical shared cells for board/capture validation. Movement
+    // traverses only trackLength cells before turning into the home lane.
+    if (this.mainTrackCells.length < trackLength ||
+        this.mainTrackCells.length > trackLength + 1) {
       throw ArgumentError(
-        'Player $playerId must have exactly $trackLength main-track cells.',
+        'Player $playerId must provide the traversed route and at most one '
+        'additional physical shared-track cell.',
       );
     }
     if (this.mainTrackCells.toSet().length != this.mainTrackCells.length) {
       throw ArgumentError('Main-track route for $playerId contains duplicates.');
     }
-    if (this.mainTrackCells.any((cell) => cell < 0 || cell >= trackLength)) {
-      throw ArgumentError('Main-track route for $playerId contains invalid cells.');
+    if (this.mainTrackCells.any(
+      (cell) => cell < 0 || cell >= this.mainTrackCells.length,
+    )) {
+      throw ArgumentError('Main-track route for $playerId contains invalid physical cell IDs.');
     }
     if (this.homeLaneCells.any((cell) => cell < 0)) {
       throw ArgumentError('Home-lane cell indexes must be non-negative.');
@@ -48,8 +54,10 @@ class LudoPlayerPath {
   int get homeLaneLength => homeLaneCells.length;
 
   /// Returns a global board cell for a player-relative distance from entry.
-  /// Distances 0..trackLength-1 are on the shared track; subsequent distances
-  /// address the private home lane. The final home/center is not a track cell.
+  /// Distances 0..trackLength-1 traverse the shared loop up to the home-lane
+  /// branch; subsequent distances address the private lane. An extra physical
+  /// loop cell may remain in [mainTrackCells] for shared-cell validation but
+  /// is not traversed by this player. The center finish is not a track cell.
   int? cellAtProgress(int progress) {
     if (progress < 0) {
       throw ArgumentError.value(progress, 'progress', 'Must not be negative.');
