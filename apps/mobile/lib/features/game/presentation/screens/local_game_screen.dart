@@ -100,6 +100,23 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
 
     final movingPlayerId = previous.currentPlayerId;
+
+    // A captured pawn returns to its yard immediately. Clear any cached
+    // animation point, otherwise its previous on-track point can keep it
+    // visually occupying the opponent's destination after the rules engine
+    // has correctly sent it home.
+    for (final oldPawn in previous.pawns) {
+      if (oldPawn.playerId == movingPlayerId) continue;
+      final newPawn = current.pawns.firstWhere(
+        (pawn) => pawn.id == oldPawn.id,
+        orElse: () => oldPawn,
+      );
+      if (oldPawn.position.section != PawnRouteSection.yard &&
+          newPawn.position.section == PawnRouteSection.yard) {
+        _animatedPawnPoints.remove(oldPawn.id);
+      }
+    }
+
     for (final oldPawn in previous.pawns) {
       if (oldPawn.playerId != movingPlayerId) continue;
       final newPawn = current.pawns.firstWhere(
