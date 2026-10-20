@@ -50,6 +50,31 @@ void main() {
       }
     });
 
+    test('Blue pawn follows its route through wraparound into its own lane', () {
+      final bluePath = ClassicLudoBoardFixture.create().forPlayer('blue');
+
+      // Blue enters at physical cell 39, follows the shared loop in order,
+      // wraps from cell 51 to cell 0, then branches into Blue's private lane.
+      expect(bluePath.entryCell, 39);
+      expect(bluePath.cellAtProgress(0), 39);
+      expect(bluePath.cellAtProgress(1), 40);
+      expect(bluePath.cellAtProgress(11), 50);
+      expect(bluePath.cellAtProgress(12), 51);
+      expect(bluePath.cellAtProgress(13), 0);
+
+      // The final shared-track step approaches Blue's lane at cell 37
+      // (grid coordinate 7,14); the next progress is Blue's first lane cell.
+      expect(bluePath.cellAtProgress(50), 37);
+      expect(track[37], const BoardGridCell(column: 7, row: 14));
+      expect(bluePath.cellAtProgress(51), 210);
+      expect(
+        ClassicLudoBoardDefinition.seatFor('blue').homeLaneCells.first,
+        const BoardGridCell(column: 7, row: 13),
+      );
+      expect(bluePath.cellAtProgress(55), 214);
+      expect(bluePath.cellAtProgress(bluePath.finishProgress), isNull);
+    });
+
     test('all home lanes have five unique, in-bounds, connected cells', () {
       final allLaneCells = <BoardGridCell>{};
       for (final seat in ClassicLudoBoardDefinition.seats) {
