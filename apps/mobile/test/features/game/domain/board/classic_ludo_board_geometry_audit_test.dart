@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_geometry_audit.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordinate_factory.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixture.dart';
 
 void main() {
   group('ClassicLudoBoardGeometryAudit', () {
@@ -42,6 +43,23 @@ void main() {
         );
       }
       expect(safeCells.every((cell) => cell >= 0 && cell < 52), isTrue);
+    });
+
+    test('all four home-lane branches are orthogonally connected', () {
+      const track = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      final paths = ClassicLudoBoardFixture.create();
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = paths.forPlayer(seat.id);
+        expect(path.trackLength, 51, reason: seat.id);
+        final approach = track[(seat.provisionalTrackEntryIndex + 50) % 52];
+        final lane = seat.homeLaneCells.first;
+        expect(
+          (approach.column - lane.column).abs() + (approach.row - lane.row).abs(),
+          1,
+          reason: '${seat.id} must turn into its lane without a gap or diagonal jump',
+        );
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: seat.id);
+      }
     });
 
     test('keeps gameplay readiness disabled until route geometry is approved', () {
