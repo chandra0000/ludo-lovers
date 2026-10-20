@@ -184,6 +184,13 @@ void main() {
         lessThanOrEqualTo(viewport.width - 20),
         reason: 'The whole board must fit the available width at $viewport.',
       );
+      if (viewport.width > viewport.height) {
+        expect(
+          boardSize.height,
+          greaterThan(250),
+          reason: 'Use more of the available height in landscape at $viewport.',
+        );
+      }
       expect(tester.takeException(), isNull, reason: 'Viewport: $viewport');
 
       await tester.pumpWidget(const SizedBox.shrink());
