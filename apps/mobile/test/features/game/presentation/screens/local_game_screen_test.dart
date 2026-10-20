@@ -1254,6 +1254,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tester.pump(); // Start the first AnimatedPositioned transition.
 
     // Each timer is longer than the AnimatedPositioned duration, so the pawn
     // must settle on each intermediate cell before advancing to the next one.
