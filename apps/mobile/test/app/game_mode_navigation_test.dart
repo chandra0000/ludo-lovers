@@ -35,7 +35,7 @@ void main() {
         home: const GameModeSelectionScreen(),
       ),
     );
-    await tester.tap(find.byKey(const ValueKey('mode_two_players_button')));
+    await tester.tap(find.text('Set up 2-player game'));
     await tester.pumpAndSettle();
 
     expect(find.text('Choose your colours'), findsOneWidget);
@@ -66,7 +66,7 @@ void main() {
         home: const GameModeSelectionScreen(),
       ),
     );
-    await tester.tap(find.byKey(const ValueKey('mode_vs_computer_button')));
+    await tester.tap(find.text('Play vs AI'));
     await tester.pump();
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
