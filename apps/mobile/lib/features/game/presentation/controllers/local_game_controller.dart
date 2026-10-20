@@ -97,7 +97,7 @@ class LocalGameController extends ChangeNotifier {
     setup = nextSetup;
     _state = nextSetup.initialState.copyWith(version: _state.version + 1);
     lastError = null;
-    lastMessage = 'New ' + playerIds.length.toString() + '-player local game';
+    lastMessage = 'New ${playerIds.length}-player local game';
     notifyListeners();
   }
 
