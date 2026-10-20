@@ -7,6 +7,34 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
+  testWidgets('local match strip labels seats without implying online status', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('local_match_player_strip')), findsOneWidget);
+    expect(find.text('ORANGE'), findsOneWidget);
+    expect(find.text('GREEN'), findsOneWidget);
+    expect(find.text('BLUE'), findsOneWidget);
+    expect(find.text('MAGENTA'), findsOneWidget);
+    expect(find.text('YOU'), findsOneWidget);
+    expect(find.text('LOCAL'), findsNWidgets(3));
+    expect(find.text('Online'), findsNothing);
+  });
+
   testWidgets('AI chooses a legal capture over an ordinary advance', (
     tester,
   ) async {
