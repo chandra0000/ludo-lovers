@@ -14,7 +14,7 @@ void main() {
     expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
     expect(find.text('Love Mode'), findsOneWidget);
     expect(find.text('Explore the Board'), findsOneWidget);
-    expect(find.text('Play Local Match (Prototype)'), findsOneWidget);
+    expect(find.text('Play Now · Choose a Mode'), findsOneWidget);
   });
 
   testWidgets('opens the board preview', (tester) async {
@@ -82,6 +82,9 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
 
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Pick your way to play'), findsOneWidget);
+    await tester.tap(find.text('Start 4-player game'));
     await tester.pumpAndSettle();
 
     expect(find.text('Ludo Lovers · Match'), findsOneWidget);
