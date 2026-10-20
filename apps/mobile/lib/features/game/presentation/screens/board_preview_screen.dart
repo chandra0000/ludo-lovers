@@ -23,35 +23,17 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
 
   static const double _touchRadiusInCells = 0.48;
 
-  List<BoardPawnMarker> get _previewPawns {
-    const seats = ClassicLudoBoardDefinition.seats;
-    return <BoardPawnMarker>[
-      BoardPawnMarker(
-        pawnId: 'preview-orange',
-        cellId: seats[0].provisionalTrackEntryIndex,
-        color: LudoBoardPalette.orange,
-        selected: _selectedCell == seats[0].provisionalTrackEntryIndex,
-      ),
-      BoardPawnMarker(
-        pawnId: 'preview-green',
-        cellId: seats[1].provisionalTrackEntryIndex,
-        color: LudoBoardPalette.green,
-        selected: _selectedCell == seats[1].provisionalTrackEntryIndex,
-      ),
-      BoardPawnMarker(
-        pawnId: 'preview-blue',
-        cellId: seats[2].provisionalTrackEntryIndex,
-        color: LudoBoardPalette.blue,
-        selected: _selectedCell == seats[2].provisionalTrackEntryIndex,
-      ),
-      BoardPawnMarker(
-        pawnId: 'preview-magenta',
-        cellId: seats[3].provisionalTrackEntryIndex,
-        color: LudoBoardPalette.magenta,
-        selected: _selectedCell == seats[3].provisionalTrackEntryIndex,
-      ),
-    ];
-  }
+  List<BoardPawnMarker> get _previewPawns =>
+      ClassicLudoBoardDefinition.seats
+          .map(
+            (seat) => BoardPawnMarker(
+              pawnId: 'preview-${seat.id}',
+              cellId: seat.provisionalTrackEntryIndex,
+              color: seat.color,
+              selected: _selectedCell == seat.provisionalTrackEntryIndex,
+            ),
+          )
+          .toList(growable: false);
 
   void _handleBoardTap(TapDownDetails details, Size boardSize) {
     final cellSize = boardSize.shortestSide /

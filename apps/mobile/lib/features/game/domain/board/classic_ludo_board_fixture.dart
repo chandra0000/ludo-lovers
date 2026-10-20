@@ -2,7 +2,7 @@
 ///
 /// The physical shared-track IDs are 0..51. Player-relative routes are rotated
 /// to match the current board-definition start markers:
-/// Orange 0, Green 13, Magenta 26, Blue 39.
+/// Orange 0, Green 13, Blue 39, Magenta 26 (seat declaration order).
 ///
 /// IMPORTANT: the display geometry remains provisional. These offsets align
 /// the engine fixture with the current seat metadata, but do not approve the
