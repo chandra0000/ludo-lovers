@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../../app/theme/app_theme.dart';
 import '../../domain/board/board_coordinate_layout.dart';
@@ -916,23 +915,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                                       ),
                                                     ),
                                                   ))
-                                            .animate(
-                                              key: ValueKey<String>(
-                                                'dice_face_animation_${state.pendingRoll ?? 'idle'}',
-                                              ),
-                                            )
-                                            .rotate(
-                                              begin: -0.12,
-                                              end: 0,
-                                              duration: 360.ms,
-                                              curve: Curves.easeOutBack,
-                                            )
-                                            .scale(
-                                              begin: const Offset(0.72, 0.72),
-                                              end: const Offset(1, 1),
-                                              duration: 280.ms,
-                                              curve: Curves.easeOutBack,
-                                            ),
+                                            ,
                                       ),
                                     ),
                                   ),
