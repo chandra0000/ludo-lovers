@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ludo_lovers/features/game/domain/board/board_pawn_layout.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
@@ -1190,7 +1191,7 @@ void main() {
   });
 
 
-  testWidgets('animates a multi-cell move through intermediate route cells', (
+  testWidgets('animates through each route cell and lands on the engine destination', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(900, 1600);
@@ -1227,25 +1228,63 @@ void main() {
     final marker = find.byKey(
       const ValueKey('pawn_marker_orange_pawn_1'),
     );
-    final start = tester.getTopLeft(marker);
+    final board = find.byKey(const ValueKey('local_game_board'));
+    final boardTopLeft = tester.getTopLeft(board);
+    final boardSize = tester.getSize(board).width;
+    const pawnId = 'orange_pawn_1';
+    final pawnLayout = BoardPawnLayout.classic();
+
+    Offset expectedTopLeft(int progress) {
+      final visual = pawnLayout.resolve(
+        playerId: 'orange',
+        pawnId: pawnId,
+        position: PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: progress,
+        ),
+      );
+      final diameter = boardSize / 15 * 0.68;
+      return boardTopLeft +
+          Offset(
+            visual.point.x * boardSize - diameter / 2,
+            visual.point.y * boardSize - diameter / 2,
+          );
+    }
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
 
-    // Allow the three route-cell timers and their position transitions to
-    // complete, then assert that the rendered pawn reached the engine target.
-    await tester.pump(const Duration(milliseconds: 900));
-    await tester.pumpAndSettle();
-    final end = tester.getTopLeft(marker);
+    // Each timer is longer than the AnimatedPositioned duration, so the pawn
+    // must settle on each intermediate cell before advancing to the next one.
+    await tester.pump(const Duration(milliseconds: 300));
+    final firstCell = tester.getTopLeft(marker);
+    expect(firstCell.dx, closeTo(expectedTopLeft(1).dx, 1.5));
+    expect(firstCell.dy, closeTo(expectedTopLeft(1).dy, 1.5));
 
-    expect(end, isNot(start));
+    await tester.pump(const Duration(milliseconds: 300));
+    final secondCell = tester.getTopLeft(marker);
+    expect(secondCell.dx, closeTo(expectedTopLeft(2).dx, 1.5));
+    expect(secondCell.dy, closeTo(expectedTopLeft(2).dy, 1.5));
+    expect(secondCell, isNot(firstCell));
+
+    await tester.pump(const Duration(milliseconds: 300));
+    final finalCell = tester.getTopLeft(marker);
+    expect(finalCell.dx, closeTo(expectedTopLeft(3).dx, 1.5));
+    expect(finalCell.dy, closeTo(expectedTopLeft(3).dy, 1.5));
+    expect(finalCell, isNot(secondCell));
     expect(
       controller.state.pawns
-          .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
+          .firstWhere((pawn) => pawn.id == pawnId)
           .position.progress,
       3,
     );
+
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
+    final settled = tester.getTopLeft(marker);
+    expect(settled.dx, closeTo(expectedTopLeft(3).dx, 1.5));
+    expect(settled.dy, closeTo(expectedTopLeft(3).dy, 1.5));
   });
 
   testWidgets('AI opponents take turns and return control to orange', (
