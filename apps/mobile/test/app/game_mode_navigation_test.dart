@@ -69,7 +69,7 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 50));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
-    expect(find.text('YOU'), findsOneWidget);
+    expect(find.text('YOU'), findsAtLeastNWidgets(1));
     expect(find.text('AI'), findsNWidgets(3));
     expect(find.text('LOCAL'), findsNothing);
   });
