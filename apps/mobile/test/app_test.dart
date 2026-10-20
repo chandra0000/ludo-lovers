@@ -26,6 +26,8 @@ void main() {
   testWidgets('opens the board preview', (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
 
+    await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('preview_board_button')));
     await tester.pumpAndSettle();
 
