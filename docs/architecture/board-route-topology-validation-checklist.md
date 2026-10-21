@@ -5,11 +5,11 @@ Branch: `main`
 
 ## Current decision
 
-**Status: structurally consistent, but not approved for gameplay/release yet.**
+**Status: route orientation and coordinate mapping are now cross-checked against the supplied board mockup; safe-cell artwork and full visual sign-off remain pending. Gameplay/release stays blocked.**
 
 The canonical route currently has 52 unique in-bounds cells and closes its loop. Automated structural and route-movement tests cover the documented route shape, player-relative progress, wraparound, home lanes, provisional safe cells, and the separate center finish. The route intentionally retains four diagonal corner transitions at indexes **4, 17, 30, and 43**. These are documented as the current v1 reference-board connections; they are not being silently converted to orthogonal steps because doing so can change the board's cell count, player entry spacing, and visual alignment.
 
-The source explicitly keeps `isVisualTopologyApproved = false` and `isGameplayReady = false`. That is correct until the rendered board is reconciled with the approved visual reference and the user signs off on it. A passing structural test is not the same as proof that every route cell matches the artwork.
+The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player quadrant arrangement, central 3×3 hub, colored home lanes, and apparent travel orientation as the canonical coordinates. The four diagonal links are consistent with the turns around that central hub. However, the mockup uses stylized icons over some grid cells, so it is not sufficient to unambiguously approve every safe/star cell or prove pixel-perfect route-cell alignment. The app screenshots (`1000546499.jpg`, `1000546326.jpg`) are runtime evidence, not the target specification. The source therefore correctly keeps `isVisualTopologyApproved = false` and `isGameplayReady = false` until the safe-cell map and rendered preview are signed off.
 
 ## Verified in source / current CI observation
 
@@ -21,23 +21,27 @@ The source explicitly keeps `isVisualTopologyApproved = false` and `isGameplayRe
 - [x] Provisional safe-cell set is in range and matches the current profile: 0, 8, 13, 21, 26, 34, 39, 47.
 - [x] Center finish is separate from the shared track and home lanes.
 - [x] Blue wraparound and home-lane movement have explicit assertions.
-- [x] Gameplay readiness remains blocked pending visual approval.
-- [x] Latest observed CI run #499: formatting, dependency resolution, Flutter analysis, and automated tests passed. Android debug APK build was still running at the time of this review; full pipeline success is **not yet confirmed**.
+- [x] Cross-checked the four entry directions against the supplied straight-on board mockup: Orange moves right then up, Green down then right, Magenta left then down, Blue up then left.
+- [x] Board Preview uses a square aspect ratio; the painter and pawn layer use the same normalized cell-center mapping on that square canvas.
+- [x] Added an independent 52-coordinate acceptance fixture, explicit entry-direction and home-lane orientation checks, and a cell-center alignment test in `approved_reference_geometry_acceptance_test.dart`.
+- [x] Gameplay readiness remains blocked pending safe-cell visual approval.
+- [x] CI run #499 completed successfully (green) before this new acceptance-test commit. The new commit triggers another CI run, which must also pass before the added test is considered verified.
 
 ## Remaining checklist — complete in this order
 
 ### 1. Compare the actual board rendering to the approved reference
-- [ ] Use the exact approved board image as the visual source of truth (not a generic Ludo board).
-- [ ] Compare every track cell in order, starting at Orange's entry and following the loop.
-- [ ] Confirm whether the four diagonal corner transitions are genuinely present in the approved artwork. Record the decision explicitly.
-- [ ] Check that the rendered route cells, colored start markers, star/safe markers, and pawn centers align with the actual artwork at phone aspect ratios.
-- [ ] Confirm all four player quadrants and exact brand colors: Orange `#FF8928`, Green `#33FF28`, Blue `#289EFF`, Magenta `#F428FF`.
+- [x] Use the supplied straight-on board mockup as the geometry reference; treat Android runtime screenshots as implementation evidence only.
+- [x] Compare the 52-cell canonical sequence with the 15×15 mockup's perimeter around the central hub; the broad route shape and quadrant orientation agree.
+- [x] Confirm the four diagonal corner links at indexes 4, 17, 30, and 43 as the current intended connectors around the central 3×3 hub; independent golden tests now lock their endpoints.
+- [x] Confirm the four quadrant colors and their forward directions against the mockup.
+- [ ] Resolve the exact star/safe-cell squares from a clearer cell-by-cell reference; the stylized artwork places decorative icons on the grid and does not make every safe square unambiguous.
+- [ ] Manually inspect the rendered board preview on-device at phone size and confirm all route-cell and pawn centers visually align.
 
 ### 2. Resolve route orientation and entry mapping
-- [ ] Confirm each player's forward direction and the first cell entered after leaving its yard.
-- [ ] Confirm the entry spacing and route orientation against the reference; do not change entry indexes based on appearance alone.
-- [ ] Confirm the final shared-track approach connects to the correct player's own home lane, especially Blue's wraparound path.
-- [ ] Keep route/seat/home-lane/safe-cell metadata in the single canonical source; remove duplicate mappings if discovered.
+- [x] Confirm each player's forward direction and entry cell: Orange 0, Green 13, Magenta 26, Blue 39.
+- [x] Confirm entry spacing and the 13-cell rotational separation in the shared-track mapping.
+- [x] Confirm each final traversed shared cell connects to its own lane; Blue wraps through physical IDs 50, 51, 0 before continuing its player-relative route and branches into Blue's lane at the defined approach.
+- [x] Keep route/seat/home-lane/safe-cell metadata in the canonical board definition and fixture.
 
 ### 3. Confirm rule metadata
 - [ ] Verify all safe/star cells against the approved board and the selected Ludo rules profile.
@@ -53,9 +57,10 @@ The source explicitly keeps `isVisualTopologyApproved = false` and `isGameplayRe
 - [x] Home-lane continuity, uniqueness, bounds, and non-overlap.
 - [x] Provisional safe-cell IDs in range and resolvable.
 - [x] Finish-cell separation and readiness-gate tests.
-- [ ] Add/adjust golden coordinate assertions only after the visual comparison is signed off.
-- [ ] Add a widget/rendering test proving pawn centers align to the canonical cell centers for all four colors.
-- [ ] Re-run all board tests and the full Flutter pipeline after any route change.
+- [x] Added independent golden coordinate assertions for all 52 shared-track cells and the four diagonal endpoints.
+- [x] Added entry-direction, exact home-lane orientation, and normalized pawn-center alignment assertions for the square board canvas.
+- [ ] Add/execute an on-device rendering review for all four colored pawns and selected-pawn highlights.
+- [ ] Re-run all board tests and the full Flutter pipeline for the new acceptance-test commit.
 
 ### 5. Release gate
 - [ ] User approves the board preview against the exact reference.
@@ -65,6 +70,7 @@ The source explicitly keeps `isVisualTopologyApproved = false` and `isGameplayRe
 
 ## Board-related test files
 
+- `apps/mobile/test/features/game/domain/board/approved_reference_geometry_acceptance_test.dart`
 - `apps/mobile/test/features/game/domain/board/classic_ludo_board_visual_topology_contract_test.dart`
 - `apps/mobile/test/features/game/domain/board/reference_board_route_movement_test.dart`
 - `apps/mobile/test/features/game/domain/board/classic_ludo_release_gate_test.dart`
