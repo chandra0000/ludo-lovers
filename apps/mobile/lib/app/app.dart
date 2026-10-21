@@ -15,7 +15,9 @@ class LudoLoversApp extends StatelessWidget {
       title: 'Ludo Lovers',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const SplashScreen(),
+      home: SplashScreen(
+        destinationBuilder: (_) => const AppFoundationScreen(),
+      ),
     );
   }
 }
