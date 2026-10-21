@@ -5,11 +5,11 @@ Branch: `main`
 
 ## Current decision
 
-**Status: route orientation and coordinate mapping are now cross-checked against the supplied board mockup; safe-cell artwork and full visual sign-off remain pending. Gameplay/release stays blocked.**
+**Status: structural route audit and full 52-cell player traversal are implemented; safe/star IDs are confirmed by the project owner. Visual sign-off on the rendered board remains pending, so gameplay/release stays blocked.**
 
-The canonical route currently has 52 unique in-bounds cells and closes its loop. Automated structural and route-movement tests cover the documented route shape, player-relative progress, wraparound, home lanes, provisional safe cells, and the separate center finish. The route intentionally retains four diagonal corner transitions at indexes **4, 17, 30, and 43**. These are documented as the current v1 reference-board connections; they are not being silently converted to orthogonal steps because doing so can change the board's cell count, player entry spacing, and visual alignment.
+The canonical route has 52 unique in-bounds cells and closes its loop. Each player's movement route now traverses all 52 physical cells in order, including the final cell before branching into its own home lane. This fixes an off-by-one error that previously skipped physical cell `(entry + 51) % 52`. Automated structural and route-movement tests cover route shape, player-relative progress, wraparound, home lanes, owner-confirmed safe cells, and the separate center finish. The route intentionally retains four diagonal corner transitions at indexes **4, 17, 30, and 43**. These are documented as the current v1 reference-board connections; they are not being silently converted to orthogonal steps because doing so can change the board's cell count, player entry spacing, and visual alignment.
 
-The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player quadrant arrangement, central 3×3 hub, colored home lanes, and apparent travel orientation as the canonical coordinates. The four diagonal links are consistent with the turns around that central hub. However, the mockup uses stylized icons over some grid cells, so it is not sufficient to unambiguously approve every safe/star cell or prove pixel-perfect route-cell alignment. The app screenshots (`1000546499.jpg`, `1000546326.jpg`) are runtime evidence, not the target specification. The source therefore correctly keeps `isVisualTopologyApproved = false` and `isGameplayReady = false` until the safe-cell map and rendered preview are signed off.
+The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player quadrant arrangement, central 3×3 hub, colored home lanes, and apparent travel orientation as the canonical coordinates. The four diagonal links are consistent with the turns around that central hub. The project owner has confirmed safe/star IDs `{0, 8, 13, 21, 26, 34, 39, 47}`. The mockup is still insufficient to prove pixel-perfect route-cell alignment at runtime. The app screenshots (`1000546499.jpg`, `1000546326.jpg`) are implementation evidence, not the target specification. Keep `isVisualTopologyApproved = false` and `isGameplayReady = false` until the rendered preview is checked on a phone.
 
 ## Verified in source / current CI observation
 
@@ -35,18 +35,18 @@ The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player qu
 - [x] Compare the 52-cell canonical sequence with the 15×15 mockup's perimeter around the central hub; the broad route shape and quadrant orientation agree.
 - [x] Confirm the four diagonal corner links at indexes 4, 17, 30, and 43 as the current intended connectors around the central 3×3 hub; independent golden tests now lock their endpoints.
 - [x] Confirm the four quadrant colors and their forward directions against the mockup.
-- [ ] Resolve the exact star/safe-cell squares from a clearer cell-by-cell reference; the stylized artwork places decorative icons on the grid and does not make every safe square unambiguous.
+- [x] Record owner-confirmed safe/star IDs: `{0, 8, 13, 21, 26, 34, 39, 47}`.
 - [ ] Manually inspect the rendered board preview on-device at phone size and confirm all route-cell and pawn centers visually align. This requires a fresh Android screenshot from the actual device; widget tests cannot verify device-specific clipping, scaling, or visual overlap.
 
 ### 2. Resolve route orientation and entry mapping
 - [x] Confirm each player's forward direction and entry cell: Orange 0, Green 13, Magenta 26, Blue 39.
 - [x] Confirm entry spacing and the 13-cell rotational separation in the shared-track mapping.
-- [x] Confirm each final traversed shared cell connects to its own lane; Blue wraps through physical IDs 50, 51, 0 before continuing its player-relative route and branches into Blue's lane at the defined approach.
+- [x] Confirm each final traversed shared cell connects to its own lane; Blue wraps through physical IDs 50, 51, 0; each player traverses the final shared cell `(entry + 51) % 52` before entering its own home lane.
 - [x] Keep route/seat/home-lane/safe-cell metadata in the canonical board definition and fixture.
 
 ### 3. Confirm rule metadata
-- [ ] Verify all safe/star cells against the approved board and the selected Ludo rules profile.
-- [ ] Confirm whether each player entry is safe in this rules profile.
+- [x] Safe/star IDs confirmed by the project owner against the board artwork: `{0, 8, 13, 21, 26, 34, 39, 47}`.
+- [x] Each player entry is safe in the current local test profile.
 - [ ] Verify capture protection on safe cells and capture behavior on ordinary cells using engine tests.
 - [ ] Confirm the five-cell home-lane length and exact-finish/overshoot policy against the selected rules profile.
 
