@@ -103,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final width = MediaQuery.sizeOf(context).width;
-                        final logoWidth = (width * 0.78).clamp(220.0, 360.0);
+                        final logoWidth = (width * 0.78).clamp(220.0, 360.0).toDouble();
                         return Image.asset(
                           'assets/images/ludo_lovers_logo.jpg',
                           key: const ValueKey('ludo_lovers_splash_logo'),
