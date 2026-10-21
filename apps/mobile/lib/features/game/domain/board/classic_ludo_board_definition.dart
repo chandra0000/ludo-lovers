@@ -84,7 +84,7 @@ class ClassicLudoBoardDefinition {
   static const int playerTrackLength = sharedTrackLength - 1;
   static const int homeLaneLength = 5;
   /// Explicit release gate; geometry agreement alone cannot approve the visual board.
-  static const bool isVisualTopologyApproved = true;
+  static const bool isVisualTopologyApproved = false;
   /// Shared center finish: a completed pawn is rendered here, not as a lane cell.
   static const BoardGridCell centerFinishCell = BoardGridCell(column: 7, row: 7);
 
