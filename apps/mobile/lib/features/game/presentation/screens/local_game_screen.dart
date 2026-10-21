@@ -62,6 +62,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   LocalGameState? _lastObservedState;
   final Map<String, BoardPoint> _animatedPawnPoints = <String, BoardPoint>{};
   final Map<String, Set<String>> _capturedPawnVisualsByMover = <String, Set<String>>{};
+  final Map<String, Map<String, List<BoardPoint>>> _capturedPawnReturnPointsByMover =
+      <String, Map<String, List<BoardPoint>>>{};
   int _pawnAnimationGeneration = 0;
   bool _playAgainstAi = false;
   bool _aiThinking = false;
@@ -126,15 +128,48 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         if (capturedPawnIds.isNotEmpty) {
           _capturedPawnVisualsByMover[oldPawn.id] = capturedPawnIds;
           final previousVisuals = _visuals(previous.pawns);
+          final returnPointsByPawn = <String, List<BoardPoint>>{};
           for (final capturedPawnId in capturedPawnIds) {
+            final capturedPawn = previous.pawns.firstWhere(
+              (pawn) => pawn.id == capturedPawnId,
+            );
             final capturedVisual = previousVisuals.firstWhere(
               (visual) => visual.pawnId == capturedPawnId,
             );
-            // Keep the captured pawn where it was until the attacker reaches
-            // the destination. The game state can already be authoritative;
-            // this cache only stages the presentation sequence.
+            // Keep the captured pawn at the capture cell until the attacker
+            // finishes its own route animation. Then animate the captured pawn
+            // backwards through every visited track cell before placing it in
+            // its correct yard slot.
             _animatedPawnPoints[capturedPawnId] = capturedVisual.point;
+            final progress = capturedPawn.position.progress;
+            if (progress != null &&
+                capturedPawn.position.section == PawnRouteSection.mainTrack) {
+              final capturedPath = _paths.forPlayer(capturedPawn.playerId);
+              final returnPoints = <BoardPoint>[];
+              for (var reverseProgress = progress - 1;
+                  reverseProgress >= 0;
+                  reverseProgress--) {
+                returnPoints.add(_pawnLayout.resolve(
+                  playerId: capturedPawn.playerId,
+                  pawnId: capturedPawn.id,
+                  position: PawnRoutePosition(
+                    section: PawnRouteSection.mainTrack,
+                    progress: reverseProgress,
+                  ),
+                  yardSlot: _yardSlotForPawn(previous.pawns, capturedPawn),
+                ).point);
+              }
+              final yardPoint = _pawnLayout.resolve(
+                playerId: capturedPawn.playerId,
+                pawnId: capturedPawn.id,
+                position: const PawnRoutePosition(section: PawnRouteSection.yard),
+                yardSlot: _yardSlotForPawn(previous.pawns, capturedPawn),
+              ).point;
+              returnPoints.add(yardPoint);
+              returnPointsByPawn[capturedPawnId] = returnPoints;
+            }
           }
+          _capturedPawnReturnPointsByMover[oldPawn.id] = returnPointsByPawn;
         }
         _animatePawnAlongRoute(previous, oldPawn, newPawn);
         return;
@@ -193,13 +228,25 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       if (step >= points.length) {
         setState(() {
           _animatedPawnPoints.remove(newPawn.id);
-          final capturedPawnIds =
-              _capturedPawnVisualsByMover.remove(newPawn.id) ?? <String>{};
-          for (final capturedPawnId in capturedPawnIds) {
-            _animatedPawnPoints.remove(capturedPawnId);
-          }
+          _pawnStepTimer = null;
         });
-        _pawnStepTimer = null;
+        final returnPoints =
+            _capturedPawnReturnPointsByMover.remove(newPawn.id) ??
+                <String, List<BoardPoint>>{};
+        if (returnPoints.isNotEmpty) {
+          _animateCapturedPawnsBackToYard(
+            returnPoints.entries.toList(growable: false),
+            generation,
+          );
+        } else {
+          setState(() {
+            final capturedPawnIds =
+                _capturedPawnVisualsByMover.remove(newPawn.id) ?? <String>{};
+            for (final capturedPawnId in capturedPawnIds) {
+              _animatedPawnPoints.remove(capturedPawnId);
+            }
+          });
+        }
         return;
       }
       setState(() => _animatedPawnPoints[newPawn.id] = points[step]);
@@ -218,6 +265,68 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
     setState(() => _animatedPawnPoints[newPawn.id] = points.first);
     _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
+  }
+
+  int _yardSlotForPawn(List<LocalPawn> pawns, LocalPawn target) {
+    var slot = 0;
+    for (final pawn in pawns) {
+      if (pawn.playerId != target.playerId) continue;
+      if (pawn.id == target.id) return slot;
+      slot++;
+    }
+    return 0;
+  }
+
+  void _animateCapturedPawnsBackToYard(
+    List<MapEntry<String, List<BoardPoint>>> returns,
+    int generation,
+  ) {
+    var pawnIndex = 0;
+    void animateNextPawn() {
+      if (!mounted || generation != _pawnAnimationGeneration) return;
+      if (pawnIndex >= returns.length) {
+        setState(() {
+          for (final entry in returns) {
+            _animatedPawnPoints.remove(entry.key);
+          }
+          _capturedPawnVisualsByMover.removeWhere(
+            (moverId, _) => !_capturedPawnReturnPointsByMover.containsKey(moverId),
+          );
+        });
+        _pawnStepTimer = null;
+        return;
+      }
+
+      final entry = returns[pawnIndex++];
+      final pawnId = entry.key;
+      final points = entry.value;
+      var step = 0;
+      void advanceReturnStep() {
+        if (!mounted || generation != _pawnAnimationGeneration) return;
+        if (step >= points.length) {
+          animateNextPawn();
+          return;
+        }
+        setState(() => _animatedPawnPoints[pawnId] = points[step++]);
+        _pawnStepTimer = Timer(
+          const Duration(milliseconds: 220),
+          advanceReturnStep,
+        );
+      }
+
+      if (points.isEmpty) {
+        animateNextPawn();
+        return;
+      }
+      setState(() => _animatedPawnPoints[pawnId] = points.first);
+      step = 1;
+      _pawnStepTimer = Timer(
+        const Duration(milliseconds: 220),
+        advanceReturnStep,
+      );
+    }
+
+    animateNextPawn();
   }
 
   void _toggleAiMode() {
