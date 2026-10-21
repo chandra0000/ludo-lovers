@@ -25,6 +25,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _loaderController;
+  late final AnimationController _entranceController;
   Timer? _navigationTimer;
 
   @override
@@ -34,6 +35,10 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..repeat();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 720),
+    )..forward();
     _navigationTimer = Timer(widget.minimumDuration, _openMainMenu);
   }
 
@@ -59,6 +64,7 @@ class _SplashScreenState extends State<SplashScreen>
   void dispose() {
     _navigationTimer?.cancel();
     _loaderController.dispose();
+    _entranceController.dispose();
     super.dispose();
   }
 
@@ -104,50 +110,62 @@ class _SplashScreenState extends State<SplashScreen>
                       builder: (context, constraints) {
                         final width = MediaQuery.sizeOf(context).width;
                         final logoWidth = (width * 0.78).clamp(220.0, 360.0).toDouble();
-                        return Image.asset(
-                          'assets/images/ludo_lovers_logo.jpg',
-                          key: const ValueKey('ludo_lovers_splash_logo'),
-                          width: logoWidth,
-                          height: logoWidth,
-                          fit: BoxFit.contain,
-                          semanticLabel: 'Ludo Lovers logo',
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            width: logoWidth,
-                            height: logoWidth,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppTheme.panel,
-                              border: Border.all(
-                                color: AppTheme.gold.withValues(alpha: 0.7),
-                                width: 1.5,
-                              ),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                  color: AppTheme.gold.withValues(alpha: 0.16),
-                                  blurRadius: 36,
-                                  spreadRadius: 3,
-                                ),
-                              ],
+                        return ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _entranceController,
+                            curve: Curves.easeOutBack,
+                          ),
+                          child: FadeTransition(
+                            opacity: CurvedAnimation(
+                              parent: _entranceController,
+                              curve: Curves.easeOutCubic,
                             ),
-                            child: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(Icons.favorite_rounded,
-                                    color: AppTheme.magenta, size: 68),
-                                SizedBox(height: 14),
-                                Text(
-                                  'LUDO LOVERS',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppTheme.gold,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 2.2,
-                                    fontSize: 22,
+                            child: Image.asset(
+                              'assets/images/ludo_lovers_logo.jpg',
+                              key: const ValueKey('ludo_lovers_splash_logo'),
+                              width: logoWidth,
+                              height: logoWidth,
+                              fit: BoxFit.contain,
+                              semanticLabel: 'Ludo Lovers logo',
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                width: logoWidth,
+                                height: logoWidth,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppTheme.panel,
+                                  border: Border.all(
+                                    color: AppTheme.gold.withValues(alpha: 0.7),
+                                    width: 1.5,
                                   ),
+                                  boxShadow: <BoxShadow>[
+                                    BoxShadow(
+                                      color: AppTheme.gold.withValues(alpha: 0.16),
+                                      blurRadius: 36,
+                                      spreadRadius: 3,
+                                    ),
+                                  ],
                                 ),
-                              ],
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Icon(Icons.favorite_rounded,
+                                        color: AppTheme.magenta, size: 68),
+                                    SizedBox(height: 14),
+                                    Text(
+                                      'LUDO LOVERS',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: AppTheme.gold,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 2.2,
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         );
