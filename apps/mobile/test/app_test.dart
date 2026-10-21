@@ -10,6 +10,8 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
+    await tester.pumpAndSettle();
 
     expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
     final logo = tester.widget<Image>(
@@ -29,6 +31,8 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
+    await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
     await tester.pumpAndSettle();
@@ -66,6 +70,8 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
+    await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
     await tester.pumpAndSettle();
@@ -105,6 +111,8 @@ void main() {
     await tester.pumpWidget(const LudoLoversApp());
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
