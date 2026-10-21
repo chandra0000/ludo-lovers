@@ -71,7 +71,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final slide = _slides[_page];
     return Scaffold(
       backgroundColor: AppTheme.black,
       body: Container(
@@ -106,17 +105,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('LUDO LOVERS', style: TextStyle(
-                            color: AppTheme.gold,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.4,
-                          )),
+                          Text(
+                            'LUDO LOVERS',
+                            style: TextStyle(
+                              color: AppTheme.gold,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.4,
+                            ),
+                          ),
                           SizedBox(height: 3),
-                          Text('PLAY • CONNECT • LOVE', style: TextStyle(
-                            color: AppTheme.mutedText,
-                            fontSize: 10,
-                            letterSpacing: 1.1,
-                          )),
+                          Text(
+                            'PLAY • CONNECT • LOVE',
+                            style: TextStyle(
+                              color: AppTheme.mutedText,
+                              fontSize: 10,
+                              letterSpacing: 1.1,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -162,9 +167,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: ElevatedButton(
                     key: const ValueKey('onboarding_continue_button'),
                     onPressed: _continue,
-                    child: Text(_page == _slides.length - 1
-                        ? 'Get Started'
-                        : 'Next'),
+                    child: Text(
+                      _page == _slides.length - 1 ? 'Get Started' : 'Next',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -244,10 +249,14 @@ class _OnboardingPage extends StatelessWidget {
                     ),
                   ),
                   Icon(slide.icon, size: 76, color: slide.accent),
-                  Positioned(
+                  const Positioned(
                     right: 27,
                     top: 34,
-                    child: Icon(Icons.auto_awesome, color: AppTheme.gold, size: 25),
+                    child: Icon(
+                      Icons.auto_awesome,
+                      color: AppTheme.gold,
+                      size: 25,
+                    ),
                   ),
                 ],
               ),
