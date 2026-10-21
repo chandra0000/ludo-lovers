@@ -17,7 +17,9 @@ class LudoLoversApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: SplashScreen(
-        destinationBuilder: (_) => const OnboardingScreen(),
+        destinationBuilder: (_) => OnboardingScreen(
+          destinationBuilder: (_) => const AppFoundationScreen(),
+        ),
       ),
     );
   }
