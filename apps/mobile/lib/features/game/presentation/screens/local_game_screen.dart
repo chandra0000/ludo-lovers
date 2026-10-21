@@ -68,6 +68,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _playAgainstAi = false;
   bool _aiThinking = false;
   bool _soundEnabled = true;
+  bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
   static const Map<String, Color> _colors = <String, Color>{
@@ -226,6 +227,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     var step = 0;
     void advanceStep() {
       if (!mounted || generation != _pawnAnimationGeneration) return;
+      if (_isPaused) {
+        _pawnStepTimer = Timer(const Duration(milliseconds: 100), advanceStep);
+        return;
+      }
       step++;
       if (step >= points.length) {
         setState(() {
@@ -278,6 +283,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     var pawnIndex = 0;
     void animateNextPawn() {
       if (!mounted || generation != _pawnAnimationGeneration) return;
+      if (_isPaused) {
+        _pawnStepTimer = Timer(const Duration(milliseconds: 100), animateNextPawn);
+        return;
+      }
       if (pawnIndex >= returns.length) {
         setState(() {
           for (final entry in returns) {
@@ -297,6 +306,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       var step = 0;
       void advanceReturnStep() {
         if (!mounted || generation != _pawnAnimationGeneration) return;
+        if (_isPaused) {
+          _pawnStepTimer = Timer(const Duration(milliseconds: 100), advanceReturnStep);
+          return;
+        }
         if (step >= points.length) {
           animateNextPawn();
           return;
@@ -333,7 +346,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 
   void _scheduleAiTurn(LocalGameState state) {
-    if (!_playAgainstAi ||
+    if (_isPaused || !_playAgainstAi ||
         state.completed ||
         state.currentPlayerId == _humanPlayerId ||
         _aiThinking ||
@@ -345,6 +358,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _aiTimer = Timer(const Duration(milliseconds: 420), () {
       _aiTimer = null;
       if (!mounted ||
+          _isPaused ||
           !_playAgainstAi ||
           _controller.state.completed ||
           _controller.state.currentPlayerId != expectedPlayerId) {
@@ -684,6 +698,50 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
   }
 
+  Future<void> _showPauseMenu() async {
+    if (_isPaused || !mounted) return;
+    setState(() => _isPaused = true);
+    final choice = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        key: const ValueKey('match_paused_dialog'),
+        backgroundColor: AppTheme.panel,
+        title: const Text('Match paused'),
+        content: const Text(
+          'Take a break. Your local match and pawn positions will be kept.',
+          style: TextStyle(color: AppTheme.readableText),
+        ),
+        actions: <Widget>[
+          TextButton(
+            key: const ValueKey('resume_match_button'),
+            onPressed: () => Navigator.of(dialogContext).pop('resume'),
+            child: const Text('Resume match'),
+          ),
+          TextButton(
+            key: const ValueKey('pause_restart_match_button'),
+            onPressed: () => Navigator.of(dialogContext).pop('restart'),
+            child: const Text('Restart match'),
+          ),
+          TextButton(
+            key: const ValueKey('pause_leave_match_button'),
+            onPressed: () => Navigator.of(dialogContext).pop('leave'),
+            child: const Text('Leave match'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    setState(() => _isPaused = false);
+    if (choice == 'restart') {
+      await _confirmRestart();
+    } else if (choice == 'leave') {
+      await _confirmLeave();
+    } else {
+      _scheduleAiTurn(_controller.state);
+    }
+  }
+
   void _showRules() {
     showModalBottomSheet<void>(
       context: context,
@@ -850,6 +908,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             onPressed: () => setState(() => _soundEnabled = !_soundEnabled),
             color: _soundEnabled ? AppTheme.gold : null,
             icon: Icon(_soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded),
+          ),
+          IconButton(
+            key: const ValueKey('pause_match_button'),
+            tooltip: 'Pause match',
+            onPressed: _showPauseMenu,
+            icon: const Icon(Icons.pause_circle_outline_rounded),
           ),
           IconButton(
             tooltip: 'How to play',
