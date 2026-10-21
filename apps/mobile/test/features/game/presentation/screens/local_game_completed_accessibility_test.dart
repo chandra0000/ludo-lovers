@@ -6,7 +6,7 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
-  testWidgets('completed match announces restart guidance and Play Again resets it', (
+  testWidgets('completed match announces restart guidance and Rematch resets it', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(900, 1600);
@@ -45,7 +45,7 @@ void main() {
     );
 
     expect(find.text('MATCH WON'), findsOneWidget);
-    expect(find.byKey(const ValueKey('play_again_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
 
     final rollButton = tester.widget<ElevatedButton>(
       find.byKey(const ValueKey('roll_dice_button')),
@@ -63,14 +63,15 @@ void main() {
     );
     expect(
       rollSemantics.properties.hint,
-      'The match is finished. Choose Play Again to start a new match.',
+      'The match is finished. Choose Rematch to start a new match.',
     );
 
-    await tester.tap(find.byKey(const ValueKey('play_again_button')));
+    await tester.ensureVisible(find.byKey(const ValueKey('results_rematch_button')));
+    await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
     await tester.pumpAndSettle();
 
     expect(find.text('MATCH WON'), findsNothing);
-    expect(find.byKey(const ValueKey('play_again_button')), findsNothing);
+    expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
     expect(
       tester.widget<ElevatedButton>(
         find.byKey(const ValueKey('roll_dice_button')),
