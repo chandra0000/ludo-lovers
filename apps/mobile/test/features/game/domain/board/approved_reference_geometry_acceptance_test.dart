@@ -108,14 +108,14 @@ void main() {
       for (final entry in expected.entries) {
         final seat = ClassicLudoBoardDefinition.seatFor(entry.key);
         expect(seat.provisionalTrackEntryIndex, expectedTrack.indexOf(entry.value.first),
-            reason: entry.key + ' entry index');
+            reason: '${entry.key} entry index');
         final path = paths.forPlayer(entry.key);
         for (var progress = 0; progress < entry.value.length; progress++) {
           final physicalId = path.cellAtProgress(progress);
           expect(physicalId, isNotNull,
-              reason: entry.key + ' progress ' + progress.toString());
+              reason: '${entry.key} progress $progress');
           expect(expectedTrack[physicalId!], entry.value[progress],
-              reason: entry.key + ' forward direction at ' + progress.toString());
+              reason: '${entry.key} forward direction at $progress');
         }
       }
     });
@@ -154,7 +154,7 @@ void main() {
 
       for (final entry in expectedLanes.entries) {
         expect(ClassicLudoBoardDefinition.seatFor(entry.key).homeLaneCells, entry.value,
-            reason: entry.key + ' home-lane direction and cell centers');
+            reason: '${entry.key} home-lane direction and cell centers');
       }
     });
 
@@ -167,9 +167,9 @@ void main() {
         final cell = expectedTrack[id];
         final pixel = layout.pixelForCell(cellId: id, width: boardSize, height: boardSize);
         expect(pixel.x, closeTo((cell.column + 0.5) * cellSize, 1e-9),
-            reason: 'track cell ' + id.toString() + ' horizontal center');
+            reason: 'track cell $id horizontal center');
         expect(pixel.y, closeTo((cell.row + 0.5) * cellSize, 1e-9),
-            reason: 'track cell ' + id.toString() + ' vertical center');
+            reason: 'track cell $id vertical center');
       }
     });
 
