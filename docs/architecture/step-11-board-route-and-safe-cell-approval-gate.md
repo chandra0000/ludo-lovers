@@ -10,16 +10,16 @@ The public Ludo King website is useful as general product context, but it is not
 
 - The current 52-cell loop contains non-orthogonal transitions at indexes **4, 17, 30 and 43**.
 - Player start markers and entry offsets are provisional.
-- The current safe-cell IDs `{0, 8, 13, 21, 26, 34, 39, 47}` are provisional metadata, not approved rules.
+- The project owner confirmed safe-cell IDs `{0, 8, 13, 21, 26, 34, 39, 47}`. Their gameplay semantics still belong to the selected local rules profile.
 - The route, start cells, home-lane entry points and safe-cell treatment must be reviewed together. Fixing only the four diagonal transitions could silently shift cell indexes and invalidate entry offsets, capture rules, and safe-cell IDs.
 
 ## Approval checklist
 
 1. **Lock the visual reference.** Use the original Ludo Lovers board artwork or a deliberately authored 15×15 cell diagram. Confirm the orientation: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
-2. **Number every shared-track cell.** Record the exact 52-cell clockwise route in `(column, row)` coordinates. Every adjacent pair, including cell 51 back to cell 0, must be Manhattan distance 1.
+2. **Number every shared-track cell.** Record the exact 52-cell clockwise route in `(column, row)` coordinates. Every adjacent pair, including cell 51 back to cell 0, must be orthogonally adjacent except the four documented one-cell diagonal corner links at indexes 4, 17, 30, and 43.
 3. **Reconcile seat entries.** For all four seats, verify that the entry index, rendered start marker, first main-track step, and route-relative progress describe the same square.
-4. **Reconcile home lanes.** Confirm the six cells for each lane are consecutive, unique, do not overlap the shared track, and connect to the correct final approach.
-5. **Approve safe cells from rules, not appearance.** Record each safe square's track index and visual coordinate; confirm whether each is a start square or a star/marked square under the chosen Ludo Lovers rules. Decide explicitly how stacks and captures work on safe squares.
+4. **Reconcile home lanes.** Confirm the five cells for each lane are consecutive, unique, do not overlap the shared track, and connect to the final shared cell through the explicitly audited one-cell diagonal branch. Every pawn must traverse all 52 shared cells before entering its lane.
+5. **Preserve owner-confirmed safe cells.** IDs are `{0, 8, 13, 21, 26, 34, 39, 47}`. Keep safe-cell capture/stack semantics tied to the chosen local rules profile and do not change these IDs without explicit owner approval.
 6. **Run acceptance tests.** Test all four seat routes, wraparound, entry, home-lane transition, exact finish, overshoot, captures, safe-cell protection, stacked pawns, and reset. Add a test for every approved safe square.
 7. **Open the release gate only after review.** The route audit must have zero blockers, all approved coordinate fixtures must match, and `isGameplayReady` must be changed only in the same reviewed change as the verified route and tests.
 
