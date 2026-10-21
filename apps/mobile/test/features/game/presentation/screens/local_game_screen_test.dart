@@ -1062,7 +1062,7 @@ void main() {
     expect(find.text('ORANGE · WINNER'), findsOneWidget);
     expect(find.byKey(const ValueKey('results_home_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
-    expect(find.byKey(const ValueKey('play_again_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsNothing);
     expect(
       tester.widget<ElevatedButton>(
@@ -1072,7 +1072,8 @@ void main() {
       reason: 'A completed match must not accept another roll.',
     );
 
-    await tester.tap(find.byKey(const ValueKey('play_again_button')));
+    await tester.ensureVisible(find.byKey(const ValueKey('results_rematch_button')));
+    await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
     await tester.pumpAndSettle();
 
     expect(controller.state.completed, isFalse);
@@ -1087,7 +1088,7 @@ void main() {
       reason: 'Rematch must restore the canonical fresh-game state.',
     );
     expect(find.text('ORANGE’S TURN'), findsOneWidget);
-    expect(find.byKey(const ValueKey('play_again_button')), findsNothing);
+    expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
     expect(
       tester.widget<ElevatedButton>(
         find.byKey(const ValueKey('roll_dice_button')),
@@ -1453,9 +1454,9 @@ void main() {
     expect(find.byKey(const ValueKey('match_finish_banner')), findsOneWidget);
     expect(find.text('MATCH WON'), findsOneWidget);
     expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
-    expect(find.byKey(const ValueKey('play_again_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('play_again_button')));
+    await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
     await tester.pumpAndSettle();
 
     expect(controller.state.completed, isFalse);
