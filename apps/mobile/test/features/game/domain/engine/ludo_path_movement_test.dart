@@ -104,6 +104,34 @@ void main() {
     expect(positions.single.progress, path.finishProgress);
   });
 
+  test('captured pawn returns through every prior track cell in reverse order', () {
+    final positions = movement.positionsBackToYard(
+      path: path,
+      fromProgress: 4,
+    );
+
+    expect(
+      positions.map((position) => (position.section, position.progress)),
+      <(PawnRouteSection, int?)>[
+        (PawnRouteSection.mainTrack, 3),
+        (PawnRouteSection.mainTrack, 2),
+        (PawnRouteSection.mainTrack, 1),
+        (PawnRouteSection.mainTrack, 0),
+        (PawnRouteSection.yard, null),
+      ],
+      reason: 'A captured pawn must retrace each prior cell before reaching its yard.',
+    );
+    expect(
+      positions.take(4).map((position) => path.cellAtProgress(position.progress!)),
+      <int?>[
+        path.mainTrackCells[3],
+        path.mainTrackCells[2],
+        path.mainTrackCells[1],
+        path.mainTrackCells[0],
+      ],
+    );
+  });
+
   test('exact finish reaches center and marks pawn finished', () {
     final result = movement.resolve(
       path: path,
