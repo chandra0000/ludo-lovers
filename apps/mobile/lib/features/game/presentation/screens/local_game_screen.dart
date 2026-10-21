@@ -166,18 +166,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       );
       points.add(visual.point);
     } else if (oldProgress != null && newProgress != null) {
-      for (var progress = oldProgress + 1; progress <= newProgress; progress++) {
-        final position = progress == path.finishProgress
-            ? PawnRoutePosition(
-                section: PawnRouteSection.finished,
-                progress: path.finishProgress,
-              )
-            : PawnRoutePosition(
-                section: progress < path.trackLength
-                    ? PawnRouteSection.mainTrack
-                    : PawnRouteSection.homeLane,
-                progress: progress,
-              );
+      // Resolve every intermediate route position from the same pure movement
+      // model used by the rules engine. This prevents captures near the branch
+      // from visually teleporting the moving pawn into its home lane: it must
+      // visit each remaining shared cell, then each home-lane cell in order.
+      for (final position in _movement.positionsBetween(
+        path: path,
+        fromProgress: oldProgress,
+        toProgress: newProgress,
+      )) {
         points.add(_pawnLayout.resolve(
           playerId: newPawn.playerId,
           pawnId: newPawn.id,
