@@ -1057,6 +1057,11 @@ void main() {
     expect(controller.state.winnerPlayerId, 'orange');
     expect(find.text('MATCH COMPLETE'), findsOneWidget);
     expect(find.text('ORANGE wins!'), findsOneWidget);
+    expect(find.byKey(const ValueKey('match_standings_panel')), findsOneWidget);
+    expect(find.text('MATCH STANDINGS'), findsOneWidget);
+    expect(find.text('ORANGE · WINNER'), findsOneWidget);
+    expect(find.byKey(const ValueKey('results_home_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('play_again_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsNothing);
     expect(
