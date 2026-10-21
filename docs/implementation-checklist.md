@@ -15,7 +15,7 @@ For the current decisions, next-step order, CI rules, board release gate, and de
 
 The repo has meaningful foundations: Flutter app shell, design tokens, board painter/preview, a board-backed local match screen, a canonical pure-Dart local engine, AI turn handling, accessibility semantics, and substantial unit/widget coverage.
 
-However, the app currently exposes only a foundation/home screen, board preview, and local game screen in `lib/`. The reference's full consumer product experience (onboarding/authentication, social/friends, rooms/invites, profile, wallet, achievements, customization, Love Mode and production navigation) is not implemented as working end-to-end product flows. The board's logical route and safe cells are still provisional. No real-device visual sign-off, online backend, authoritative server, store-release readiness, or production safety/privacy review is evidenced by this repository review.
+The app now includes a skippable three-page onboarding flow ahead of the foundation/home screen, plus board preview and local match prototype. Onboarding is presentation-only: guest continuation reaches the local foundation screen, while Google/email/phone authentication, persistent first-run completion, social/friends, rooms/invites, profile, wallet, achievements, customization, Love Mode and production navigation are not yet working end-to-end flows. The board's logical route and safe cells are still provisional. No real-device visual sign-off, online backend, authoritative server, store-release readiness, or production safety/privacy review is evidenced by this repository review.
 
 ## 1. What is in good shape
 
@@ -60,7 +60,8 @@ However, the app currently exposes only a foundation/home screen, board preview,
 
 ### Not yet at commercial quality / not yet evidenced
 
-- [ ] **Reference fidelity:** side-by-side comparison with the approved screen-9 reference at real Android sizes. Code inspection alone cannot certify visual fidelity.
+- [ ] **Reference fidelity:** side-by-side comparison with the approved screen-9 reference at real Android sizes.
+- [x] **Onboarding foundation:** skippable three-slide intro, page indicators, Next/Get Started, fixed logo asset, responsive scrolling, and navigation to the foundation screen; widget tests cover skip and completion. No authentication provider is wired yet. Code inspection alone cannot certify visual fidelity.
 - [ ] **Board composition:** board scale/proportions, quadrants, center finish, seat panels, dice and control placement must match the reference and remain legible on small devices.
 - [ ] **Logo:** verify the actual supplied logo asset is used wherever branding appears; the current foundation-screen snippet shows a heart icon beside the wordmark, which is not evidence that the fixed logo asset is being used there.
 - [ ] **Visual polish:** verify typography, spacing, gold borders/glows, shadows, token depth, selected/legal-move states, and transitions in rendered screenshots—not only through code.
