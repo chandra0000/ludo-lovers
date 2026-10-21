@@ -67,6 +67,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   int _pawnAnimationGeneration = 0;
   bool _playAgainstAi = false;
   bool _aiThinking = false;
+  bool _soundEnabled = true;
   static const String _humanPlayerId = 'orange';
 
   static const Map<String, Color> _colors = <String, Color>{
@@ -93,14 +94,28 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     super.dispose();
   }
 
+  void _playFeedbackSound({bool important = false}) {
+    if (!_soundEnabled) return;
+    try {
+      unawaited(SystemSound.play(
+        important ? SystemSoundType.alert : SystemSoundType.click,
+      ));
+    } on Object {
+      // Platform feedback sounds are best-effort; gameplay must not depend on audio.
+    }
+  }
+
   void _handleControllerChanged() {
     final previous = _lastObservedState;
     final current = _controller.state;
     _lastObservedState = current;
-    if (previous == null ||
-        _controller.lastMessage?.contains('PawnMoved') != true) {
-      return;
+    final message = _controller.lastMessage ?? '';
+    if (message.contains('DiceRolled')) _playFeedbackSound();
+    if (message.contains('PawnCaptured') || message.contains('PawnFinished') ||
+        message.contains('GameCompleted')) {
+      _playFeedbackSound(important: true);
     }
+    if (previous == null || !message.contains('PawnMoved')) return;
 
     final movingPlayerId = previous.currentPlayerId;
 
@@ -237,19 +252,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         return;
       }
       setState(() => _animatedPawnPoints[newPawn.id] = points[step]);
-      try {
-        unawaited(SystemSound.play(SystemSoundType.click));
-      } on Object {
-        // System sounds are best-effort on platforms that do not expose them.
-      }
+      _playFeedbackSound();
       _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
     }
 
-    try {
-      unawaited(SystemSound.play(SystemSoundType.click));
-    } on Object {
-      // System sounds are best-effort on platforms that do not expose them.
-    }
+    _playFeedbackSound(important: oldPawn.position.section == PawnRouteSection.yard);
     setState(() => _animatedPawnPoints[newPawn.id] = points.first);
     _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
   }
@@ -772,6 +779,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 : null,
             color: _playAgainstAi ? AppTheme.gold : null,
             icon: const Icon(Icons.smart_toy_rounded),
+          ),
+          IconButton(
+            key: const ValueKey('toggle_sound_button'),
+            tooltip: _soundEnabled ? 'Mute sound effects' : 'Enable sound effects',
+            onPressed: () => setState(() => _soundEnabled = !_soundEnabled),
+            color: _soundEnabled ? AppTheme.gold : null,
+            icon: Icon(_soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded),
           ),
           IconButton(
             tooltip: 'How to play',
