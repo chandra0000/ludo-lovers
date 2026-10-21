@@ -15,19 +15,19 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.mainTrack,
-            progress: 49,
+            progress: 51,
           ),
           diceValue: 1,
           sixRequiredToEnter: true,
           requireExactFinishRoll: true,
         );
         expect(lastTrackMove.isSuccess, isTrue, reason: playerId);
-        expect(lastTrackMove.resolution!.position.progress, 50, reason: playerId);
+        expect(lastTrackMove.resolution!.position.progress, 51, reason: playerId);
         expect(lastTrackMove.resolution!.position.section, PawnRouteSection.mainTrack,
             reason: '$playerId should still be on the shared track');
         expect(
           lastTrackMove.resolution!.destinationCell,
-          path.cellAtProgress(50),
+          path.cellAtProgress(51),
           reason: '$playerId must resolve progress through its own route',
         );
 
@@ -42,7 +42,7 @@ void main() {
           requireExactFinishRoll: true,
         );
         expect(laneEntryMove.isSuccess, isTrue, reason: playerId);
-        expect(laneEntryMove.resolution!.position.progress, 51, reason: playerId);
+        expect(laneEntryMove.resolution!.position.progress, 52, reason: playerId);
         expect(laneEntryMove.resolution!.position.section, PawnRouteSection.homeLane,
             reason: '$playerId should turn into its private lane at the branch');
         expect(
@@ -60,7 +60,7 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.homeLane,
-            progress: 55,
+            progress: 56,
           ),
           diceValue: 1,
           sixRequiredToEnter: true,
@@ -73,7 +73,7 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.homeLane,
-            progress: 54,
+            progress: 55,
           ),
           diceValue: 3,
           sixRequiredToEnter: true,
