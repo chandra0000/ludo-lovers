@@ -4,6 +4,17 @@ import 'package:ludo_lovers/app/app.dart';
 import 'package:ludo_lovers/app/theme/app_theme.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+Future<void> _openHome(WidgetTester tester) async {
+  await tester.pumpWidget(const LudoLoversApp());
+  await tester.pump(const Duration(seconds: 3));
+  await tester.pump(const Duration(milliseconds: 400));
+  final skip = find.byKey(const ValueKey('onboarding_skip_button'));
+  if (skip.evaluate().isNotEmpty) {
+    await tester.tap(skip);
+    await tester.pumpAndSettle();
+  }
+}
+
 void main() {
   testWidgets('home navigates to the three local game modes', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
@@ -11,9 +22,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const LudoLoversApp());
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openHome(tester);
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
