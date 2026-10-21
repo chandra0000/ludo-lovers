@@ -8,6 +8,8 @@ import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen
 void main() {
   testWidgets('renders the Ludo Lovers foundation screen', (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('LUDO LOVERS'), findsOneWidget);
     final logo = tester.widget<Image>(
@@ -25,6 +27,8 @@ void main() {
 
   testWidgets('opens the board preview', (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
     await tester.pumpAndSettle();
@@ -60,6 +64,8 @@ void main() {
   testWidgets('board preview exposes route blockers and provisional safe cells',
       (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
     await tester.pumpAndSettle();
@@ -97,6 +103,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
