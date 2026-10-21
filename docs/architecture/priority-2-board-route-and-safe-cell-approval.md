@@ -4,10 +4,10 @@
 
 ## What is now checked automatically
 
-- Exactly 52 unique, in-bounds physical shared-track coordinates, plus a 51-cell player traversal that exits into the home lane before looping over the cell immediately after that player's start.
+- Exactly 52 unique, in-bounds physical shared-track coordinates; each player traverses all 52 cells in order, including the final cell before branching into its own home lane.
 - Every sequential transition, including wraparound, is orthogonally adjacent or one of the four explicitly documented diagonal corner links.
 - Four distinct player entries align with their physical start-marker coordinates.
-- Home lanes have five unique, in-bounds, consecutive cells and do not overlap the shared track or one another; the last traversed track cell connects orthogonally to the first lane cell; the centre finish is a separate position.
+- Home lanes have five unique, in-bounds, consecutive cells and do not overlap the shared track or one another; the last traversed track cell connects to the first lane cell through the approved one-cell orthogonal/diagonal branch; the centre finish is a separate position.
 - The provisional safe-cell profile equals the four player start IDs plus the cell eight track steps after each start.
 - Gameplay readiness remains false while any route or profile check fails.
 
