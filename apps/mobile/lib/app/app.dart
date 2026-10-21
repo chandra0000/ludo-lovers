@@ -4,8 +4,8 @@ import '../features/game/presentation/screens/board_preview_screen.dart';
 import '../features/game/presentation/screens/local_game_screen.dart';
 import '../features/game/domain/engine/local_game_factory.dart';
 import 'theme/app_theme.dart';
-import 'splash_screen.dart';
 import 'onboarding_screen.dart';
+import 'splash_screen.dart';
 
 class LudoLoversApp extends StatelessWidget {
   const LudoLoversApp({super.key});
