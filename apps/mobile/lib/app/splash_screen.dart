@@ -42,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement<void, void>(
       PageRouteBuilder<void>(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            destinationBuilder(context),
+            widget.destinationBuilder(context),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final fade = CurvedAnimation(
             parent: animation,
