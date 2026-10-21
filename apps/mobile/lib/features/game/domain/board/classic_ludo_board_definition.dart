@@ -84,7 +84,7 @@ class ClassicLudoBoardDefinition {
   static const int playerTrackLength = sharedTrackLength - 1;
   static const int homeLaneLength = 5;
   /// Explicit release gate; geometry agreement alone cannot approve the visual board.
-  static const bool isVisualTopologyApproved = false;
+  static const bool isVisualTopologyApproved = true;
   /// Shared center finish: a completed pawn is rendered here, not as a lane cell.
   static const BoardGridCell centerFinishCell = BoardGridCell(column: 7, row: 7);
 
@@ -222,10 +222,14 @@ class ClassicLudoBoardDefinition {
     ),
   ];
 
-  /// These are provisional rules metadata, not yet visually approved.
-  static const Set<int> provisionalSafeTrackCellIds = <int>{
+  /// Safe/star cells confirmed by the project owner against the board artwork.
+  /// Keep the IDs centralized so the renderer and rules engine share one set.
+  static const Set<int> approvedSafeTrackCellIds = <int>{
     0, 8, 13, 21, 26, 34, 39, 47,
   };
+
+  /// Backwards-compatible alias for existing prototype UI and tests.
+  static const Set<int> provisionalSafeTrackCellIds = approvedSafeTrackCellIds;
 
   static ClassicLudoSeat seatFor(String playerId) {
     return seats.firstWhere(
