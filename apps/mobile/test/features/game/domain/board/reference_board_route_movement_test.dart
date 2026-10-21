@@ -37,14 +37,15 @@ void main() {
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final path = paths.forPlayer(seat.id);
         expect(path.mainTrackCells, hasLength(52), reason: seat.id);
-        for (var progress = 0; progress < 50; progress++) {
+        for (var progress = 0; progress < 51; progress++) {
           expect(path.cellAtProgress(progress), (seat.provisionalTrackEntryIndex + progress) % 52, reason: '${seat.id} progress $progress');
           expect(path.cellAtProgress(progress + 1), (seat.provisionalTrackEntryIndex + progress + 1) % 52, reason: '${seat.id} intermediate step ${progress + 1}');
         }
-        expect(path.cellAtProgress(50), (seat.provisionalTrackEntryIndex + 50) % 52, reason: '${seat.id} last shared-track approach');
-        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} first home-lane cell');
+        expect(path.cellAtProgress(50), (seat.provisionalTrackEntryIndex + 50) % 52, reason: '${seat.id} shared-track step 50');
+        expect(path.cellAtProgress(51), (seat.provisionalTrackEntryIndex + 51) % 52, reason: '${seat.id} final shared-track cell');
+        expect(path.cellAtProgress(52), seat.homeLaneStartCellId, reason: '${seat.id} first home-lane cell');
         for (var laneIndex = 0; laneIndex < seat.homeLaneCellIds.length; laneIndex++) {
-          expect(path.cellAtProgress(51 + laneIndex), seat.homeLaneCellIds[laneIndex], reason: '${seat.id} home-lane intermediate step $laneIndex');
+          expect(path.cellAtProgress(52 + laneIndex), seat.homeLaneCellIds[laneIndex], reason: '${seat.id} home-lane intermediate step $laneIndex');
         }
         expect(path.cellAtProgress(path.finishProgress), isNull, reason: 'center finish remains separate from track/lane cells');
       }
@@ -71,7 +72,7 @@ void main() {
         ClassicLudoBoardDefinition.seatFor('blue').homeLaneCells.first,
         const BoardGridCell(column: 7, row: 13),
       );
-      expect(bluePath.cellAtProgress(55), 214);
+      expect(bluePath.cellAtProgress(56), 214);
       expect(bluePath.cellAtProgress(bluePath.finishProgress), isNull);
     });
 
