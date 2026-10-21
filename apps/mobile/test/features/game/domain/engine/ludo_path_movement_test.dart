@@ -69,6 +69,41 @@ void main() {
     expect(result.resolution!.destinationCell, 100);
   });
 
+  test('animation positions visit the track and every home-lane cell in order', () {
+    final positions = movement.positionsBetween(
+      path: path,
+      fromProgress: 6,
+      toProgress: 10,
+    );
+
+    expect(
+      positions.map((position) => (position.section, position.progress)),
+      <(PawnRouteSection, int?)>[
+        (PawnRouteSection.mainTrack, 7),
+        (PawnRouteSection.homeLane, 8),
+        (PawnRouteSection.homeLane, 9),
+        (PawnRouteSection.homeLane, 10),
+      ],
+      reason: 'A pawn must not skip the branch cell or jump to a later lane cell.',
+    );
+    expect(
+      positions.map((position) => path.cellAtProgress(position.progress!)),
+      <int?>[path.mainTrackCells[7], 100, 101, 102],
+    );
+  });
+
+  test('route animation marks the center only after the final lane cell', () {
+    final positions = movement.positionsBetween(
+      path: path,
+      fromProgress: 10,
+      toProgress: path.finishProgress,
+    );
+
+    expect(positions, hasLength(1));
+    expect(positions.single.section, PawnRouteSection.finished);
+    expect(positions.single.progress, path.finishProgress);
+  });
+
   test('exact finish reaches center and marks pawn finished', () {
     final result = movement.resolve(
       path: path,
