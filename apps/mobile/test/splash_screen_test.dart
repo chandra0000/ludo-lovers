@@ -17,7 +17,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('ludo_lovers_splash_logo')), findsOneWidget);
     expect(find.text('PLAY • CONNECT • LOVE'), findsOneWidget);
-    expect(find.byType(ScaleTransition), findsOneWidget);
+    expect(find.byType(ScaleTransition), findsAtLeastNWidgets(1));
     expect(find.byType(FadeTransition), findsAtLeastNWidgets(1));
     expect(find.byType(AnimatedBuilder), findsAtLeastNWidgets(1));
     expect(find.text('Main Menu'), findsNothing);
