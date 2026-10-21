@@ -56,6 +56,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   );
   late final _paths = ClassicLudoBoardFixture.create();
   static const LudoPathMovement _movement = LudoPathMovement();
+  // Captured pawns retrace the route quickly while keeping each cell visible.
+  static const Duration _capturedPawnReturnStepDuration =
+      Duration(milliseconds: 120);
 
   Timer? _aiTimer;
   Timer? _pawnStepTimer;
@@ -316,7 +319,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         }
         setState(() => _animatedPawnPoints[pawnId] = points[step++]);
         _pawnStepTimer = Timer(
-          const Duration(milliseconds: 220),
+          _capturedPawnReturnStepDuration,
           advanceReturnStep,
         );
       }
@@ -328,7 +331,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       setState(() => _animatedPawnPoints[pawnId] = points.first);
       step = 1;
       _pawnStepTimer = Timer(
-        const Duration(milliseconds: 220),
+        _capturedPawnReturnStepDuration,
         advanceReturnStep,
       );
     }
