@@ -2,6 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/app/app.dart';
 
+Future<void> _openHome(WidgetTester tester) async {
+  await tester.pumpWidget(const LudoLoversApp());
+  await tester.pump(const Duration(seconds: 3));
+  await tester.pump(const Duration(milliseconds: 400));
+  final skip = find.byKey(const ValueKey('onboarding_skip_button'));
+  if (skip.evaluate().isNotEmpty) {
+    await tester.tap(skip);
+    await tester.pumpAndSettle();
+  }
+}
+
 void main() {
   testWidgets('home opens the game-mode hub and back returns home', (
     tester,
@@ -11,9 +22,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const LudoLoversApp());
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openHome(tester);
 
     expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
     expect(find.byKey(const ValueKey('local_game_lab_button')), findsOneWidget);
@@ -42,9 +51,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const LudoLoversApp());
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openHome(tester);
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Set up 2-player game'));
@@ -80,9 +87,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const LudoLoversApp());
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openHome(tester);
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
