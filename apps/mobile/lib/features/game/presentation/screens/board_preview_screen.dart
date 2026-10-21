@@ -124,7 +124,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               ],
               const SizedBox(height: 8),
               const Text(
-                'Provisional safe track IDs',
+                'Owner-confirmed safe track IDs',
                 style: TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 4),
@@ -143,7 +143,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'The selected provisional profile models eight safe cells: the four player starts and one star cell eight track steps after each start. Public rules references describe this common pattern, but variants differ and cannot prove this custom board’s exact cell mapping. The four diagonal corner links pass structural checks, but visual approval remains required. Approve a straight-on 15×15 board diagram before enabling release gameplay.',
+                'The owner-confirmed safe-cell map contains eight cells: the four player starts and star cells at IDs 8, 21, 34, and 47. Each player path now traverses all 52 shared-track cells before entering its five-cell home lane. The four shared-loop corner diagonals and four diagonal home-lane branches pass structural checks. A fresh phone screenshot is still required to confirm rendered cell-center alignment before enabling release gameplay.',
                 style: TextStyle(color: AppTheme.mutedText, height: 1.4),
               ),
             ],
@@ -249,7 +249,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.length} invalid transitions · ${ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.length} provisional safe cells',
+                            '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.length} invalid transitions · ${ClassicLudoBoardDefinition.approvedSafeTrackCellIds.length} owner-confirmed safe cells',
                             key: const ValueKey('board_route_gate_counts'),
                             style: const TextStyle(
                               color: AppTheme.cream,
