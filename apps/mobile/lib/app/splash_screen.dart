@@ -7,7 +7,13 @@ import 'theme/app_theme.dart';
 /// Premium launch screen. It replaces itself with the app's main menu so the
 /// Android back button cannot return users to the splash screen.
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key, this.minimumDuration = const Duration(milliseconds: 2500)});
+  const SplashScreen({
+    super.key,
+    required this.destinationBuilder,
+    this.minimumDuration = const Duration(milliseconds: 2500),
+  });
+
+  final WidgetBuilder destinationBuilder;
 
   /// Kept configurable so the transition can be tested without waiting.
   final Duration minimumDuration;
@@ -36,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement<void, void>(
       PageRouteBuilder<void>(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const AppFoundationScreen(),
+            destinationBuilder(context),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final fade = CurvedAnimation(
             parent: animation,
