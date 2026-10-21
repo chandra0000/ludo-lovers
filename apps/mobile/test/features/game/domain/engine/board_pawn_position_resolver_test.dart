@@ -12,7 +12,7 @@ void main() {
       playerId: 'orange',
       mainTrackCells: List<int>.generate(52, (index) => index),
       homeLaneCells: const <int>[200, 201, 202, 203, 204],
-      trackLength: 51,
+      trackLength: 52,
     );
     final greenPath = LudoPlayerPath(
       playerId: 'green',
@@ -106,7 +106,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.homeLane,
-          progress: 51,
+          progress: 52,
         ),
       ),
       200,
@@ -119,7 +119,7 @@ void main() {
           progress: 53,
         ),
       ),
-      222,
+      221,
     );
   });
 
@@ -136,7 +136,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.finished,
-          progress: 56,
+          progress: 57,
         ),
       ),
       isNull,
@@ -172,20 +172,20 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 50,
+          progress: 51,
         ),
       ),
-      50,
+      51,
     );
     expect(
       resolver.cellIdFor(
         playerId: 'green',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 50,
+          progress: 51,
         ),
       ),
-      11,
+      12,
     );
   });
 
