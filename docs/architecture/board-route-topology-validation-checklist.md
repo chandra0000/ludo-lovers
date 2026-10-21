@@ -26,7 +26,7 @@ The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player qu
 - [x] Added an independent 52-coordinate acceptance fixture, explicit entry-direction and home-lane orientation checks, and a cell-center alignment test in `approved_reference_geometry_acceptance_test.dart`.
 - [x] Added a widget rendering test that checks the preview canvas is square and preview pawn markers use canonical track-cell centres; this is automated canvas validation, not on-device visual sign-off.
 - [x] Gameplay readiness remains blocked pending safe-cell visual approval.
-- [ ] CI run #511 failed at `flutter analyze` because the capture acceptance test used `where` where `whereType<PawnCaptured>()` is preferred. The lint is corrected alongside the rendering test; a new full CI run must pass before these additions are considered verified.
+- [x] CI run #512 passed formatting, dependency resolution, Flutter analysis, all automated tests, and Android debug APK build for commit `efe07db5e2de651b1ac2f5b0d8721e388de7ca5f`. This does not constitute visual sign-off or gameplay readiness.
 
 ## Remaining checklist — complete in this order
 
@@ -60,11 +60,11 @@ The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player qu
 - [x] Finish-cell separation and readiness-gate tests.
 - [x] Added independent golden coordinate assertions for all 52 shared-track cells and the four diagonal endpoints.
 - [x] Added entry-direction, exact home-lane orientation, and normalized pawn-center alignment assertions for the square board canvas.
-- [ ] Add/execute an on-device rendering review for all four colored pawns and selected-pawn highlights.
-- [ ] Re-run all board tests and the full Flutter pipeline for the new acceptance-test commit.
+- [ ] Add/execute an on-device rendering review for all four colored pawns and selected-pawn highlights. A fresh full-board Android screenshot is still required.
+- [x] Full Flutter pipeline passed for the prior rendering-test commit (#512); re-run is required after this new end-to-end test commit.
 
 ### 5. Release gate
-- [ ] User approves the board preview against the exact reference.
+- [ ] User approves the board preview against the exact reference; approval is blocked until a fresh Android screenshot is reviewed.
 - [ ] Visual topology approval flag is changed only after that approval.
 - [ ] Gameplay readiness stays false until topology and rules are approved and the integrated local match flow passes.
 - [ ] Confirm the full CI run passes formatting, dependencies, analysis, all tests, Android debug APK build, and artifact upload.
