@@ -63,11 +63,13 @@ void main() {
       expect(bluePath.cellAtProgress(12), 51);
       expect(bluePath.cellAtProgress(13), 0);
 
-      // The final shared-track step approaches Blue's lane at cell 37
-      // (grid coordinate 7,14); the next progress is Blue's first lane cell.
+      // Blue must visit every shared cell: cell 37, then 38 (6,14),
+      // before entering its own lane at progress 52.
       expect(bluePath.cellAtProgress(50), 37);
       expect(track[37], const BoardGridCell(column: 7, row: 14));
-      expect(bluePath.cellAtProgress(51), 210);
+      expect(bluePath.cellAtProgress(51), 38);
+      expect(track[38], const BoardGridCell(column: 6, row: 14));
+      expect(bluePath.cellAtProgress(52), 210);
       expect(
         ClassicLudoBoardDefinition.seatFor('blue').homeLaneCells.first,
         const BoardGridCell(column: 7, row: 13),
@@ -94,7 +96,7 @@ void main() {
           expect(allLaneCells.add(cell), isTrue, reason: 'home lanes overlap at $cell');
           expect(track.contains(cell), isFalse, reason: '${seat.id} lane overlaps shared track');
         }
-        final approachIndex = (seat.provisionalTrackEntryIndex + 50) % 52;
+        final approachIndex = (seat.provisionalTrackEntryIndex + 51) % 52;
         final approach = track[approachIndex];
         final firstLane = lane.first;
         final dx = (approach.column - firstLane.column).abs();
