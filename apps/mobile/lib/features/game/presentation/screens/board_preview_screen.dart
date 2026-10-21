@@ -58,7 +58,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
     final blockers = auditIssues
         .where((issue) => issue.contains('not an approved neighbouring-cell connection'))
         .toList(growable: false);
-    final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
+    final safeCells = ClassicLudoBoardDefinition.approvedSafeTrackCellIds
         .toList()
       ..sort();
 
