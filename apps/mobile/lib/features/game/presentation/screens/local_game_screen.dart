@@ -620,6 +620,70 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     );
   }
 
+  Future<void> _confirmRestart() async {
+    final shouldRestart = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.panel,
+        title: const Text('Restart this match?'),
+        content: const Text(
+          'The current local match will be reset and all pawn progress will be lost.',
+          style: TextStyle(color: AppTheme.readableText),
+        ),
+        actions: <Widget>[
+          TextButton(
+            key: const ValueKey('cancel_restart_button'),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Keep playing'),
+          ),
+          ElevatedButton(
+            key: const ValueKey('confirm_restart_button'),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Restart match'),
+          ),
+        ],
+      ),
+    );
+    if (shouldRestart == true && mounted) {
+      _controller.reset();
+      _showLocalActionNotice('A new local match has started.');
+    }
+  }
+
+  Future<void> _confirmLeave() async {
+    final shouldLeave = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.panel,
+        title: const Text('Leave this match?'),
+        content: const Text(
+          'Your current local match will end. You can start a new match from the home screen.',
+          style: TextStyle(color: AppTheme.readableText),
+        ),
+        actions: <Widget>[
+          TextButton(
+            key: const ValueKey('cancel_leave_match_button'),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Stay in match'),
+          ),
+          ElevatedButton(
+            key: const ValueKey('confirm_leave_match_button'),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Leave match'),
+          ),
+        ],
+      ),
+    );
+    if (shouldLeave == true && mounted) {
+      _aiTimer?.cancel();
+      _aiTimer = null;
+      _pawnStepTimer?.cancel();
+      _pawnStepTimer = null;
+      _pawnAnimationGeneration++;
+      Navigator.of(context).pop();
+    }
+  }
+
   void _showRules() {
     showModalBottomSheet<void>(
       context: context,
@@ -793,8 +857,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             icon: const Icon(Icons.help_outline_rounded),
           ),
           IconButton(
+            key: const ValueKey('leave_match_button'),
+            tooltip: 'Leave match',
+            onPressed: _confirmLeave,
+            icon: const Icon(Icons.exit_to_app_rounded),
+          ),
+          IconButton(
+            key: const ValueKey('restart_match_button'),
             tooltip: 'Restart match',
-            onPressed: _controller.reset,
+            onPressed: _confirmRestart,
             icon: const Icon(Icons.restart_alt_rounded),
           ),
         ],
