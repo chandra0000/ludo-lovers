@@ -7,7 +7,7 @@ void main() {
     final paths = ClassicLudoBoardFixture.create();
     const movement = LudoPathMovement();
 
-    test('each seat exits the shared track at its adjacent home-lane branch', () {
+    test('each seat traverses the final shared cell before entering its lane', () {
       for (final playerId in paths.pathsByPlayer.keys) {
         final path = paths.forPlayer(playerId);
 
@@ -15,7 +15,7 @@ void main() {
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.mainTrack,
-            progress: 51,
+            progress: 50,
           ),
           diceValue: 1,
           sixRequiredToEnter: true,
@@ -28,14 +28,14 @@ void main() {
         expect(
           lastTrackMove.resolution!.destinationCell,
           path.cellAtProgress(51),
-          reason: '$playerId must resolve progress through its own route',
+          reason: '$playerId must visit the final physical shared cell',
         );
 
         final laneEntryMove = movement.resolve(
           path: path,
           current: const PawnRoutePosition(
             section: PawnRouteSection.mainTrack,
-            progress: 50,
+            progress: 51,
           ),
           diceValue: 1,
           sixRequiredToEnter: true,
