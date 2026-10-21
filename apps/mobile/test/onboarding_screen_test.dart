@@ -6,7 +6,13 @@ import 'package:ludo_lovers/app/app.dart';
 void main() {
   testWidgets('onboarding shows the first introduction and skip opens home',
       (tester) async {
-    await tester.pumpWidget(MaterialApp(home: OnboardingScreen(destinationBuilder: (_) => const AppFoundationScreen())));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: OnboardingScreen(
+          destinationBuilder: (_) => const AppFoundationScreen(),
+        ),
+      ),
+    );
 
     expect(find.text('WELCOME TO YOUR GAME NIGHT'), findsOneWidget);
     expect(find.text('Play your way.\nStay connected.'), findsOneWidget);
@@ -21,7 +27,13 @@ void main() {
 
   testWidgets('onboarding next advances through the slides to get started',
       (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: OnboardingScreen()));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: OnboardingScreen(
+          destinationBuilder: (_) => const AppFoundationScreen(),
+        ),
+      ),
+    );
 
     final next = find.byKey(const ValueKey('onboarding_continue_button'));
     expect(find.text('Next'), findsOneWidget);
