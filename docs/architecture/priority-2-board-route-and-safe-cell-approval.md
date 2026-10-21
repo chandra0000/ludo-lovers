@@ -15,7 +15,7 @@
 
 ### Route branch correction: implemented structurally
 
-The earlier fixture incorrectly treated all 52 physical loop cells as traversable before entering the home lane. That made the lane entry jump diagonally from the last loop cell to the first lane cell and caused each pawn to pass the branch instead of turning into its lane. The route model now keeps all 52 physical IDs for shared-cell/capture validation but defines 51 traversed shared-track positions per player. The last traversed cells are Orange 50 at (0,7), Green 11 at (7,0), Blue 37 at (7,14), and Magenta 24 at (14,7); each is orthogonally adjacent to its first home-lane cell. The five lane cells and separate centre finish are preserved. This is a structural correction only; artwork/safe-square approval remains blocked.
+The earlier fixture traversed only 51 of the 52 physical shared-track cells, skipping the cell immediately before each player's start marker. That caused pawns—especially Blue—to turn into their home lane one step too early. The route model now traverses all 52 physical cells before entering the five-cell home lane. Final shared cells are Orange 51 at (0,6), Green 12 at (8,0), Blue 38 at (6,14), and Magenta 25 at (14,8). Each joins its first private-lane cell through a one-cell diagonal branch: Orange to (1,7), Green to (7,1), Blue to (7,13), and Magenta to (13,7). The five lane cells and separate centre finish are preserved.
 
 ### Diagonal corner decision: accepted as explicit connectors in the provisional trace
 
@@ -30,9 +30,9 @@ For the current 15×15 coordinate trace, the four non-orthogonal links are **for
 
 The test suite locks these exact endpoints and requires every other sequential transition to be orthogonally adjacent. This is a **structural decision for the current provisional route**, not a claim that the artwork has been visually approved. If the straight-on reference contradicts a connector, update the canonical definition and its fixtures together rather than adding a renderer-only workaround.
 
-The canonical contract is: 52 physical shared cells; 51 traversed shared-track positions per player's route (entry offsets Orange 0, Green 13, Blue 39, Magenta 26, exiting at the cell immediately before the start marker); five private home-lane cells per seat; a separate centre finish at grid cell (7,7); and provisional safe IDs {0, 8, 13, 21, 26, 34, 39, 47}. Each lane branch must connect orthogonally from the last traversed shared cell to the first home-lane cell. Automated checks now assert that the coordinate factory, player-path fixture, entry markers, home lanes and default rule profile agree on these values. The safe-cell pattern remains a provisional rules hypothesis until the printed start/star squares are verified against the final artwork.
+The canonical contract is: 52 physical shared cells traversed once per player's route (entry offsets Orange 0, Green 13, Blue 39, Magenta 26); five private home-lane cells per seat; a separate centre finish at grid cell (7,7); and owner-confirmed safe IDs {0, 8, 13, 21, 26, 34, 39, 47}. The four shared-loop corner diagonals and four diagonal track-to-lane joins are explicitly audited. Automated checks assert that the coordinate factory, player-path fixture, entry markers, home lanes and current local rules profile agree on these values. The safe-cell positions are owner-confirmed; formal competitive rules and on-device visual alignment remain separate approval gates.
 
-**Gameplay remains blocked.** The current straight-on board reference is not sufficiently legible in the available context to approve the physical cell order or safe-square markings. Do not set `isVisualTopologyApproved` to true or enable `isGameplayReady` based only on passing structural tests.
+**Gameplay remains blocked.** Structural route validation is now implemented, but a fresh Android screenshot has not been visually reviewed against the board reference. Do not set `isVisualTopologyApproved` to true or enable `isGameplayReady` based only on passing structural tests.
 
 The safe-square pattern is based on a common Ludo variant in which each start square and a star square eight track steps later are safe. Rules vary by board and implementation; the source links below are supporting references, not authority for the custom Ludo Lovers board.
 
@@ -49,9 +49,9 @@ These references do not establish the exact route order for the Ludo Lovers boar
 - [ ] Approve the board image and selected rules variant.
 - [ ] Trace all 52 shared cells in movement order from that image.
 - [ ] Verify all four entry cells, their clockwise order, and home-lane transitions.
-- [ ] Verify safe-cell IDs against the printed stars and start cells.
-- [ ] Add explicit route fixtures/tests for every transition and all four player-relative paths, including each track-to-home-lane branch.
-- [ ] Reconcile the local-engine fixture with the approved physical route.
+- [x] Record owner-confirmed safe-cell IDs: 0, 8, 13, 21, 26, 34, 39, 47.
+- [x] Add explicit route fixtures/tests for all 52 cells, every shared transition, all four player-relative paths, and each track-to-home-lane branch.
+- [x] Reconcile local player-relative paths with the canonical 52-cell physical route.
 - [ ] Run analysis, unit/widget tests, and Android debug build.
 - [ ] Manually inspect the rendered board and play a complete local match on Android.
 - [ ] Only then consider setting gameplay readiness to true.
