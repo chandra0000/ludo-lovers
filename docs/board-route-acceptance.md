@@ -33,11 +33,11 @@ Do not simply remove these diagnostics or mark the route ready. The listed trans
 - [ ] Confirm the shared-track order clockwise or counter-clockwise, including all four corners.
 - [ ] Confirm the exact entry/start cell and direction for orange, green, blue, and magenta.
 - [ ] Confirm each private home lane's five physical cells and the separate centre finish position.
-- [ ] Confirm all safe cells against the same reference and the chosen written rules profile.
+- [x] Safe/star cell IDs confirmed by the project owner: 0, 8, 13, 21, 26, 34, 39, 47. Keep rule semantics local-prototype-only until the rules profile is formally locked.
 - [ ] Verify the shared track has exactly 52 unique cells, all inside the 15×15 grid.
 - [ ] Verify every consecutive shared-track pair, including index 51 back to 0, is either orthogonally adjacent or one of the four explicitly validated diagonal corner connections.
 - [ ] Verify home lanes do not overlap the shared track or one another and connect to their intended final route cell.
-- [ ] Verify each player-relative path is a rotation of the same shared physical track and enters the correct private lane.
+- [ ] Verify each player-relative path traverses all 52 physical shared cells exactly once in route order, then enters the correct private lane at progress 52.
 - [ ] Run board geometry, route mapping, movement, safe-cell, capture, finish, and board-backed widget acceptance tests.
 - [ ] Review any intentional rule differences (safe squares, capture stacks, six bonus, exact finish) and document the selected rule profile.
 - [ ] Only after all evidence and tests agree, deliberately update the release gate and its tests.
