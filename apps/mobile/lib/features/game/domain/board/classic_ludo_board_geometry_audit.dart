@@ -1,5 +1,6 @@
 import 'classic_ludo_board_coordinate_factory.dart';
 import 'classic_ludo_board_definition.dart';
+import 'classic_ludo_board_fixture.dart';
 
 /// Structural audit for the provisional classic-board fixture.
 ///
@@ -177,8 +178,54 @@ class ClassicLudoBoardGeometryAudit {
       );
     }
 
+    // Audit the player-relative movement paths as well as the physical grid.
+    // A valid 52-cell drawing is insufficient if a pawn branches into its lane
+    // one step early and silently skips the final physical shared cell.
+    try {
+      final paths = ClassicLudoBoardFixture.create();
+      const expectedEntryIndexes = <String, int>{
+        'orange': 0,
+        'green': 13,
+        'magenta': 26,
+        'blue': 39,
+      };
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = paths.forPlayer(seat.id);
+        if (path.trackLength != track.length ||
+            path.mainTrackCells.length != track.length) {
+          issues.add(
+            '${seat.id} must traverse all ${track.length} shared-track cells '
+            'before entering its home lane.',
+          );
+          continue;
+        }
+        if (seat.provisionalTrackEntryIndex != expectedEntryIndexes[seat.id]) {
+          issues.add('${seat.id} entry index does not match the canonical 13-cell seat rotation.');
+        }
+        for (var progress = 0; progress < track.length; progress++) {
+          final expectedCell =
+              (seat.provisionalTrackEntryIndex + progress) % track.length;
+          if (path.cellAtProgress(progress) != expectedCell) {
+            issues.add(
+              '${seat.id} progress $progress must map to physical track cell '
+              '$expectedCell, not ${path.cellAtProgress(progress)}.',
+            );
+            break;
+          }
+        }
+        if (path.cellAtProgress(track.length) != seat.homeLaneStartCellId) {
+          issues.add('${seat.id} must enter its own home lane immediately after all shared cells.');
+        }
+        if (path.cellAtProgress(path.finishProgress) != null) {
+          issues.add('${seat.id} finish must remain separate from numbered track/lane cells.');
+        }
+      }
+    } on Object catch (error) {
+      issues.add('Player route fixture could not be validated: $error');
+    }
+
     if (ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.isNotEmpty) {
-      issues.add('Shared track contains invalid transitions outside the four documented diagonal corners.');
+      issues.add('Shared track contains invalid transitions outside the four documented diagonal corner links.');
     }
 
     return List<String>.unmodifiable(issues);
