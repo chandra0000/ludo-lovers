@@ -144,7 +144,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             final progress = capturedPawn.position.progress;
             if (progress != null &&
                 capturedPawn.position.section == PawnRouteSection.mainTrack) {
-              final capturedPath = _paths.forPlayer(capturedPawn.playerId);
               final returnPoints = <BoardPoint>[];
               for (var reverseProgress = progress - 1;
                   reverseProgress >= 0;
