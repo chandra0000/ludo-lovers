@@ -54,10 +54,9 @@ class LudoPlayerPath {
   int get homeLaneLength => homeLaneCells.length;
 
   /// Returns a global board cell for a player-relative distance from entry.
-  /// Distances 0..trackLength-1 traverse the shared loop up to the home-lane
-  /// branch; subsequent distances address the private lane. An extra physical
-  /// loop cell may remain in [mainTrackCells] for shared-cell validation but
-  /// is not traversed by this player. The center finish is not a track cell.
+  /// Distances 0..trackLength-1 traverse every shared-loop cell in order;
+  /// subsequent distances address the private home lane. The center finish
+  /// is not a track cell.
   int? cellAtProgress(int progress) {
     if (progress < 0) {
       throw ArgumentError.value(progress, 'progress', 'Must not be negative.');
