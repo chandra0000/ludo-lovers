@@ -69,6 +69,14 @@ The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player qu
 - [ ] Gameplay readiness stays false until topology and rules are approved and the integrated local match flow passes.
 - [ ] Confirm the full CI run passes formatting, dependencies, analysis, all tests, Android debug APK build, and artifact upload.
 
+## Turn order and local sound feedback
+
+- [x] Canonical player/turn sequence is Orange → Green → Magenta → Blue; a deterministic engine test covers no-move turn rotation.
+- [x] Local match screen provides best-effort platform sound feedback for dice rolls, each animated pawn step, pawn entry from the yard, capture, finish, and match completion.
+- [x] Sound effects can be muted/unmuted from the match app bar without changing game state.
+- [ ] Verify sound playback on a physical Android device. Platform click/alert sounds are used as a safe initial implementation; dedicated authored audio assets are not yet included.
+- [ ] Re-run and confirm the full Flutter/Android CI pipeline for the current commits.
+
 ## Board-related test files
 
 - `apps/mobile/test/features/game/domain/board/approved_reference_geometry_acceptance_test.dart`
