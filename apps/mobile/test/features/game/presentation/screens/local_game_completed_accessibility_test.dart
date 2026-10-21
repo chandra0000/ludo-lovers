@@ -19,7 +19,7 @@ void main() {
       pawns: setup.initialState.pawns
           .map(
             (pawn) => pawn.copyWith(
-              position: const PawnRoutePosition(
+              position: PawnRoutePosition(
                 section: PawnRouteSection.finished,
                 progress: setup.paths.forPlayer(pawn.playerId).finishProgress,
               ),
