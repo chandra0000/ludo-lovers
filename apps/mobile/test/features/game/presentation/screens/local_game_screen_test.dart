@@ -1179,7 +1179,7 @@ void main() {
     expect(find.text('BLUE · track entry 39'), findsOneWidget);
     expect(find.text('MAGENTA · track entry 26'), findsOneWidget);
     expect(
-      find.text('Provisional safe-cell IDs: 0, 8, 13, 21, 26, 34, 39, 47'),
+      find.text('Owner-confirmed safe-cell IDs: 0, 8, 13, 21, 26, 34, 39, 47'),
       findsOneWidget,
     );
     for (final transition in <String>[
