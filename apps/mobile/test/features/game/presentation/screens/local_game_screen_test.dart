@@ -1517,4 +1517,74 @@ void main() {
   });
 
 
+
+  testWidgets('restart requires confirmation and can be cancelled', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    final originalVersion = controller.state.version;
+    await tester.tap(find.byKey(const ValueKey('restart_match_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Restart this match?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('cancel_restart_button')));
+    await tester.pumpAndSettle();
+    expect(controller.state.version, originalVersion);
+
+    await tester.tap(find.byKey(const ValueKey('restart_match_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirm_restart_button')));
+    await tester.pumpAndSettle();
+    expect(controller.state.version, greaterThan(originalVersion));
+    expect(controller.state.completed, isFalse);
+  });
+
+  testWidgets('leaving a local match requires explicit confirmation', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: const Scaffold(body: Text('Home destination')),
+      ),
+    );
+    await tester.tap(find.text('Home destination'));
+    await tester.pumpAndSettle();
+    Navigator.of(tester.element(find.text('Home destination'))).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LocalGameScreen(controller: controller),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('leave_match_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave this match?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('cancel_leave_match_button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('leave_match_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirm_leave_match_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Home destination'), findsOneWidget);
+    expect(find.byKey(const ValueKey('local_game_board')), findsNothing);
+  });
+
 }
