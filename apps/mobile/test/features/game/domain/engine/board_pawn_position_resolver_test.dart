@@ -47,9 +47,9 @@ void main() {
     for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
       final path = resolver.paths.forPlayer(playerId);
       expect(path.homeLaneLength, 5, reason: playerId);
-      expect(path.finishProgress, 56, reason: playerId);
-      expect(path.cellAtProgress(55), path.homeLaneCells.last, reason: playerId);
-      expect(path.cellAtProgress(56), isNull, reason: playerId);
+      expect(path.finishProgress, 57, reason: playerId);
+      expect(path.cellAtProgress(56), path.homeLaneCells.last, reason: playerId);
+      expect(path.cellAtProgress(57), isNull, reason: playerId);
     }
   });
 
