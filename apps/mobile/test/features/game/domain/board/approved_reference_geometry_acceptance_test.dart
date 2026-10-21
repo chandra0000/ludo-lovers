@@ -5,8 +5,9 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixtur
 
 void main() {
   group('Approved-reference geometry acceptance contract', () {
-    // Independent golden coordinates transcribed from the supplied straight-on
-    // Ludo Lovers board reference. Keep this list independent of the definition.
+    // Independent golden coordinates for the route reviewed against the supplied
+    // board mockup. This locks coordinate drift; on-device visual sign-off is
+    // still required because the artwork is stylized rather than cell-annotated.
     const expectedTrack = <BoardGridCell>[
       BoardGridCell(column: 1, row: 6),
       BoardGridCell(column: 2, row: 6),
