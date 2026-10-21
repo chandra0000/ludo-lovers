@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'app.dart';
 import 'theme/app_theme.dart';
 
 /// First-run introduction for the Ludo Lovers local alpha.
@@ -8,7 +7,9 @@ import 'theme/app_theme.dart';
 /// Account providers are intentionally not presented as working until a real
 /// authentication flow is connected.
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, required this.destinationBuilder});
+
+  final WidgetBuilder destinationBuilder;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -64,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _enterApp() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (_) => const AppFoundationScreen()),
+      MaterialPageRoute<void>(builder: widget.destinationBuilder),
     );
   }
 
