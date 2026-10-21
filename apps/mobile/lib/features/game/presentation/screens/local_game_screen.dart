@@ -884,24 +884,26 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       appBar: AppBar(
         title: const Text('Ludo Lovers · Match'),
         actions: <Widget>[
-          IconButton(
-            key: const ValueKey('player_setup_button'),
-            tooltip: 'Choose two player colours',
-            onPressed: _showPlayerSetup,
-            icon: const Icon(Icons.people_alt_rounded),
-          ),
-          IconButton(
-            key: const ValueKey('toggle_ai_button'),
-            tooltip: _playAgainstAi ? 'Disable AI opponents' : 'Play against AI',
-            onPressed: _controller.state.players.length == 4 &&
-                    _controller.state.players.every(
-                      (playerId) => LocalGameFactory.playerIds.contains(playerId),
-                    )
-                ? _toggleAiMode
-                : null,
-            color: _playAgainstAi ? AppTheme.gold : null,
-            icon: const Icon(Icons.smart_toy_rounded),
-          ),
+          if (MediaQuery.sizeOf(context).width >= 420) ...<Widget>[
+            IconButton(
+              key: const ValueKey('player_setup_button'),
+              tooltip: 'Choose two player colours',
+              onPressed: _showPlayerSetup,
+              icon: const Icon(Icons.people_alt_rounded),
+            ),
+            IconButton(
+              key: const ValueKey('toggle_ai_button'),
+              tooltip: _playAgainstAi ? 'Disable AI opponents' : 'Play against AI',
+              onPressed: _controller.state.players.length == 4 &&
+                      _controller.state.players.every(
+                        (playerId) => LocalGameFactory.playerIds.contains(playerId),
+                      )
+                  ? _toggleAiMode
+                  : null,
+              color: _playAgainstAi ? AppTheme.gold : null,
+              icon: const Icon(Icons.smart_toy_rounded),
+            ),
+          ],
           IconButton(
             key: const ValueKey('toggle_sound_button'),
             tooltip: _soundEnabled ? 'Mute sound effects' : 'Enable sound effects',
@@ -909,12 +911,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             color: _soundEnabled ? AppTheme.gold : null,
             icon: Icon(_soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded),
           ),
-          IconButton(
-            key: const ValueKey('pause_match_button'),
-            tooltip: 'Pause match',
-            onPressed: _showPauseMenu,
-            icon: const Icon(Icons.pause_circle_outline_rounded),
-          ),
+          if (MediaQuery.sizeOf(context).width >= 420)
+            IconButton(
+              key: const ValueKey('pause_match_button'),
+              tooltip: 'Pause match',
+              onPressed: _showPauseMenu,
+              icon: const Icon(Icons.pause_circle_outline_rounded),
+            ),
           IconButton(
             tooltip: 'How to play',
             onPressed: _showRules,
@@ -932,8 +935,43 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             onPressed: _confirmRestart,
             icon: const Icon(Icons.restart_alt_rounded),
           ),
-        ],
-      ),
+          if (MediaQuery.sizeOf(context).width < 420)
+            PopupMenuButton<String>(
+              key: const ValueKey('match_more_actions_button'),
+              tooltip: 'More match actions',
+              onSelected: (action) {
+                switch (action) {
+                  case 'players':
+                    _showPlayerSetup();
+                    break;
+                  case 'ai':
+                    _toggleAiMode();
+                    break;
+                  case 'pause':
+                    _showPauseMenu();
+                    break;
+                }
+              },
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'players',
+                  child: Text('Choose player colours'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'ai',
+                  enabled: _controller.state.players.length == 4 &&
+                      _controller.state.players.every(
+                        (playerId) => LocalGameFactory.playerIds.contains(playerId),
+                      ),
+                  child: Text(_playAgainstAi ? 'Disable AI opponents' : 'Play against AI'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'pause',
+                  child: Text('Pause match'),
+                ),
+              ],
+            ),
+        ],      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
