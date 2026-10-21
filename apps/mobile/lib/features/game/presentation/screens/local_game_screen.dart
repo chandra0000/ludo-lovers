@@ -791,7 +791,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               const _RuleRow(
                 number: '5',
                 title: 'Prototype warning',
-                detail: 'The board route and safe-cell positions are still provisional. This guide describes the current local test rules, not approved online or competitive rules.',
+                detail: 'The owner-confirmed safe/star positions are fixed. The complete board route still requires on-device visual review. This guide describes the current local test rules, not approved online or competitive rules.',
               ),
               const SizedBox(height: 16),
               Text(
@@ -856,7 +856,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 ),
               const SizedBox(height: 6),
               Text(
-                'Provisional safe-cell IDs: ${(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.toList()..sort()).join(', ')}',
+                'Owner-confirmed safe-cell IDs: ${(ClassicLudoBoardDefinition.approvedSafeTrackCellIds.toList()..sort()).join(', ')}',
                 key: const ValueKey('provisional_safe_cell_ids'),
                 style: const TextStyle(
                   color: AppTheme.readableText,
