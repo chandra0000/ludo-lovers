@@ -6,7 +6,7 @@ import 'package:ludo_lovers/app/app.dart';
 void main() {
   testWidgets('onboarding shows the first introduction and skip opens home',
       (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: OnboardingScreen()));
+    await tester.pumpWidget(MaterialApp(home: OnboardingScreen(destinationBuilder: (_) => const AppFoundationScreen())));
 
     expect(find.text('WELCOME TO YOUR GAME NIGHT'), findsOneWidget);
     expect(find.text('Play your way.\nStay connected.'), findsOneWidget);
