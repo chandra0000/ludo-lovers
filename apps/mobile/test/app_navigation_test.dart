@@ -12,6 +12,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
     expect(find.byKey(const ValueKey('local_game_lab_button')), findsOneWidget);
@@ -41,6 +43,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Set up 2-player game'));
@@ -77,6 +81,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const LudoLoversApp());
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
     await tester.pumpAndSettle();
 
