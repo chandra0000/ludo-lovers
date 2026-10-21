@@ -53,6 +53,42 @@ class PawnMoveResult {
 class LudoPathMovement {
   const LudoPathMovement();
 
+  /// Returns every logical position between two accepted progress values.
+  ///
+  /// This is used by the presentation layer to animate one cell at a time,
+  /// including the shared-track-to-home-lane transition. Home-lane progress is
+  /// never inferred from the destination alone: each lane cell is visited in
+  /// the exact order supplied by the player's route.
+  List<PawnRoutePosition> positionsBetween({
+    required LudoPlayerPath path,
+    required int fromProgress,
+    required int toProgress,
+  }) {
+    if (fromProgress < 0 || toProgress < fromProgress ||
+        toProgress > path.finishProgress) {
+      throw ArgumentError('Progress range must be forward and within the route.');
+    }
+    return List<PawnRoutePosition>.generate(
+      toProgress - fromProgress,
+      (index) {
+        final progress = fromProgress + index + 1;
+        if (progress == path.finishProgress) {
+          return PawnRoutePosition(
+            section: PawnRouteSection.finished,
+            progress: path.finishProgress,
+          );
+        }
+        return PawnRoutePosition(
+          section: progress < path.trackLength
+              ? PawnRouteSection.mainTrack
+              : PawnRouteSection.homeLane,
+          progress: progress,
+        );
+      },
+      growable: false,
+    );
+  }
+
   PawnMoveResult resolve({
     required LudoPlayerPath path,
     required PawnRoutePosition current,
