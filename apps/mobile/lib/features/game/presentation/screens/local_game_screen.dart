@@ -694,7 +694,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       _pawnStepTimer?.cancel();
       _pawnStepTimer = null;
       _pawnAnimationGeneration++;
-      Navigator.of(context).pop();
+      _capturedPawnVisualsByMover.clear();
+      _capturedPawnReturnPointsByMover.clear();
+      _animatedPawnPoints.clear();
+      // Return to the app home, not an intermediate setup screen.
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -991,6 +995,23 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 final isAiTurn =
                     _playAgainstAi && current != _humanPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
+                final standings = List<String>.of(state.players)
+                  ..sort((left, right) {
+                    int finishedCount(String playerId) => state.pawns
+                        .where((pawn) =>
+                            pawn.playerId == playerId &&
+                            pawn.position.section == PawnRouteSection.finished)
+                        .length;
+                    int pawnsOnBoard(String playerId) => state.pawns
+                        .where((pawn) =>
+                            pawn.playerId == playerId &&
+                            pawn.position.section != PawnRouteSection.yard)
+                        .length;
+                    final finishedOrder =
+                        finishedCount(right).compareTo(finishedCount(left));
+                    if (finishedOrder != 0) return finishedOrder;
+                    return pawnsOnBoard(right).compareTo(pawnsOnBoard(left));
+                  });
                 final visuals = _visuals(state.pawns);
                 final actionFeedback = _friendlyActionFeedback(state);
                 return SingleChildScrollView(
@@ -1244,6 +1265,107 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 key: ValueKey('match_finish_banner_hidden'),
                               ),
                       ),
+                      if (state.completed) ...<Widget>[
+                        const SizedBox(height: 8),
+                        Container(
+                          key: const ValueKey('match_standings_panel'),
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.panel,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppTheme.gold.withValues(alpha: 0.38),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Text(
+                                'MATCH STANDINGS',
+                                style: TextStyle(
+                                  color: AppTheme.gold,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              for (var index = 0; index < standings.length; index++)
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: index == standings.length - 1 ? 0 : 7,
+                                  ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        width: 30,
+                                        child: Text(
+                                          '#${index + 1}',
+                                          style: const TextStyle(
+                                            color: AppTheme.gold,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 9,
+                                        height: 9,
+                                        decoration: BoxDecoration(
+                                          color: _colors[standings[index]] ?? AppTheme.cream,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          standings[index].toUpperCase() ==
+                                                  state.winnerPlayerId?.toUpperCase()
+                                              ? '${standings[index].toUpperCase()} · WINNER'
+                                              : standings[index].toUpperCase(),
+                                          style: const TextStyle(
+                                            color: AppTheme.readableText,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${state.pawns.where((pawn) => pawn.playerId == standings[index] && pawn.position.section == PawnRouteSection.finished).length}/4 home',
+                                        style: const TextStyle(
+                                          color: AppTheme.mutedText,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      key: const ValueKey('results_home_button'),
+                                      onPressed: () => Navigator.of(context)
+                                          .popUntil((route) => route.isFirst),
+                                      icon: const Icon(Icons.home_rounded),
+                                      label: const Text('Home'),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      key: const ValueKey('results_rematch_button'),
+                                      onPressed: _controller.reset,
+                                      icon: const Icon(Icons.replay_rounded),
+                                      label: const Text('Rematch'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 6),
                       Row(
                         children: <Widget>[
