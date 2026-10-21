@@ -144,27 +144,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             final progress = capturedPawn.position.progress;
             if (progress != null &&
                 capturedPawn.position.section == PawnRouteSection.mainTrack) {
-              final returnPoints = <BoardPoint>[];
-              for (var reverseProgress = progress - 1;
-                  reverseProgress >= 0;
-                  reverseProgress--) {
-                returnPoints.add(_pawnLayout.resolve(
-                  playerId: capturedPawn.playerId,
-                  pawnId: capturedPawn.id,
-                  position: PawnRoutePosition(
-                    section: PawnRouteSection.mainTrack,
-                    progress: reverseProgress,
-                  ),
-                  yardSlot: _yardSlotForPawn(previous.pawns, capturedPawn),
-                ).point);
-              }
-              final yardPoint = _pawnLayout.resolve(
+              final returnPoints = _movement.positionsBackToYard(
+                path: _paths.forPlayer(capturedPawn.playerId),
+                fromProgress: progress,
+              ).map((position) => _pawnLayout.resolve(
                 playerId: capturedPawn.playerId,
                 pawnId: capturedPawn.id,
-                position: const PawnRoutePosition(section: PawnRouteSection.yard),
+                position: position,
                 yardSlot: _yardSlotForPawn(previous.pawns, capturedPawn),
-              ).point;
-              returnPoints.add(yardPoint);
+              ).point).toList(growable: false);
               returnPointsByPawn[capturedPawnId] = returnPoints;
             }
           }
