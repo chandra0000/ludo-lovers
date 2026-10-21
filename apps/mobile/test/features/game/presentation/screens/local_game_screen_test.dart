@@ -1590,4 +1590,36 @@ void main() {
     expect(find.byKey(const ValueKey('local_game_board')), findsNothing);
   });
 
+
+  testWidgets('pause menu freezes the match until the player resumes', (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    final versionBeforePause = controller.state.version;
+    await tester.tap(find.byKey(const ValueKey('pause_match_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('match_paused_dialog')), findsOneWidget);
+    expect(find.byKey(const ValueKey('resume_match_button')), findsOneWidget);
+    expect(controller.state.version, versionBeforePause);
+
+    await tester.tap(find.byKey(const ValueKey('resume_match_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('match_paused_dialog')), findsNothing);
+    expect(controller.state.version, versionBeforePause);
+    expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+  });
+
 }
