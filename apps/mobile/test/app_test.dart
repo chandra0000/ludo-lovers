@@ -137,7 +137,7 @@ void main() {
     expect(find.text('Roll the dice'), findsOneWidget);
     expect(find.text('Choose a glowing pawn'), findsOneWidget);
     expect(find.text('Prototype warning'), findsOneWidget);
-    expect(find.textContaining('still provisional'), findsOneWidget);
+    expect(find.textContaining('on-device visual review'), findsOneWidget);
   });
 
   testWidgets('local match rolls, moves a legal pawn, and updates the board',
