@@ -971,7 +971,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 ),
               ],
             ),
-        ],      ),
+        ],
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
