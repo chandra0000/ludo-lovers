@@ -214,7 +214,10 @@ void main() {
 
     final versionBeforeRestart = controller.state.version;
     await tester.tap(find.byTooltip('Restart match'));
-    await tester.pump();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('confirm_restart_button')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('confirm_restart_button')));
+    await tester.pumpAndSettle();
 
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
