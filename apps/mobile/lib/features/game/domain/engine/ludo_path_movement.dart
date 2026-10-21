@@ -89,6 +89,30 @@ class LudoPathMovement {
     );
   }
 
+  /// Returns the captured pawn's reverse path, excluding its current cell,
+  /// then a final yard position. The renderer can animate these positions one
+  /// at a time rather than teleporting the pawn directly into its yard.
+  List<PawnRoutePosition> positionsBackToYard({
+    required LudoPlayerPath path,
+    required int fromProgress,
+  }) {
+    if (fromProgress < 0 || fromProgress >= path.trackLength) {
+      throw ArgumentError.value(
+        fromProgress,
+        'fromProgress',
+        'A captured pawn must be on the shared track.',
+      );
+    }
+    return <PawnRoutePosition>[
+      for (var progress = fromProgress - 1; progress >= 0; progress--)
+        PawnRoutePosition(
+          section: PawnRouteSection.mainTrack,
+          progress: progress,
+        ),
+      const PawnRoutePosition(section: PawnRouteSection.yard),
+    ];
+  }
+
   PawnMoveResult resolve({
     required LudoPlayerPath path,
     required PawnRoutePosition current,
