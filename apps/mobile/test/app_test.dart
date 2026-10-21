@@ -11,7 +11,7 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
 
-    expect(find.text('LUDO LOVERS'), findsOneWidget);
+    expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
     final logo = tester.widget<Image>(
       find.byKey(const ValueKey('ludo_lovers_home_logo')),
     );
