@@ -1062,7 +1062,6 @@ void main() {
     expect(find.text('ORANGE · WINNER'), findsOneWidget);
     expect(find.byKey(const ValueKey('results_home_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
-    expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsNothing);
     expect(
       tester.widget<ElevatedButton>(
