@@ -86,11 +86,11 @@ void main() {
     expect(find.byKey(const ValueKey('safe_cell_coordinate_audit')), findsOneWidget);
     expect(find.textContaining('0 (1,6)'), findsOneWidget);
     expect(
-      find.textContaining('cannot prove this custom board’s exact cell mapping'),
+      find.textContaining('The owner-confirmed safe-cell map contains eight cells'),
       findsOneWidget,
     );
     expect(
-      find.textContaining('The four diagonal corner links pass structural checks'),
+      find.textContaining('The four shared-loop corner diagonals and four diagonal home-lane branches pass structural checks'),
       findsOneWidget,
     );
   });
