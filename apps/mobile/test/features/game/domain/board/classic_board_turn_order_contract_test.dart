@@ -15,25 +15,17 @@ void main() {
 
       var state = setup.initialState;
       for (final expectedPlayer in <String>['green', 'magenta', 'blue', 'orange']) {
-        // A roll of one with all pawns in the yard creates no legal move and
-        // advances the turn without introducing randomness into this contract.
-        final roll = setup.engine.roll(
+        // A non-six with every pawn in the yard is an accepted no-legal-move
+        // turn, so the engine advances deterministically without a pawn move.
+        final transition = setup.engine.roll(
           state,
           playerId: state.currentPlayerId,
           expectedVersion: state.version,
           value: 1,
         );
-        final afterRoll = roll.state;
-        final transition = setup.engine.move(
-          afterRoll,
-          playerId: afterRoll.currentPlayerId,
-          expectedVersion: afterRoll.version,
-          pawnId: setup.engine.legalPawnIds(afterRoll).isEmpty
-              ? afterRoll.pawns.firstWhere((p) => p.playerId == afterRoll.currentPlayerId).id
-              : setup.engine.legalPawnIds(afterRoll).first,
-        );
         state = transition.state;
         expect(state.currentPlayerId, expectedPlayer);
+        expect(transition.events.map((event) => event.type), contains('TurnEnded'));
       }
     });
 
