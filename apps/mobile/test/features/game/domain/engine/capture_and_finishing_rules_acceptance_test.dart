@@ -60,7 +60,7 @@ void main() {
     );
     expect(bluePawn.position.section, PawnRouteSection.mainTrack);
     expect(bluePawn.position.progress, blueProgress);
-    expect(transition.events.where((event) => event is PawnCaptured), isEmpty);
+    expect(transition.events.whereType<PawnCaptured>(), isEmpty);
   });
 
   test('ordinary shared-track cell captures one opponent and returns it to yard', () {

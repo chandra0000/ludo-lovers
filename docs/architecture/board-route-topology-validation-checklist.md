@@ -24,8 +24,9 @@ The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player qu
 - [x] Cross-checked the four entry directions against the supplied straight-on board mockup: Orange moves right then up, Green down then right, Magenta left then down, Blue up then left.
 - [x] Board Preview uses a square aspect ratio; the painter and pawn layer use the same normalized cell-center mapping on that square canvas.
 - [x] Added an independent 52-coordinate acceptance fixture, explicit entry-direction and home-lane orientation checks, and a cell-center alignment test in `approved_reference_geometry_acceptance_test.dart`.
+- [x] Added a widget rendering test that checks the preview canvas is square and preview pawn markers use canonical track-cell centres; this is automated canvas validation, not on-device visual sign-off.
 - [x] Gameplay readiness remains blocked pending safe-cell visual approval.
-- [x] CI run #499 completed successfully (green) before this new acceptance-test commit. The new commit triggers another CI run, which must also pass before the added test is considered verified.
+- [ ] CI run #511 failed at `flutter analyze` because the capture acceptance test used `where` where `whereType<PawnCaptured>()` is preferred. The lint is corrected alongside the rendering test; a new full CI run must pass before these additions are considered verified.
 
 ## Remaining checklist — complete in this order
 
@@ -35,7 +36,7 @@ The supplied straight-on mockup (`1000545512.jpg`) shows the same four-player qu
 - [x] Confirm the four diagonal corner links at indexes 4, 17, 30, and 43 as the current intended connectors around the central 3×3 hub; independent golden tests now lock their endpoints.
 - [x] Confirm the four quadrant colors and their forward directions against the mockup.
 - [ ] Resolve the exact star/safe-cell squares from a clearer cell-by-cell reference; the stylized artwork places decorative icons on the grid and does not make every safe square unambiguous.
-- [ ] Manually inspect the rendered board preview on-device at phone size and confirm all route-cell and pawn centers visually align.
+- [ ] Manually inspect the rendered board preview on-device at phone size and confirm all route-cell and pawn centers visually align. This requires a fresh Android screenshot from the actual device; widget tests cannot verify device-specific clipping, scaling, or visual overlap.
 
 ### 2. Resolve route orientation and entry mapping
 - [x] Confirm each player's forward direction and entry cell: Orange 0, Green 13, Magenta 26, Blue 39.
