@@ -1514,7 +1514,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
                                           : 'Roll dice',
                               hint: state.completed
-                                  ? 'The match is finished. Choose Play Again to start a new match.'
+                                  ? 'The match is finished. Choose Rematch to start a new match.'
                                   : isAiTurn
                                       ? 'The AI is choosing its move. Please wait.'
                                       : state.pendingRoll != null
@@ -1615,18 +1615,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(color: state.completed ? AppTheme.gold : (_colors[current] ?? AppTheme.gold), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.4),
                       ),
-                      if (state.completed) ...<Widget>[
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            key: const ValueKey('play_again_button'),
-                            onPressed: _controller.reset,
-                            icon: const Icon(Icons.replay_rounded),
-                            label: const Text('Play Again'),
-                          ),
-                        ),
-                      ],
                       if (_controller.lastMessage != null) ...<Widget>[
                         const SizedBox(height: 8),
                         Semantics(
