@@ -19,7 +19,7 @@ import '../controllers/local_game_controller.dart';
 /// Development-only board-backed local match.
 ///
 /// The local rules engine is connected to the board for end-to-end testing,
-/// but the board route and safe-cell IDs remain provisional and are not
+/// but the board route remains provisional and is not
 /// approved for release or competitive play.
 class LocalGameScreen extends StatefulWidget {
   const LocalGameScreen({
