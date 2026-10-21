@@ -1168,7 +1168,7 @@ void main() {
     expect(find.text('Reach home exactly'), findsOneWidget);
     expect(
       find.textContaining(
-        'The board route and safe-cell positions are still provisional',
+        'The owner-confirmed safe/star positions are fixed. The complete board route still requires on-device visual review.',
       ),
       findsOneWidget,
     );
