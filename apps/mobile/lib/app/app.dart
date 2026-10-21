@@ -410,7 +410,7 @@ class _FoundationNotice extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'A local match prototype is available for testing turns and pawn moves. The board route and safe-cell mapping remain provisional; accounts and multiplayer are not connected yet.',
+              'A local match prototype is available for testing turns and pawn moves. Safe/star cell positions have been confirmed by the project owner; the complete board route and gameplay topology still require final validation. Accounts and online multiplayer are not connected yet.',
               style: TextStyle(
                 color: AppTheme.readableText,
                 height: 1.45,
