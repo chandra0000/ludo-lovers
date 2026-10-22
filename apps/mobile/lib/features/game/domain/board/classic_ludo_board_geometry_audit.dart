@@ -179,8 +179,8 @@ class ClassicLudoBoardGeometryAudit {
     }
 
     // Audit the player-relative movement paths as well as the physical grid.
-    // A valid 52-cell drawing is insufficient if a pawn branches into its lane
-    // one step early and silently skips the final physical shared cell.
+    // A valid 52-cell physical drawing is insufficient if a pawn walks into
+    // the outer corner cell beside its lane instead of turning after 51 cells.
     try {
       final paths = ClassicLudoBoardFixture.create();
       const expectedEntryIndexes = <String, int>{
@@ -191,18 +191,21 @@ class ClassicLudoBoardGeometryAudit {
       };
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final path = paths.forPlayer(seat.id);
-        if (path.trackLength != track.length ||
+        if (path.trackLength != ClassicLudoBoardDefinition.playerTrackLength ||
             path.mainTrackCells.length != track.length) {
           issues.add(
-            '${seat.id} must traverse all ${track.length} shared-track cells '
-            'before entering its home lane.',
+            '${seat.id} must traverse exactly '
+            '${ClassicLudoBoardDefinition.playerTrackLength} shared-track cells '
+            'before entering its home lane.'
           );
           continue;
         }
         if (seat.provisionalTrackEntryIndex != expectedEntryIndexes[seat.id]) {
           issues.add('${seat.id} entry index does not match the canonical 13-cell seat rotation.');
         }
-        for (var progress = 0; progress < track.length; progress++) {
+        for (var progress = 0;
+            progress < ClassicLudoBoardDefinition.playerTrackLength;
+            progress++) {
           final expectedCell =
               (seat.provisionalTrackEntryIndex + progress) % track.length;
           if (path.cellAtProgress(progress) != expectedCell) {
@@ -213,8 +216,9 @@ class ClassicLudoBoardGeometryAudit {
             break;
           }
         }
-        if (path.cellAtProgress(track.length) != seat.homeLaneStartCellId) {
-          issues.add('${seat.id} must enter its own home lane immediately after all shared cells.');
+        if (path.cellAtProgress(ClassicLudoBoardDefinition.playerTrackLength) !=
+            seat.homeLaneStartCellId) {
+          issues.add('${seat.id} must turn directly into its own home lane after 51 shared-track cells.');
         }
         if (path.cellAtProgress(path.finishProgress) != null) {
           issues.add('${seat.id} finish must remain separate from numbered track/lane cells.');
