@@ -85,9 +85,9 @@ class BoardPawnLayout {
             progress < trackLength) {
           throw ArgumentError('Home-lane progress is still on the shared track.');
         }
-        // Traverse all 52 shared-track cells before entering the private
-        // lane. Wrap against the physical loop length, not a player-relative
-        // progress count, so the final shared cell is never skipped.
+        // The physical loop has 52 cells, but player progress traverses only
+        // 51 before turning directly into the private lane. Keep modulo based
+        // on the physical loop length so player-relative routing stays aligned.
         final pathIndex = position.section == PawnRouteSection.mainTrack
             ? (seat.provisionalTrackEntryIndex + progress) %
                 ClassicLudoBoardDefinition.sharedTrackLength
