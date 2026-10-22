@@ -73,7 +73,7 @@ void main() {
       }
     });
 
-    test('Blue pawn follows its route through wraparound into its own lane', {
+    test('Blue pawn follows its route through wraparound into its own lane', () {
       final bluePath = ClassicLudoBoardFixture.create().forPlayer('blue');
 
       // Blue enters at physical cell 39, follows the shared loop in order,
