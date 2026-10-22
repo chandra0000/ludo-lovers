@@ -4,7 +4,7 @@
 
 ## What is now checked automatically
 
-- Exactly 52 unique, in-bounds physical shared-track coordinates; each player traverses all 52 cells in order, including the final cell before branching into its own home lane.
+- Exactly 52 unique, in-bounds physical shared-track coordinates; each player traverses 51 cells from the 52-cell physical loop before branching into its own home lane.
 - Every sequential transition, including wraparound, is orthogonally adjacent or one of the four explicitly documented diagonal corner links.
 - Four distinct player entries align with their physical start-marker coordinates.
 - Home lanes have five unique, in-bounds, consecutive cells and do not overlap the shared track or one another; the last traversed track cell connects to the first lane cell through the approved one-cell orthogonal/diagonal branch; the centre finish is a separate position.
@@ -15,7 +15,7 @@
 
 ### Route branch correction: implemented structurally
 
-The earlier fixture traversed only 51 of the 52 physical shared-track cells, skipping the cell immediately before each player's start marker. That caused pawns—especially Blue—to turn into their home lane one step too early. The route model now traverses all 52 physical cells before entering the five-cell home lane. Final shared cells are Orange 51 at (0,6), Green 12 at (8,0), Blue 38 at (6,14), and Magenta 25 at (14,8). Each joins its first private-lane cell through a one-cell diagonal branch: Orange to (1,7), Green to (7,1), Blue to (7,13), and Magenta to (13,7). The five lane cells and separate centre finish are preserved.
+The corrected route keeps all 52 physical cells for shared geometry but traverses only 51 per player before turning into the five-cell home lane. The outer corner immediately beside each home entrance is not traversed. Final shared cells are Orange 50 at (0,7), Green 11 at (7,0), Blue 37 at (7,14), and Magenta 24 at (14,7). Each joins its first private-lane cell orthogonally: Orange to (1,7), Green to (7,1), Blue to (7,13), and Magenta to (13,7). The five lane cells and separate centre finish are preserved.
 
 ### Diagonal corner decision: accepted as explicit connectors in the provisional trace
 
@@ -30,7 +30,7 @@ For the current 15×15 coordinate trace, the four non-orthogonal links are **for
 
 The test suite locks these exact endpoints and requires every other sequential transition to be orthogonally adjacent. This is a **structural decision for the current provisional route**, not a claim that the artwork has been visually approved. If the straight-on reference contradicts a connector, update the canonical definition and its fixtures together rather than adding a renderer-only workaround.
 
-The canonical contract is: 52 physical shared cells traversed once per player's route (entry offsets Orange 0, Green 13, Blue 39, Magenta 26); five private home-lane cells per seat; a separate centre finish at grid cell (7,7); and owner-confirmed safe IDs {0, 8, 13, 21, 26, 34, 39, 47}. The four shared-loop corner diagonals and four diagonal track-to-lane joins are explicitly audited. Automated checks assert that the coordinate factory, player-path fixture, entry markers, home lanes and current local rules profile agree on these values. The safe-cell positions are owner-confirmed; formal competitive rules and on-device visual alignment remain separate approval gates.
+The canonical contract is: 51 shared cells traversed per player's route from the 52-cell physical loop (entry offsets Orange 0, Green 13, Blue 39, Magenta 26); five private home-lane cells per seat; a separate centre finish at grid cell (7,7); and owner-confirmed safe IDs {0, 8, 13, 21, 26, 34, 39, 47}. The four shared-loop corner diagonals and four orthogonal track-to-lane joins after 51 steps are explicitly audited. Automated checks assert that the coordinate factory, player-path fixture, entry markers, home lanes and current local rules profile agree on these values. The safe-cell positions are owner-confirmed; formal competitive rules and on-device visual alignment remain separate approval gates.
 
 **Gameplay remains blocked.** Structural route validation is now implemented, but a fresh Android screenshot has not been visually reviewed against the board reference. Do not set `isVisualTopologyApproved` to true or enable `isGameplayReady` based only on passing structural tests.
 
