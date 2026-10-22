@@ -1,8 +1,8 @@
 /// Canonical logical route fixture for a classic four-player Ludo board.
 ///
-/// The physical shared-track IDs are 0..51. Every player route traverses all
-/// 52 cells before branching into its private home lane. Routes are rotated
-/// to match the current board-definition start markers:
+/// The physical shared-track IDs are 0..51. Each player traverses 51 cells
+/// before branching into its private home lane, leaving the outer corner cell
+/// beyond that lane entrance unused. Routes are rotated to match the markers:
 /// Orange 0, Green 13, Blue 39, Magenta 26 (seat declaration order).
 ///
 /// IMPORTANT: the display geometry remains provisional. These offsets align
