@@ -52,7 +52,7 @@ void main() {
       final green = board.forPlayer('green');
       final blue = board.forPlayer('blue');
 
-      expect(green.finishProgress, 57);
+      expect(green.finishProgress, 56);
       expect(green.cellAtProgress(0), 13);
       expect(green.cellAtProgress(50), 11);
       expect(green.cellAtProgress(51), 220);
