@@ -65,8 +65,8 @@ void main() {
         expect(path.trackLength, 51, reason: seat.id);
         expect(path.cellAtProgress(50), route.approachId, reason: '${seat.id} final outer-lap cell');
         expect(track[route.approachId], route.approach, reason: '${seat.id} final approach coordinate');
+        expect(path.mainTrackCells[51], route.cornerId, reason: '${seat.id} outer corner remains only in physical loop data');
         expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} must turn into home');
-        expect(path.cellAtProgress(51), isNot(route.cornerId), reason: '${seat.id} must skip the outer corner');
         final dx = (route.approach.column - seat.homeLaneCells.first.column).abs();
         final dy = (route.approach.row - seat.homeLaneCells.first.row).abs();
         expect(dx + dy, 1, reason: '${seat.id} home-lane entry must be orthogonally adjacent');
