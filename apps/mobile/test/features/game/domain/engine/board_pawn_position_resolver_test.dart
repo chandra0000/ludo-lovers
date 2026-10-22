@@ -18,19 +18,19 @@ void main() {
       playerId: 'green',
       mainTrackCells: List<int>.generate(52, (index) => (index + 13) % 52),
       homeLaneCells: const <int>[220, 221, 222, 223, 224],
-      trackLength: 52,
+      trackLength: 51,
     );
     final bluePath = LudoPlayerPath(
       playerId: 'blue',
       mainTrackCells: List<int>.generate(52, (index) => (index + 39) % 52),
       homeLaneCells: const <int>[210, 211, 212, 213, 214],
-      trackLength: 52,
+      trackLength: 51,
     );
     final magentaPath = LudoPlayerPath(
       playerId: 'magenta',
       mainTrackCells: List<int>.generate(52, (index) => (index + 26) % 52),
       homeLaneCells: const <int>[230, 231, 232, 233, 234],
-      trackLength: 52,
+      trackLength: 51,
     );
     resolver = BoardPawnPositionResolver(
       paths: LudoBoardPaths(<LudoPlayerPath>[
