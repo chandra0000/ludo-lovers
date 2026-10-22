@@ -468,8 +468,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           if (opponentTrackIndex < 0 || targetTrackIndex < 0) continue;
           final distance = (targetTrackIndex -
                   opponentTrackIndex +
-                  opponentPath.trackLength) %
-              opponentPath.trackLength;
+                  ClassicLudoBoardDefinition.sharedTrackLength) %
+              ClassicLudoBoardDefinition.sharedTrackLength;
           if (distance >= 1 && distance <= 6) {
             threateningOpponents++;
           }
