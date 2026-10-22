@@ -12,7 +12,7 @@ void main() {
       playerId: 'orange',
       mainTrackCells: List<int>.generate(52, (index) => index),
       homeLaneCells: const <int>[200, 201, 202, 203, 204],
-      trackLength: 52,
+      trackLength: 51,
     );
     final greenPath = LudoPlayerPath(
       playerId: 'green',
@@ -47,9 +47,9 @@ void main() {
     for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
       final path = resolver.paths.forPlayer(playerId);
       expect(path.homeLaneLength, 5, reason: playerId);
-      expect(path.finishProgress, 57, reason: playerId);
-      expect(path.cellAtProgress(56), path.homeLaneCells.last, reason: playerId);
-      expect(path.cellAtProgress(57), isNull, reason: playerId);
+      expect(path.finishProgress, 56, reason: playerId);
+      expect(path.cellAtProgress(55), path.homeLaneCells.last, reason: playerId);
+      expect(path.cellAtProgress(56), isNull, reason: playerId);
     }
   });
 
@@ -106,7 +106,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.homeLane,
-          progress: 52,
+          progress: 51,
         ),
       ),
       200,
@@ -116,7 +116,7 @@ void main() {
         playerId: 'green',
         position: const PawnRoutePosition(
           section: PawnRouteSection.homeLane,
-          progress: 53,
+          progress: 52,
         ),
       ),
       221,
@@ -136,7 +136,7 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.finished,
-          progress: 57,
+          progress: 56,
         ),
       ),
       isNull,
@@ -159,33 +159,33 @@ void main() {
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 52,
+          progress: 51,
         ),
       ),
       throwsArgumentError,
     );
   });
 
-  test('maps the last traversed shared-track step before entering the home lane', () {
+  test('maps the last traversed shared-track step before turning into the home lane', () {
     expect(
       resolver.cellIdFor(
         playerId: 'orange',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 51,
+          progress: 50,
         ),
       ),
-      51,
+      50,
     );
     expect(
       resolver.cellIdFor(
         playerId: 'green',
         position: const PawnRoutePosition(
           section: PawnRouteSection.mainTrack,
-          progress: 51,
+          progress: 50,
         ),
       ),
-      12,
+      11,
     );
   });
 
