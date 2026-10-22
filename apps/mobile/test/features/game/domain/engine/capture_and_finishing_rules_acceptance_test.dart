@@ -21,14 +21,16 @@ void main() {
     final orangePath = setup.paths.forPlayer('orange');
     final bluePath = setup.paths.forPlayer('blue');
     final safeCells = setup.engine.safeCellIndexes;
-    final orangeProgress = List<int>.generate(orangePath.trackLength, (i) => i)
-        .firstWhere((progress) =>
-            safeCells.contains(orangePath.mainTrackCells[
-                (progress + 1) % orangePath.trackLength]));
-    final destination =
-        orangePath.mainTrackCells[(orangeProgress + 1) % orangePath.trackLength];
+    final orangeProgress = List<int>.generate(orangePath.trackLength - 1, (i) => i)
+        .firstWhere((progress) {
+          final destination = orangePath.mainTrackCells[progress + 1];
+          final blueProgress = bluePath.mainTrackCells.indexOf(destination);
+          return safeCells.contains(destination) &&
+              blueProgress >= 0 && blueProgress < bluePath.trackLength;
+        });
+    final destination = orangePath.mainTrackCells[orangeProgress + 1];
     final blueProgress = bluePath.mainTrackCells.indexOf(destination);
-    expect(blueProgress, greaterThanOrEqualTo(0));
+    expect(blueProgress, inInclusiveRange(0, bluePath.trackLength - 1));
 
     final state = setup.initialState.copyWith(
       pendingRoll: 1,
@@ -68,14 +70,16 @@ void main() {
     final orangePath = setup.paths.forPlayer('orange');
     final bluePath = setup.paths.forPlayer('blue');
     final safeCells = setup.engine.safeCellIndexes;
-    final orangeProgress = List<int>.generate(orangePath.trackLength, (i) => i)
-        .firstWhere((progress) =>
-            !safeCells.contains(orangePath.mainTrackCells[
-                (progress + 1) % orangePath.trackLength]));
-    final destination =
-        orangePath.mainTrackCells[(orangeProgress + 1) % orangePath.trackLength];
+    final orangeProgress = List<int>.generate(orangePath.trackLength - 1, (i) => i)
+        .firstWhere((progress) {
+          final destination = orangePath.mainTrackCells[progress + 1];
+          final blueProgress = bluePath.mainTrackCells.indexOf(destination);
+          return !safeCells.contains(destination) &&
+              blueProgress >= 0 && blueProgress < bluePath.trackLength;
+        });
+    final destination = orangePath.mainTrackCells[orangeProgress + 1];
     final blueProgress = bluePath.mainTrackCells.indexOf(destination);
-    expect(blueProgress, greaterThanOrEqualTo(0));
+    expect(blueProgress, inInclusiveRange(0, bluePath.trackLength - 1));
 
     final state = setup.initialState.copyWith(
       pendingRoll: 1,
