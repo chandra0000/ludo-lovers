@@ -78,9 +78,9 @@ class ClassicLudoBoardDefinition {
   const ClassicLudoBoardDefinition._();
 
   static const int gridSize = 15;
-  /// Physical cells in the shared loop. Each pawn traverses all 52 cells
-  /// from its entry marker through the cell immediately before that marker,
-  /// then branches into its private home lane.
+  /// Physical cells in the shared loop. The player-relative route traverses
+  /// 51 of these cells, then branches directly into its private home lane
+  /// before the outer corner cell beside that lane entrance.
   static const int sharedTrackLength = 52;
   /// Each pawn advances through 51 shared-track cells, then turns into its
   /// own home lane before entering the outer corner cell beside that lane.
