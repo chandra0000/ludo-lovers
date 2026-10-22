@@ -50,7 +50,30 @@ void main() {
       }
     });
 
-    test('Blue pawn follows its route through wraparound into its own lane', () {
+    test('all four colors turn into their lane before the adjacent outer corner', () {
+      final paths = ClassicLudoBoardFixture.create();
+      const expected = <String, ({int approachId, BoardGridCell approach, int cornerId})>{
+        'orange': (approachId: 50, approach: BoardGridCell(column: 0, row: 7), cornerId: 51),
+        'green': (approachId: 11, approach: BoardGridCell(column: 7, row: 0), cornerId: 12),
+        'magenta': (approachId: 24, approach: BoardGridCell(column: 14, row: 7), cornerId: 25),
+        'blue': (approachId: 37, approach: BoardGridCell(column: 7, row: 14), cornerId: 38),
+      };
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = paths.forPlayer(seat.id);
+        final route = expected[seat.id]!;
+        expect(path.trackLength, 51, reason: seat.id);
+        expect(path.cellAtProgress(50), route.approachId, reason: '${seat.id} final outer-lap cell');
+        expect(track[route.approachId], route.approach, reason: '${seat.id} final approach coordinate');
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} must turn into home');
+        expect(path.cellAtProgress(51), isNot(route.cornerId), reason: '${seat.id} must skip the outer corner');
+        final dx = (route.approach.column - seat.homeLaneCells.first.column).abs();
+        final dy = (route.approach.row - seat.homeLaneCells.first.row).abs();
+        expect(dx + dy, 1, reason: '${seat.id} home-lane entry must be orthogonally adjacent');
+      }
+    });
+
+    test('Blue pawn follows its route through wraparound into its own lane', {
       final bluePath = ClassicLudoBoardFixture.create().forPlayer('blue');
 
       // Blue enters at physical cell 39, follows the shared loop in order,
