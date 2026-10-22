@@ -10,9 +10,9 @@ This checklist deliberately records the current defects without guessing which g
 
 A read-only comparison against the public `rojanparajuli/Flutter_ludo` board constants found that its 52-cell shared-track sequence, start indexes `0, 13, 26, 39`, and safe-cell indexes `0, 8, 13, 21, 26, 34, 39, 47` match this repository's current values when row/column coordinates are normalized. Reference: https://github.com/rojanparajuli/Flutter_ludo/blob/master/lib/constant/board_constants.dart
 
-This is useful corroboration, not approval to enable gameplay. The selected Ludo Lovers convention is five coloured home-lane cells plus a separate centre finish. The route fixture now traverses all 52 shared cells before entering the private lane, and tests lock each player-relative path. The project owner confirmed safe/star IDs. Remaining approval blocker: inspect a fresh on-device rendering for cell-center alignment and clipping before changing the release gate. Do not copy third-party code into this repository.
+This is useful corroboration, not approval to enable gameplay. The selected Ludo Lovers convention is five coloured home-lane cells plus a separate centre finish. The physical loop retains 52 unique cells, but each player traverses 51 cells and turns directly into its private lane before the adjacent outer corner. Tests lock each player-relative path. The project owner confirmed safe/star IDs. Remaining approval blocker: inspect a fresh on-device rendering for cell-center alignment and clipping before changing the release gate. Do not copy third-party code into this repository.
 
-The four diagonal coordinate transitions listed below also occur in that reference sequence. The geometry audit now treats exactly these four one-cell diagonal corner links as structurally valid, while reporting any other non-neighbour transition as a defect. The four corner links are structurally locked. Each player also branches diagonally from its final shared cell into its own home lane after traversing all 52 cells. This is structural validation only: `isGameplayReady` remains false behind `isVisualTopologyApproved` until the rendered board is checked on-device.
+The four diagonal coordinate transitions listed below also occur in that reference sequence. The geometry audit now treats exactly these four one-cell diagonal corner links as structurally valid, while reporting any other non-neighbour transition as a defect. The four corner links are structurally locked. Each player branches orthogonally from its final traversed shared cell into its own home lane after 51 cells, skipping the adjacent outer corner. This is structural validation only: `isGameplayReady` remains false behind `isVisualTopologyApproved` until the rendered board is checked on-device.
 
 ## Known diagonal corner transitions
 
@@ -37,7 +37,7 @@ Do not simply remove these diagnostics or mark the route ready. The listed trans
 - [x] Add acceptance tests for exactly 52 unique shared-track cells inside the 15×15 grid.
 - [x] Add acceptance tests for every consecutive shared-track pair, including wraparound and the four explicitly validated diagonal corner connections.
 - [x] Add acceptance tests for lane uniqueness, non-overlap, continuity, and the final shared-cell-to-lane connection.
-- [x] Add acceptance tests that each player-relative path traverses all 52 physical shared cells exactly once, then enters its own lane at progress 52.
+- [x] Add acceptance tests that each player-relative path traverses 51 shared cells, skips the adjacent outer corner, then enters its own lane at progress 51.
 - [ ] Run board geometry, route mapping, movement, safe-cell, capture, finish, and board-backed widget acceptance tests.
 - [ ] Review any intentional rule differences (safe squares, capture stacks, six bonus, exact finish) and document the selected rule profile.
 - [ ] Only after all evidence and tests agree, deliberately update the release gate and its tests.
@@ -45,6 +45,6 @@ Do not simply remove these diagnostics or mark the route ready. The listed trans
 ## Current engineering safeguards
 
 - The logical movement engine remains pure Dart and separate from Flutter presentation.
-- The route geometry audit validates all 52 player-relative steps, the four known diagonal corner connections, home-lane branches, entries, safe-cell IDs, and rejects other non-neighbour transitions; the visual-approval release gate remains closed.
+- The route geometry audit validates all 51 traversed player-relative steps across the 52-cell physical loop, the four known diagonal corner connections, home-lane branches, entries, safe-cell IDs, and rejects other non-neighbour transitions; the visual-approval release gate remains closed.
 - Local Game Lab / board-backed UI remains a development prototype and visibly warns that route and safe cells are provisional.
 - No online multiplayer, server-authoritative dice, or release-ready gameplay is claimed by this document.
