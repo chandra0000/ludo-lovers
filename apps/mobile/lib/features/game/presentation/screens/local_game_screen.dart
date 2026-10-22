@@ -465,7 +465,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               opponentPath.mainTrackCells.indexOf(opponentCell);
           final targetTrackIndex =
               opponentPath.mainTrackCells.indexOf(destinationCell);
-          if (opponentTrackIndex < 0 || targetTrackIndex < 0) continue;
+          if (opponentTrackIndex < 0 ||
+              targetTrackIndex < 0 ||
+              targetTrackIndex >= opponentPath.trackLength) {
+            // This opponent's route intentionally skips the outer corner
+            // immediately before its own home lane, so it cannot threaten it.
+            continue;
+          }
           final distance = (targetTrackIndex -
                   opponentTrackIndex +
                   ClassicLudoBoardDefinition.sharedTrackLength) %
