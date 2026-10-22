@@ -117,10 +117,9 @@ void main() {
           path.cellAtProgress(50),
           (seat.provisionalTrackEntryIndex + 50) % 52,
         );
-        expect(path.cellAtProgress(51), (seat.provisionalTrackEntryIndex + 51) % 52);
-        expect(path.cellAtProgress(52), seat.homeLaneStartCellId);
-        expect(path.cellAtProgress(56), seat.homeLaneStartCellId + 4);
-        expect(path.cellAtProgress(57), isNull);
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId);
+        expect(path.cellAtProgress(55), seat.homeLaneStartCellId + 4);
+        expect(path.cellAtProgress(56), isNull);
       }
     });
 
@@ -160,9 +159,9 @@ void main() {
             (approach.column - firstLane.column).abs() == 1 &&
             (approach.row - firstLane.row).abs() == 1,
             isTrue, reason: '${seat.id} must enter its own lane through an approved adjacent connection');
-        expect(path.cellAtProgress(52), seat.homeLaneStartCellId, reason: '${seat.id} lane entry');
-        expect(path.cellAtProgress(56), seat.homeLaneStartCellId + 4, reason: '${seat.id} final lane cell');
-        expect(path.cellAtProgress(57), isNull, reason: '${seat.id} finish is not a board cell');
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} lane entry');
+        expect(path.cellAtProgress(55), seat.homeLaneStartCellId + 4, reason: '${seat.id} final lane cell');
+        expect(path.cellAtProgress(56), isNull, reason: '${seat.id} finish is not a board cell');
       }
     });
 
