@@ -50,8 +50,8 @@ void main() {
       final paths = ClassicLudoBoardFixture.create();
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final path = paths.forPlayer(seat.id);
-        expect(path.trackLength, 52, reason: seat.id);
-        final approach = track[(seat.provisionalTrackEntryIndex + 51) % 52];
+        expect(path.trackLength, 51, reason: seat.id);
+        final approach = track[(seat.provisionalTrackEntryIndex + 50) % 52];
         final lane = seat.homeLaneCells.first;
         final dx = (approach.column - lane.column).abs();
         final dy = (approach.row - lane.row).abs();
@@ -61,8 +61,8 @@ void main() {
           reason: '${seat.id} must enter its lane through a one-cell '
               'orthogonal or reference-approved diagonal connection',
         );
-        expect(path.cellAtProgress(51), (seat.provisionalTrackEntryIndex + 51) % 52, reason: '${seat.id} final shared cell');
-        expect(path.cellAtProgress(52), seat.homeLaneStartCellId, reason: '${seat.id} first lane cell');
+        expect(path.cellAtProgress(50), (seat.provisionalTrackEntryIndex + 50) % 52, reason: '${seat.id} final shared cell');
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} first lane cell');
       }
     });
 
