@@ -102,11 +102,12 @@ void main() {
     int? captureProgress;
     int? blueProgress;
     int? captureDestination;
-    for (var progress = 0; progress < greenPath.trackLength; progress++) {
-      final destination =
-          greenPath.mainTrackCells[(progress + 1) % greenPath.trackLength];
+    for (var progress = 0; progress < greenPath.trackLength - 1; progress++) {
+      final destination = greenPath.mainTrackCells[progress + 1];
       final matchingBlueProgress = bluePath.mainTrackCells.indexOf(destination);
-      if (matchingBlueProgress >= 0 && !safeCells.contains(destination)) {
+      if (matchingBlueProgress >= 0 &&
+          matchingBlueProgress < bluePath.trackLength &&
+          !safeCells.contains(destination)) {
         captureProgress = progress;
         blueProgress = matchingBlueProgress;
         captureDestination = destination;
@@ -118,9 +119,8 @@ void main() {
     expect(captureDestination, isNotNull);
 
     int? alternateProgress;
-    for (var progress = 0; progress < greenPath.trackLength; progress++) {
-      final destination =
-          greenPath.mainTrackCells[(progress + 1) % greenPath.trackLength];
+    for (var progress = 0; progress < greenPath.trackLength - 1; progress++) {
+      final destination = greenPath.mainTrackCells[progress + 1];
       if (progress != captureProgress &&
           destination != captureDestination &&
           !safeCells.contains(destination)) {
@@ -183,7 +183,7 @@ void main() {
     final bluePawn = controller.state.pawns.firstWhere(
       (pawn) => pawn.id == 'blue_pawn_1',
     );
-    expect(greenPawn.position.progress, (captureProgress! + 1) % greenPath.trackLength);
+    expect(greenPawn.position.progress, captureProgress! + 1);
     expect(bluePawn.position.section, PawnRouteSection.yard);
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
