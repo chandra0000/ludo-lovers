@@ -37,15 +37,14 @@ void main() {
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final path = paths.forPlayer(seat.id);
         expect(path.mainTrackCells, hasLength(52), reason: seat.id);
-        for (var progress = 0; progress < 51; progress++) {
+        for (var progress = 0; progress < 50; progress++) {
           expect(path.cellAtProgress(progress), (seat.provisionalTrackEntryIndex + progress) % 52, reason: '${seat.id} progress $progress');
           expect(path.cellAtProgress(progress + 1), (seat.provisionalTrackEntryIndex + progress + 1) % 52, reason: '${seat.id} intermediate step ${progress + 1}');
         }
         expect(path.cellAtProgress(50), (seat.provisionalTrackEntryIndex + 50) % 52, reason: '${seat.id} shared-track step 50');
-        expect(path.cellAtProgress(51), (seat.provisionalTrackEntryIndex + 51) % 52, reason: '${seat.id} final shared-track cell');
-        expect(path.cellAtProgress(52), seat.homeLaneStartCellId, reason: '${seat.id} first home-lane cell');
+        expect(path.cellAtProgress(51), seat.homeLaneStartCellId, reason: '${seat.id} must turn into its lane before the outer corner');
         for (var laneIndex = 0; laneIndex < seat.homeLaneCellIds.length; laneIndex++) {
-          expect(path.cellAtProgress(52 + laneIndex), seat.homeLaneCellIds[laneIndex], reason: '${seat.id} home-lane intermediate step $laneIndex');
+          expect(path.cellAtProgress(51 + laneIndex), seat.homeLaneCellIds[laneIndex], reason: '${seat.id} home-lane intermediate step $laneIndex');
         }
         expect(path.cellAtProgress(path.finishProgress), isNull, reason: 'center finish remains separate from track/lane cells');
       }
@@ -63,18 +62,16 @@ void main() {
       expect(bluePath.cellAtProgress(12), 51);
       expect(bluePath.cellAtProgress(13), 0);
 
-      // Blue must visit every shared cell: cell 37, then 38 (6,14),
-      // before entering its own lane at progress 52.
+      // Blue turns directly from cell 37 (7,14) into its lane; cell 38
+      // (6,14), the outer corner beside the lane entrance, is skipped.
       expect(bluePath.cellAtProgress(50), 37);
       expect(track[37], const BoardGridCell(column: 7, row: 14));
-      expect(bluePath.cellAtProgress(51), 38);
-      expect(track[38], const BoardGridCell(column: 6, row: 14));
-      expect(bluePath.cellAtProgress(52), 210);
+      expect(bluePath.cellAtProgress(51), 210);
       expect(
         ClassicLudoBoardDefinition.seatFor('blue').homeLaneCells.first,
         const BoardGridCell(column: 7, row: 13),
       );
-      expect(bluePath.cellAtProgress(56), 214);
+      expect(bluePath.cellAtProgress(55), 214);
       expect(bluePath.cellAtProgress(bluePath.finishProgress), isNull);
     });
 
@@ -96,7 +93,7 @@ void main() {
           expect(allLaneCells.add(cell), isTrue, reason: 'home lanes overlap at $cell');
           expect(track.contains(cell), isFalse, reason: '${seat.id} lane overlaps shared track');
         }
-        final approachIndex = (seat.provisionalTrackEntryIndex + 51) % 52;
+        final approachIndex = (seat.provisionalTrackEntryIndex + 50) % 52;
         final approach = track[approachIndex];
         final firstLane = lane.first;
         final dx = (approach.column - firstLane.column).abs();
