@@ -96,7 +96,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('The four shared-loop corner diagonals and four diagonal home-lane branches pass structural checks'),
+      find.textContaining('The physical loop has 52 cells, while each player traverses 51 cells before turning directly into its five-cell home lane'),
       findsOneWidget,
     );
   });
