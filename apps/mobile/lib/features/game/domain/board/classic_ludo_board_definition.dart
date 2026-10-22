@@ -82,7 +82,10 @@ class ClassicLudoBoardDefinition {
   /// from its entry marker through the cell immediately before that marker,
   /// then branches into its private home lane.
   static const int sharedTrackLength = 52;
-  static const int playerTrackLength = sharedTrackLength;
+  /// Each pawn advances through 51 shared-track cells, then turns into its
+  /// own home lane before entering the outer corner cell beside that lane.
+  /// Keep the physical loop at 52 cells for shared geometry and wraparound.
+  static const int playerTrackLength = 51;
   static const int homeLaneLength = 5;
   /// Explicit release gate; geometry agreement alone cannot approve the visual board.
   static const bool isVisualTopologyApproved = false;
