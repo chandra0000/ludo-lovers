@@ -1839,12 +1839,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     required double cellSize,
     required bool isLegal,
   }) {
-    final diameter = cellSize * (visual.isStacked ? 0.5 : 0.68);
-    final centerX = visual.point.x * boardSize.width +
-        visual.stackOffset.dx * cellSize;
-    final centerY = visual.point.y * boardSize.height +
-        visual.stackOffset.dy * cellSize;
-
+    final diameter = cellSize * (visual.isFinished ? 0.38 : visual.isStacked ? 0.58 : 0.78);
+    final centerX = visual.point.x * boardSize.width + visual.stackOffset.dx * cellSize;
+    final centerY = visual.point.y * boardSize.height + visual.stackOffset.dy * cellSize;
     return AnimatedPositioned(
       key: ValueKey<String>('pawn_marker_${visual.pawnId}'),
       duration: const Duration(milliseconds: 260),
@@ -1854,52 +1851,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       width: diameter,
       height: diameter,
       child: IgnorePointer(
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              center: const Alignment(-0.35, -0.45),
-              radius: 1.15,
-              colors: <Color>[
-                Color.lerp(_colors[visual.playerId] ?? AppTheme.cream, Colors.white, 0.48)!,
-                _colors[visual.playerId] ?? AppTheme.cream,
-                Color.lerp(_colors[visual.playerId] ?? AppTheme.cream, Colors.black, 0.34)!,
-              ],
-              stops: const <double>[0, 0.48, 1],
-            ),
-            border: Border.all(
-              color: isLegal ? AppTheme.gold : AppTheme.cream.withValues(alpha: 0.9),
-              width: cellSize * (isLegal ? 0.105 : 0.055),
-            ),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.52),
-                offset: Offset(0, cellSize * 0.10),
-                blurRadius: cellSize * 0.14,
-              ),
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.28),
-                offset: Offset(-cellSize * 0.035, -cellSize * 0.035),
-                blurRadius: cellSize * 0.045,
-              ),
-              if (isLegal)
-                BoxShadow(
-                  color: AppTheme.gold.withValues(alpha: 0.88),
-                  blurRadius: cellSize * 0.34,
-                  spreadRadius: cellSize * 0.045,
-                ),
-            ],
-          ),
-          child: Center(
-            child: Icon(
-              Icons.favorite_rounded,
-              color: AppTheme.cream,
-              shadows: const <Shadow>[
-                Shadow(color: Colors.black38, offset: Offset(0, 1.5), blurRadius: 2),
-              ],
-              size: diameter * 0.54,
-            ),
-          ),
+        child: _GlassConePawn(
+          color: _colors[visual.playerId] ?? AppTheme.cream,
+          size: diameter,
+          isActive: isLegal || (visual.isYard &&
+              visual.playerId == _controller.state.currentPlayerId &&
+              _controller.state.pendingRoll == null),
+          pawnId: visual.pawnId,
         ),
       ),
     );
