@@ -40,9 +40,7 @@ class ClassicLudoBoardGeometryAudit {
       final dx = (current.column - next.column).abs();
       final dy = (current.row - next.row).abs();
       final isOrthogonal = dx + dy == 1;
-      final isExpectedDiagonal =
-          const <int>{4, 17, 30, 43}.contains(index) && dx == 1 && dy == 1;
-      if (!isOrthogonal && !isExpectedDiagonal) {
+      if (!isOrthogonal) {
         issues.add(
           'Track transition $index to ${(index + 1) % track.length} '
           'is not an approved neighbouring-cell connection.',
@@ -229,7 +227,10 @@ class ClassicLudoBoardGeometryAudit {
     }
 
     if (ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.isNotEmpty) {
-      issues.add('Shared track contains invalid transitions outside the four documented diagonal corner links.');
+      issues.add(
+        'Shared track is not orthogonally continuous at transitions '
+        '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.join(', ')}.',
+      );
     }
 
     return List<String>.unmodifiable(issues);
