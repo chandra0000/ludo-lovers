@@ -1459,16 +1459,26 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     child: Center(
                                       child: AnimatedSwitcher(
                                         duration: const Duration(milliseconds: 260),
-                                        child: (state.pendingRoll == null
-                                                ? AnimatedRotation(
-                                                    turns: _diceRolling ? 2.5 : 0,
-                                                    duration: Duration(milliseconds: _diceRolling ? 620 : 180),
-                                                    curve: Curves.easeInOutCubic,
-                                                    child: const Icon(
-                                                      Icons.casino_rounded,
-                                                      key: ValueKey('dice_idle'),
-                                                      size: 44,
-                                                      color: Color(0xFF3B2600),
+                                        child: (_diceRolling || state.pendingRoll == null
+                                                ? AnimatedScale(
+                                                    scale: _diceRolling ? 1.16 : 1,
+                                                    duration: Duration(milliseconds: _diceRolling ? 310 : 180),
+                                                    curve: Curves.easeInOutBack,
+                                                    child: AnimatedRotation(
+                                                      turns: _diceRolling ? 2.5 : 0,
+                                                      duration: Duration(milliseconds: _diceRolling ? 620 : 180),
+                                                      curve: Curves.easeInOutCubic,
+                                                      child: Icon(
+                                                        Icons.casino_rounded,
+                                                        key: const ValueKey('dice_idle'),
+                                                        size: 44,
+                                                        color: const Color(0xFF3B2600),
+                                                        shadows: _diceRolling
+                                                            ? const <Shadow>[
+                                                                Shadow(color: Color(0x88FFFFFF), blurRadius: 12),
+                                                              ]
+                                                            : null,
+                                                      ),
                                                     ),
                                                   )
                                                 : Container(
