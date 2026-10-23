@@ -1301,7 +1301,7 @@ void main() {
           progress: progress,
         ),
       );
-      final diameter = boardSize / 15 * 0.68;
+      final diameter = boardSize / 15 * 0.78;
       return boardTopLeft +
           Offset(
             visual.point.x * boardSize - diameter / 2,
