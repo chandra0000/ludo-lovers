@@ -20,11 +20,16 @@ void main() {
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
-      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(
+        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        <int>[4, 17, 30, 43],
+        reason: 'Diagonal transitions must block release until the route is corrected.',
+      );
+      expect(ClassicLudoBoardCoordinateFactory.isOrthogonallyContinuous, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('only the four documented corners use diagonal adjacency', () {
+    test('audits every transition and identifies each orthogonal-continuity blocker', () {
       const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
       final knownBlockers =
           ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes;
@@ -34,8 +39,8 @@ void main() {
         final dx = (current.column - next.column).abs();
         final dy = (current.row - next.row).abs();
         if (knownBlockers.contains(index)) {
-          expect(dx, 1, reason: 'Corner transition $index must change one column');
-          expect(dy, 1, reason: 'Corner transition $index must change one row');
+          expect(dx, 1, reason: 'Diagonal blocker $index must change one column');
+          expect(dy, 1, reason: 'Diagonal blocker $index must change one row');
         } else {
           expect(
             dx + dy,
