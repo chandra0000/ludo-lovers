@@ -83,7 +83,7 @@ void main() {
     expect(find.text('GREEN'), findsAtLeastNWidgets(1));
     expect(find.text('BLUE'), findsAtLeastNWidgets(1));
     expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
-    expect(find.text('LOCAL'), findsNWidgets(4));
+    expect(find.text('LOCAL'), findsNWidgets(3));
     expect(find.text('YOUR TURN'), findsOneWidget);
     expect(find.text('Online'), findsNothing);
   });
