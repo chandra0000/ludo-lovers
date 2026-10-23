@@ -1318,7 +1318,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 2),
-                                      const Text(
+                                      Text(
                                         'LOCAL',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
