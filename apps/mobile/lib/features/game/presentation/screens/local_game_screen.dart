@@ -102,7 +102,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 
   void _rollDice(LocalGameState state) {
-    if (state.completed || state.pendingRoll != null || _diceRolling) return;
+    if (state.completed || state.pendingRoll != null) return;
     setState(() => _diceRolling = true);
     _playFeedbackSound();
     _controller.rollDice(expectedVersion: state.version);
