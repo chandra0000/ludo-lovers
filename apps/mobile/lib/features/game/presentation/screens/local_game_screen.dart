@@ -1318,10 +1318,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 2),
-                                      Text(
-                                        state.players[playerIndex] == current
-                                            ? 'YOUR TURN'
-                                            : 'LOCAL',
+                                      const Text(
+                                        'LOCAL',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
