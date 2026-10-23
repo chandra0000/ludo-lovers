@@ -1007,7 +1007,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // each side, so size the board against its usable content width.
             final boardSize = math.min(
               math.max(0.0, constraints.maxWidth - 20),
-              constraints.maxHeight * 0.86,
+              constraints.maxHeight * 0.78,
             );
             return AnimatedBuilder(
               animation: _controller,
@@ -1041,9 +1041,58 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   child: Column(
                     children: <Widget>[
-                      // Keep one compact player/profile row above the board.
-                      // The duplicate turn banner and local-seat strip were
-                      // consuming board space and creating the red-marked clutter.
+                      // Compact turn feedback preserves accessibility and
+                      // testable game status without restoring the large banner.
+                      Semantics(
+                        key: const ValueKey('turn_status_semantics'),
+                        liveRegion: true,
+                        label: state.completed
+                            ? 'Match complete. ${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins.'
+                            : '${current.toUpperCase()} player turn.',
+                        child: Container(
+                          key: const ValueKey('compact_turn_status'),
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: AppTheme.panel.withValues(alpha: 0.78),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.45)),
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: 5,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: _colors[current] ?? AppTheme.gold,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      state.completed ? 'MATCH COMPLETE' : '${current.toUpperCase()}’S TURN',
+                                      style: TextStyle(color: _colors[current] ?? AppTheme.cream, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.6),
+                                    ),
+                                    Text(
+                                      state.completed
+                                          ? '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins!'
+                                          : state.pendingRoll == null
+                                              ? 'Roll the dice to start your turn.'
+                                              : 'Rolled ${state.pendingRoll} · Tap a glowing pawn.',
+                                      style: const TextStyle(color: AppTheme.readableText, fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 420),
                         switchInCurve: Curves.easeOutBack,
