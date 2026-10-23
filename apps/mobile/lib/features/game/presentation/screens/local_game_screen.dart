@@ -1361,7 +1361,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         semanticLabel: 'Ludo Lovers live game board',
                                       ),
                                     ),
-                                    for (final visual in visuals)                                    for (final visual in visuals)
+                                    for (final visual in visuals)
                                       _buildAnimatedPawnMarker(
                                         visual: visual,
                                         boardSize: size,
@@ -1805,102 +1805,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             : Offset.zero,
       );
     }).toList(growable: false);
-  }
-}
-
-class _MatchPlayerCard extends StatelessWidget {
-  const _MatchPlayerCard({
-    super.key,
-    required this.title,
-    required this.name,
-    required this.color,
-    required this.avatar,
-    required this.isActive,
-    required this.pawnsOut,
-  });
-
-  final String title;
-  final String name;
-  final Color color;
-  final IconData avatar;
-  final bool isActive;
-  final int pawnsOut;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            color.withValues(alpha: isActive ? 0.22 : 0.09),
-            AppTheme.panel,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(13),
-        border: Border.all(
-          color: color.withValues(alpha: isActive ? 0.95 : 0.32),
-          width: isActive ? 1.5 : 1,
-        ),
-        boxShadow: isActive
-            ? <BoxShadow>[
-                BoxShadow(color: color.withValues(alpha: 0.14), blurRadius: 10),
-              ]
-            : null,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: 27,
-            height: 27,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[
-                  color.withValues(alpha: 0.95),
-                  color.withValues(alpha: 0.42),
-                ],
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.72),
-                width: 1,
-              ),
-              boxShadow: <BoxShadow>[
-                BoxShadow(color: color.withValues(alpha: 0.20), blurRadius: 7),
-              ],
-            ),
-            child: Icon(avatar, color: Colors.white, size: 16),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: color,
-              fontSize: 9,
-              letterSpacing: 0.35,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          Text(
-            'OUT $pawnsOut/4',
-            maxLines: 1,
-            style: const TextStyle(
-              color: AppTheme.mutedText,
-              fontSize: 8.5,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
