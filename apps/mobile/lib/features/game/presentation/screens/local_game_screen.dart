@@ -1723,6 +1723,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     final diameter = cellSize * (visual.isFinished ? 0.34 : visual.isStacked ? 0.44 : 0.68);
     final centerX = visual.point.x * boardSize.width + visual.stackOffset.dx * cellSize;
     final centerY = visual.point.y * boardSize.height + visual.stackOffset.dy * cellSize;
+    final isSelectable = isLegal || (visual.isYard &&
+        visual.playerId == _controller.state.currentPlayerId &&
+        _controller.state.pendingRoll == null);
+    final hopKey = ValueKey<String>(
+      'pawn_hop_${visual.pawnId}_${visual.point.x.toStringAsFixed(4)}_${visual.point.y.toStringAsFixed(4)}',
+    );
     return AnimatedPositioned(
       key: ValueKey<String>('pawn_marker_${visual.pawnId}'),
       duration: const Duration(milliseconds: 260),
@@ -1732,13 +1738,51 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       width: diameter,
       height: diameter,
       child: IgnorePointer(
-        child: _GlassConePawn(
-          color: _colors[visual.playerId] ?? AppTheme.cream,
-          size: diameter,
-          isActive: isLegal || (visual.isYard &&
-              visual.playerId == _controller.state.currentPlayerId &&
-              _controller.state.pendingRoll == null),
-          pawnId: visual.pawnId,
+        child: TweenAnimationBuilder<double>(
+          key: hopKey,
+          tween: Tween<double>(begin: 0, end: math.pi),
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
+          builder: (context, angle, child) {
+            final hop = math.sin(angle).clamp(0.0, 1.0);
+            return Transform.translate(
+              offset: Offset(0, -cellSize * 0.58 * hop),
+              child: Transform.scale(
+                scale: 1 + 0.12 * hop,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      bottom: -diameter * 0.08 + cellSize * 0.12 * hop,
+                      child: Container(
+                        width: diameter * (0.78 - 0.2 * hop),
+                        height: diameter * (0.18 - 0.04 * hop),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.34 - 0.18 * hop),
+                          borderRadius: BorderRadius.all(
+                            Radius.elliptical(diameter, diameter),
+                          ),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.24 - 0.12 * hop),
+                              blurRadius: diameter * (0.16 + 0.18 * hop),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _GlassConePawn(
+                      color: _colors[visual.playerId] ?? AppTheme.cream,
+                      size: diameter,
+                      isActive: isSelectable,
+                      pawnId: visual.pawnId,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -1898,11 +1942,28 @@ class _GlassConePawnPainter extends CustomPainter {
       Paint()..color = Colors.black.withValues(alpha: 0.55),
     );
     if (isActive) {
+      // Gold selection halo belongs to the pawn itself; no detached tile
+      // markers are needed to communicate that this token is selectable.
       canvas.drawOval(
-        Rect.fromCenter(center: Offset(center, h * 0.87), width: w * 1.2, height: h * 0.28),
+        Rect.fromCenter(
+          center: Offset(center, h * 0.87),
+          width: w * 1.34,
+          height: h * 0.34,
+        ),
         Paint()
-          ..color = color.withValues(alpha: 0.55)
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.15),
+          ..color = AppTheme.gold.withValues(alpha: 0.28)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.19),
+      );
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(center, h * 0.87),
+          width: w * 1.14,
+          height: h * 0.29,
+        ),
+        Paint()
+          ..color = AppTheme.gold.withValues(alpha: 0.96)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = math.max(1.0, w * 0.045),
       );
     }
     final baseRect = Rect.fromCenter(center: Offset(center, h * 0.86), width: w * 0.82, height: h * 0.24);
