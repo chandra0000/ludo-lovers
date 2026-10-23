@@ -1250,6 +1250,98 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ],
+                      // Player identity cards sit immediately above the board.
+                      // In local mode the selected player ID is the display name;
+                      // online profiles can replace this with a verified username later.
+                      Container(
+                        key: const ValueKey('local_match_player_strip'),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: 4, bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            for (var playerIndex = 0;
+                                playerIndex < state.players.length;
+                                playerIndex++) ...<Widget>[
+                              if (playerIndex > 0) const SizedBox(width: 6),
+                              Expanded(
+                                child: Container(
+                                  key: ValueKey<String>(
+                                    'player_profile_${state.players[playerIndex]}',
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                    vertical: 7,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.panel,
+                                    borderRadius: BorderRadius.circular(11),
+                                    border: Border.all(
+                                      color: state.players[playerIndex] == current
+                                          ? AppTheme.gold
+                                          : (_colors[state.players[playerIndex]] ??
+                                                  AppTheme.cream)
+                                              .withValues(alpha: 0.58),
+                                      width: state.players[playerIndex] == current
+                                          ? 1.7
+                                          : 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      CircleAvatar(
+                                        radius: 13,
+                                        backgroundColor:
+                                            _colors[state.players[playerIndex]] ??
+                                                AppTheme.cream,
+                                        child: Text(
+                                          state.players[playerIndex]
+                                              .characters.first.toUpperCase(),
+                                          style: const TextStyle(
+                                            color: Color(0xFF17120A),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        state.players[playerIndex].toUpperCase(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: AppTheme.readableText,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        state.players[playerIndex] == current
+                                            ? 'YOUR TURN'
+                                            : 'LOCAL',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: state.players[playerIndex] == current
+                                              ? AppTheme.gold
+                                              : AppTheme.mutedText,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 4),
                       Center(
                         child: SizedBox(
