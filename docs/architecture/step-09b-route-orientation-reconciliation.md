@@ -82,3 +82,13 @@ Before changing movement rules, obtain or create a clean, straight-on board-cell
 5. The existing quadrant mapping: Orange top-left, Green top-right, Blue bottom-left, Magenta bottom-right.
 
 Then reconcile the cell IDs against the reference, update the coordinate fixture and seat entry metadata together, and add tests for the approved transitions and start positions. Only after those checks pass should the local engine's route fixture be migrated. The board's current composite style reference is not enough to infer every cell-level rule safely.
+
+
+## Geometry reconciliation increment — 2026-10-23
+
+- Kept the existing 52-cell coordinate source and the existing player-relative route fixture; no second engine or duplicate route was introduced.
+- Classified the four known one-cell diagonal corner transitions (4, 17, 30, 43) as explicit reference-corner connectors. The audit now distinguishes those documented edges from an accidental/unmapped jump.
+- The 51-to-0 wrap remains checked as a normal orthogonal connection. All four home lanes remain five distinct, orthogonally consecutive cells, and each player path enters its own lane after 51 shared-track cells.
+- Added/updated automated contracts to prove the four connectors are exactly the known ones and that no undocumented diagonal jump is present.
+- **Important:** a structurally consistent route is not the same as artwork sign-off. The four connectors remain a review signal; `isVisualTopologyApproved` and `isGameplayReady` stay false. This increment does not claim that the full board has been visually verified on a physical Android device.
+- Next, run the complete CI pipeline on this change. Once green, use the same route source to validate capture, safe-square, and exact-finish behavior without replacing the local game engine.
