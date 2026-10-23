@@ -16,7 +16,8 @@ void main() {
         <int>[4, 17, 30, 43],
       );
       expect(ClassicLudoBoardDefinition.isVisualTopologyApproved, isFalse);
-      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isFalse);
+      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isTrue,
+          reason: 'Documented connectors pass structural checks; visual approval remains separate.');
     });
 
     test('provisional safe-cell IDs are unique and within the 52-cell track', () {
@@ -47,10 +48,11 @@ void main() {
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
     });
 
-    test('geometry audit blocks the four diagonal corner transitions', () {
+    test('geometry audit recognizes documented connectors but preserves release review signals', () {
       final issues = ClassicLudoBoardGeometryAudit.inspect();
 
-      expect(issues.where((issue) => issue.contains('not an approved neighbouring-cell connection')), hasLength(4));
+      expect(issues.where((issue) => issue.contains('neither orthogonal nor a documented')), isEmpty);
+      expect(ClassicLudoBoardCoordinateFactory.unmappedTransitionIndexes, isEmpty);
       expect(
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
