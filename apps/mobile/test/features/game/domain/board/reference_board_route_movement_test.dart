@@ -186,6 +186,53 @@ void main() {
       expect(blue.cellAtProgress(blue.finishProgress), isNull);
     });
 
+    test('movement animation visits every intermediate step for all four player routes', () {
+      final paths = ClassicLudoBoardFixture.create();
+      const movement = LudoPathMovement();
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = paths.forPlayer(seat.id);
+        expect(path.entryCell, seat.provisionalTrackEntryIndex, reason: seat.id);
+
+        // Traverse the complete player-relative shared route. Each step must
+        // map to exactly the next physical ID, including loop wraparound.
+        for (var progress = 0; progress < path.trackLength - 1; progress++) {
+          final steps = movement.positionsBetween(
+            path: path,
+            fromProgress: progress,
+            toProgress: progress + 1,
+          );
+          expect(steps, hasLength(1), reason: '${seat.id} progress $progress');
+          expect(steps.single.section, PawnRouteSection.mainTrack, reason: seat.id);
+          expect(steps.single.progress, progress + 1, reason: seat.id);
+          expect(path.cellAtProgress(progress + 1), isNotNull, reason: seat.id);
+        }
+
+        // Home lane steps are visited in order; the next step after the fifth
+        // lane cell is the separate center finish, never a fabricated grid ID.
+        for (var laneIndex = 0; laneIndex < path.homeLaneLength; laneIndex++) {
+          final progress = path.trackLength + laneIndex;
+          final steps = movement.positionsBetween(
+            path: path,
+            fromProgress: progress - 1,
+            toProgress: progress,
+          );
+          expect(steps, hasLength(1), reason: '${seat.id} lane $laneIndex');
+          expect(steps.single.section, PawnRouteSection.homeLane, reason: seat.id);
+          expect(path.cellAtProgress(progress), seat.homeLaneCellIds[laneIndex],
+              reason: '${seat.id} lane cell $laneIndex');
+        }
+
+        final finish = movement.positionsBetween(
+          path: path,
+          fromProgress: path.finishProgress - 1,
+          toProgress: path.finishProgress,
+        );
+        expect(finish.single.section, PawnRouteSection.finished, reason: seat.id);
+        expect(path.cellAtProgress(path.finishProgress), isNull, reason: seat.id);
+      }
+    });
+
     test('safe cells, board bounds and center finish remain consistent', () {
       const safe = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds;
       expect(safe, <int>{0, 8, 13, 21, 26, 34, 39, 47});
