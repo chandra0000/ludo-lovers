@@ -310,7 +310,8 @@ void main() {
           findsOneWidget,
         );
       }
-      expect(find.byKey(const ValueKey('match_turn_caption')), findsOneWidget);
+      expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
+      expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
       expect(find.text('Chat'), findsOneWidget);
       expect(find.text('React'), findsOneWidget);
 
