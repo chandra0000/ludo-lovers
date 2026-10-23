@@ -308,8 +308,8 @@ void main() {
         find.byKey(const ValueKey('local_match_player_strip')),
         findsOneWidget,
       );
-      expect(find.byType(CircleAvatar), findsNothing);
-      expect(find.byIcon(Icons.person_rounded), findsNWidgets(4));
+      expect(find.byType(CircleAvatar), findsNWidgets(4));
+      expect(find.byIcon(Icons.person_rounded), findsNothing);
       expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
       expect(find.text('Chat'), findsOneWidget);
@@ -1304,7 +1304,7 @@ void main() {
           progress: progress,
         ),
       );
-      final diameter = boardSize / 15 * 0.68;
+      final diameter = boardSize / 15 * 0.58;
       return boardTopLeft +
           Offset(
             visual.point.x * boardSize - diameter / 2,
