@@ -144,7 +144,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     width: 58,
                     height: 58,
                     decoration: BoxDecoration(
-                      color: AppTheme.background,
+                      color: AppTheme.black,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: _selectedAnimalByPlayer[playerId] == entry.key
