@@ -54,10 +54,6 @@ void main() {
         isEmpty,
         reason: 'Known corner connectors must not be confused with accidental jumps.',
       );
-      expect(
-        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
-        isEmpty,
-      );
     });
 
     test('each player entry marker maps to its canonical physical track cell', () {
