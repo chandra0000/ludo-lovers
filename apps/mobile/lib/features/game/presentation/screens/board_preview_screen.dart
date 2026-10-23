@@ -84,7 +84,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               Text(
                 ClassicLudoBoardCoordinateFactory.isGameplayReady
                     ? 'Structural checks pass. Visual and rules approval is still required before release.'
-                    : 'Structural geometry checks pass. Visual topology and rules approval are still required before release.',
+                    : 'Structural geometry checks found blockers. Visual topology and rules approval are still required before release.',
               ),
               const SizedBox(height: 12),
               const Text(
