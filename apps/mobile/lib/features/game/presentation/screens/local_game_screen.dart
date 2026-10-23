@@ -1046,6 +1046,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       Semantics(
                         key: const ValueKey('turn_status_semantics'),
                         liveRegion: true,
+                        excludeSemantics: true,
                         label: state.completed
                             ? 'Match complete. ${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins.'
                             : '${current.toUpperCase()} player turn.',
@@ -1091,6 +1092,57 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                      // Compact seat/profile strip: keeps colour and seat
+                      // identity visible without the old oversized duplicate banner.
+                      Container(
+                        key: const ValueKey('local_match_player_strip'),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.panel.withValues(alpha: 0.7),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.gold.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: state.players.map((playerId) {
+                            final playerColor = _colors[playerId] ?? AppTheme.cream;
+                            final isHuman = _playAgainstAi && playerId == _humanPlayerId;
+                            final isAiSeat = _playAgainstAi && !isHuman;
+                            final seatLabel = _playAgainstAi ? (isHuman ? 'YOU' : 'AI') : 'LOCAL';
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 1),
+                                  decoration: BoxDecoration(
+                                    color: playerId == current ? playerColor.withValues(alpha: 0.12) : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: playerId == current ? playerColor : Colors.white.withValues(alpha: 0.08),
+                                      width: playerId == current ? 1.1 : 0.6,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      CircleAvatar(
+                                        radius: 11,
+                                        backgroundColor: playerColor,
+                                        child: Icon(isAiSeat ? Icons.smart_toy_rounded : Icons.person_rounded, size: 13, color: Colors.black87),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(playerId.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(color: playerColor, fontSize: 8, fontWeight: FontWeight.w900)),
+                                      Text(seatLabel, style: const TextStyle(color: AppTheme.readableText, fontSize: 7, fontWeight: FontWeight.w700)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(growable: false),
                         ),
                       ),
                       AnimatedSwitcher(
