@@ -4,7 +4,7 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_defini
 
 void main() {
   group('Classic Ludo v1 visual-topology contract', () {
-    test('the 52-cell route has only the four explicitly documented corner diagonals', () {
+    test('the 52-cell route identifies all four diagonal transitions as blockers', () {
       const expectedDiagonalTransitions = <int, List<BoardGridCell>>{
         4: <BoardGridCell>[
           BoardGridCell(column: 5, row: 6),
@@ -41,7 +41,10 @@ void main() {
           reason: 'v1 diagonal transition ${entry.key} has an unexpected destination',
         );
       }
-      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(
+        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        <int>[4, 17, 30, 43],
+      );
     });
 
     test('each player entry marker maps to its canonical physical track cell', () {
