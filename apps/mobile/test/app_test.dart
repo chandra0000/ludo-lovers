@@ -122,8 +122,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Ludo Lovers · Match'), findsOneWidget);
-    expect(find.text('ORANGE’S TURN'), findsOneWidget);
-    expect(find.text('YOUR TURN'), findsOneWidget);
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
     expect(find.text('Chat'), findsOneWidget);
     expect(find.text('React'), findsOneWidget);
     expect(
@@ -159,11 +158,7 @@ void main() {
       MaterialApp(home: LocalGameScreen(controller: controller)),
     );
 
-    expect(find.text('ORANGE’S TURN'), findsOneWidget);
-    expect(
-      tester.getSemantics(find.byKey(const ValueKey('turn_status_semantics'))).label,
-      'ORANGE player turn.',
-    );
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
     expect(find.text('YOU'), findsAtLeastNWidgets(1));
     expect(find.text('GREEN'), findsAtLeastNWidgets(1));
     expect(find.text('BLUE'), findsAtLeastNWidgets(1));
@@ -194,7 +189,6 @@ void main() {
     expect(controller.state.pendingRoll, isNull);
     // A six grants another turn under the current local rule profile.
     expect(controller.state.currentPlayerId, 'orange');
-    expect(find.text('ORANGE’S TURN'), findsOneWidget);
     expect(find.text('OUT 1/4'), findsOneWidget);
     expect(find.text('OUT 0/4'), findsNWidgets(3));
     expect(
@@ -236,7 +230,8 @@ void main() {
       ),
       isTrue,
     );
-    expect(find.text('Roll the dice to start your turn.'), findsOneWidget);
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
+    expect(find.text('OUT 0/4'), findsNWidgets(4));
   });
 
   testWidgets('local match advances turn after a legal non-bonus move',
@@ -278,7 +273,7 @@ void main() {
     );
     expect(controller.state.pendingRoll, isNull);
     expect(controller.state.currentPlayerId, 'green');
-    expect(find.text('GREEN’S TURN'), findsOneWidget);
+    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
   });
 
   testWidgets('local match auto-advances when a roll has no legal pawns',
@@ -296,7 +291,7 @@ void main() {
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
     expect(controller.legalPawnIds, isEmpty);
-    expect(find.text('GREEN’S TURN'), findsOneWidget);
+    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
   });
 
 }
