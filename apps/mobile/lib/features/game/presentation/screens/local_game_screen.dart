@@ -1290,18 +1290,51 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      CircleAvatar(
-                                        radius: 13,
-                                        backgroundColor:
-                                            _colors[state.players[playerIndex]] ??
-                                                AppTheme.cream,
-                                        child: Text(
-                                          state.players[playerIndex]
-                                              .characters.first.toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Color(0xFF17120A),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w900,
+                                      AnimatedContainer(
+                                        key: ValueKey<String>(
+                                          'active_avatar_ring_${state.players[playerIndex]}',
+                                        ),
+                                        duration: const Duration(milliseconds: 240),
+                                        curve: Curves.easeOutCubic,
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: state.players[playerIndex] == current
+                                                ? AppTheme.gold
+                                                : Colors.transparent,
+                                            width: 2,
+                                          ),
+                                          boxShadow: state.players[playerIndex] == current
+                                              ? <BoxShadow>[
+                                                  BoxShadow(
+                                                    color: AppTheme.gold.withValues(alpha: 0.32),
+                                                    blurRadius: 9,
+                                                    spreadRadius: 1,
+                                                  ),
+                                                ]
+                                              : const <BoxShadow>[],
+                                        ),
+                                        child: AnimatedScale(
+                                          duration: const Duration(milliseconds: 240),
+                                          curve: Curves.easeOutBack,
+                                          scale: state.players[playerIndex] == current
+                                              ? 1.08
+                                              : 1,
+                                          child: CircleAvatar(
+                                            radius: 13,
+                                            backgroundColor:
+                                                _colors[state.players[playerIndex]] ??
+                                                    AppTheme.cream,
+                                            child: Text(
+                                              state.players[playerIndex]
+                                                  .characters.first.toUpperCase(),
+                                              style: const TextStyle(
+                                                color: Color(0xFF17120A),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
