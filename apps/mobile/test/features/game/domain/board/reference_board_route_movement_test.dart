@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordinate_factory.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixture.dart';
+import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
 
 void main() {
   group('Reference board route movement', () {
@@ -124,6 +125,65 @@ void main() {
         expect(dx + dy == 1 || (dx == 1 && dy == 1), isTrue, reason: '${seat.id} lane entry must be a direct reference-board connection');
       }
       expect(allLaneCells, hasLength(20));
+    });
+
+    test('movement resolver follows the real board route through corners, wrap, lane and finish', () {
+      final paths = ClassicLudoBoardFixture.create();
+      const movement = LudoPathMovement();
+      final blue = paths.forPlayer('blue');
+
+      // A pawn crosses the reference corner connector in ordered steps.
+      final cornerSteps = movement.positionsBetween(
+        path: blue,
+        fromProgress: 16,
+        toProgress: 19,
+      );
+      expect(cornerSteps.map((step) => step.progress), <int>[17, 18, 19]);
+      expect(cornerSteps.every((step) => step.section == PawnRouteSection.mainTrack), isTrue);
+      expect(blue.cellAtProgress(17), 4);
+      expect(blue.cellAtProgress(18), 5);
+      expect(blue.cellAtProgress(19), 6);
+
+      // Blue crosses the physical 51 -> 0 wrap without skipping a move.
+      expect(blue.cellAtProgress(11), 50);
+      expect(blue.cellAtProgress(12), 51);
+      expect(blue.cellAtProgress(13), 0);
+      final wrapSteps = movement.positionsBetween(
+        path: blue,
+        fromProgress: 11,
+        toProgress: 13,
+      );
+      expect(wrapSteps.map((step) => step.progress), <int>[12, 13]);
+      expect(wrapSteps.every((step) => step.section == PawnRouteSection.mainTrack), isTrue);
+
+      // The last outer-lap cell branches into Blue's five-cell private lane.
+      final laneSteps = movement.positionsBetween(
+        path: blue,
+        fromProgress: 49,
+        toProgress: 54,
+      );
+      expect(laneSteps.map((step) => step.section), <PawnRouteSection>[
+        PawnRouteSection.mainTrack,
+        PawnRouteSection.homeLane,
+        PawnRouteSection.homeLane,
+        PawnRouteSection.homeLane,
+        PawnRouteSection.homeLane,
+      ]);
+      expect(blue.cellAtProgress(50), 37);
+      expect(blue.cellAtProgress(51), 210);
+      expect(blue.cellAtProgress(52), 211);
+      expect(blue.cellAtProgress(53), 212);
+      expect(blue.cellAtProgress(54), 213);
+
+      final finishSteps = movement.positionsBetween(
+        path: blue,
+        fromProgress: blue.finishProgress - 1,
+        toProgress: blue.finishProgress,
+      );
+      expect(finishSteps, hasLength(1));
+      expect(finishSteps.single.section, PawnRouteSection.finished);
+      expect(finishSteps.single.progress, blue.finishProgress);
+      expect(blue.cellAtProgress(blue.finishProgress), isNull);
     });
 
     test('safe cells, board bounds and center finish remain consistent', () {
