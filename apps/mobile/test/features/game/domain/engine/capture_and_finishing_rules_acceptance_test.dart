@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_coordinate_factory.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixture.dart';
 import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart';
@@ -29,6 +30,19 @@ void main() {
               blueProgress >= 0 && blueProgress < bluePath.trackLength;
         });
     final destination = orangePath.mainTrackCells[orangeProgress + 1];
+    // Resolve the same destination through the canonical board-coordinate source,
+    // not a separately hard-coded route used only by this rules test.
+    expect(destination, inInclusiveRange(0, 51));
+    expect(
+      ClassicLudoBoardCoordinateFactory.sharedTrack[destination].isInsideBoard,
+      isTrue,
+      reason: 'Safe-square test destination must map to a reviewed board cell.',
+    );
+    expect(
+      orangePath.cellAtProgress(orangeProgress + 1),
+      destination,
+      reason: 'Engine destination must equal the fixture route destination.',
+    );
     final blueProgress = bluePath.mainTrackCells.indexOf(destination);
     expect(blueProgress, inInclusiveRange(0, bluePath.trackLength - 1));
 
