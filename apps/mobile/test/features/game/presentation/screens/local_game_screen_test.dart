@@ -1631,4 +1631,34 @@ void main() {
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
   });
 
+  testWidgets('players can choose an animal avatar for match recognition', (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: const LocalGameScreen(),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('animal_avatar_orange')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('choose_animal_avatar_orange')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('animal_avatar_picker')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('animal_avatar_option_lion')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('animal_avatar_picker')), findsNothing);
+    expect(find.byKey(const ValueKey('animal_avatar_orange')), findsOneWidget);
+    expect(find.text('🦁'), findsOneWidget);
+    // Other players keep their own default animal identities.
+    expect(find.text('🐸'), findsOneWidget);
+    expect(find.text('🐼'), findsOneWidget);
+    expect(find.text('🐱'), findsOneWidget);
+  });
+
 }
