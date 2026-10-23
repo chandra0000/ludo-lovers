@@ -76,6 +76,8 @@ void main() {
       ),
     );
 
+    expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
     expect(find.byKey(const ValueKey('local_match_player_strip')), findsOneWidget);
     expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
     expect(find.text('GREEN'), findsAtLeastNWidgets(1));
