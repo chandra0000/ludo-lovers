@@ -1910,8 +1910,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         pawnId: visual.pawnId,
         playerId: visual.playerId,
         point: visual.point,
+        isYard: visual.isYard,
+        isFinished: visual.isFinished,
         isStacked: isStacked,
-        stackOffset: isStacked
+        stackOffset: isStacked && !visual.isFinished
             ? _stackOffsets[stackIndex % _stackOffsets.length]
             : Offset.zero,
       );
@@ -2057,12 +2059,106 @@ class _RoundActionButton extends StatelessWidget {
   }
 }
 
+class _GlassConePawn extends StatelessWidget {
+  const _GlassConePawn({
+    required this.color,
+    required this.size,
+    required this.isActive,
+    required this.pawnId,
+  });
+
+  final Color color;
+  final double size;
+  final bool isActive;
+  final String pawnId;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      key: ValueKey<String>('glass_cone_pawn_$pawnId'),
+      painter: _GlassConePawnPainter(color: color, isActive: isActive),
+      size: Size(size, size),
+    );
+  }
+}
+
+class _GlassConePawnPainter extends CustomPainter {
+  const _GlassConePawnPainter({required this.color, required this.isActive});
+
+  final Color color;
+  final bool isActive;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final w = size.width;
+    final h = size.height;
+    final center = w / 2;
+    final baseY = h * 0.91;
+    final coneTop = h * 0.28;
+    final conePath = Path()
+      ..moveTo(center - w * 0.39, baseY)
+      ..quadraticBezierTo(center - w * 0.19, h * 0.67, center - w * 0.12, coneTop)
+      ..quadraticBezierTo(center, h * 0.19, center + w * 0.12, coneTop)
+      ..quadraticBezierTo(center + w * 0.19, h * 0.67, center + w * 0.39, baseY)
+      ..close();
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(center, h * 0.93), width: w * 0.82, height: h * 0.18),
+      Paint()..color = Colors.black.withValues(alpha: 0.55),
+    );
+    if (isActive) {
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(center, h * 0.87), width: w * 1.2, height: h * 0.28),
+        Paint()
+          ..color = color.withValues(alpha: 0.55)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.15),
+      );
+    }
+    final baseRect = Rect.fromCenter(center: Offset(center, h * 0.86), width: w * 0.82, height: h * 0.24);
+    canvas.drawOval(baseRect, Paint()..shader = LinearGradient(
+      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+      colors: <Color>[Color.lerp(color, Colors.white, 0.65)!, color, Color.lerp(color, Colors.black, 0.62)!],
+    ).createShader(baseRect));
+    canvas.drawPath(conePath, Paint()..shader = LinearGradient(
+      begin: Alignment.topLeft, end: Alignment.bottomRight,
+      colors: <Color>[
+        Color.lerp(color, Colors.white, 0.82)!.withValues(alpha: 0.98),
+        Color.lerp(color, Colors.white, 0.25)!.withValues(alpha: 0.94),
+        color.withValues(alpha: 0.97),
+        Color.lerp(color, Colors.black, 0.62)!,
+      ],
+      stops: const <double>[0, 0.22, 0.66, 1],
+    ).createShader(Rect.fromLTWH(0, coneTop, w, baseY - coneTop)));
+    canvas.drawPath(conePath, Paint()
+      ..color = Colors.white.withValues(alpha: 0.62)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(0.7, w * 0.035));
+    canvas.drawLine(Offset(center - w * 0.10, h * 0.38), Offset(center - w * 0.24, h * 0.70),
+      Paint()..color = Colors.white.withValues(alpha: 0.42)..strokeWidth = w * 0.045..strokeCap = StrokeCap.round);
+    final headRect = Rect.fromCenter(center: Offset(center, h * 0.23), width: w * 0.46, height: h * 0.46);
+    canvas.drawCircle(Offset(center, h * 0.23), w * 0.235, Paint()..shader = RadialGradient(
+      center: const Alignment(-0.38, -0.48),
+      colors: <Color>[Colors.white.withValues(alpha: 0.98), Color.lerp(color, Colors.white, 0.32)!, color, Color.lerp(color, Colors.black, 0.48)!],
+      stops: const <double>[0, 0.18, 0.58, 1],
+    ).createShader(headRect));
+    canvas.drawCircle(Offset(center - w * 0.07, h * 0.15), w * 0.055, Paint()..color = Colors.white.withValues(alpha: 0.95));
+    canvas.drawOval(Rect.fromCenter(center: Offset(center, h * 0.31), width: w * 0.36, height: h * 0.08),
+      Paint()..color = Colors.black.withValues(alpha: 0.28));
+  }
+
+  @override
+  bool shouldRepaint(covariant _GlassConePawnPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.isActive != isActive;
+}
+
 class _PawnVisual {
   const _PawnVisual({
     required this.pawnId,
     required this.playerId,
     required this.point,
     this.isStacked = false,
+    this.isYard = false,
+    this.isFinished = false,
     this.stackOffset = Offset.zero,
   });
 
@@ -2070,6 +2166,8 @@ class _PawnVisual {
   final String playerId;
   final BoardPoint point;
   final bool isStacked;
+  final bool isYard;
+  final bool isFinished;
   final Offset stackOffset;
 }
 
