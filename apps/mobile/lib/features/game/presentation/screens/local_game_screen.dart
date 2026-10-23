@@ -10,7 +10,6 @@ import '../../domain/board/board_pawn_layout.dart';
 import '../../domain/board/classic_ludo_board_coordinate_factory.dart';
 import '../../domain/board/classic_ludo_board_definition.dart';
 import '../../domain/board/classic_ludo_board_fixture.dart';
-import '../../domain/board/classic_ludo_board_painter.dart';
 import '../../domain/engine/local_game_factory.dart';
 import '../../domain/engine/ludo_path_movement.dart';
 import '../../domain/engine/path_based_local_game_engine.dart';
