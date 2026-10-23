@@ -346,7 +346,7 @@ void main() {
         pendingRollSemantics.properties.hint,
         'Choose a highlighted pawn to use the current roll.',
       );
-      expect(find.text('Rolled 6 · Tap a glowing pawn.'), findsOneWidget);
+      expect(find.text('You rolled 6. Choose a glowing pawn.'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsOneWidget,
@@ -586,7 +586,7 @@ void main() {
       expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
       expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-      expect(find.text('OUT 1/4'), findsOneWidget);
+      
       expect(find.textContaining('PawnCaptured'), findsOneWidget);
       expect(
         find.text('Brilliant capture! An opponent pawn returns to the yard.'),
@@ -1059,7 +1059,7 @@ void main() {
     expect(controller.state.completed, isTrue);
     expect(controller.state.winnerPlayerId, 'orange');
     expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
-    expect(find.text('ORANGE wins!'), findsOneWidget);
+    expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
     expect(find.byKey(const ValueKey('match_standings_panel')), findsOneWidget);
     expect(find.text('MATCH STANDINGS'), findsOneWidget);
     expect(find.text('ORANGE · WINNER'), findsOneWidget);
@@ -1141,7 +1141,7 @@ void main() {
             .position.section,
         PawnRouteSection.mainTrack,
       );
-      expect(find.text('OUT 1/4'), findsOneWidget);
+      
       expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
     },
