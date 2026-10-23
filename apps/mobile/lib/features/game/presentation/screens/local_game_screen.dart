@@ -1720,7 +1720,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     required double cellSize,
     required bool isLegal,
   }) {
-    final diameter = cellSize * (visual.isFinished ? 0.34 : visual.isStacked ? 0.44 : 0.68);
+    final diameter = cellSize * (visual.isFinished ? 0.34 : visual.isYard ? 0.42 : visual.isStacked ? 0.44 : 0.58);
     final centerX = visual.point.x * boardSize.width + visual.stackOffset.dx * cellSize;
     final centerY = visual.point.y * boardSize.height + visual.stackOffset.dy * cellSize;
     final isSelectable = isLegal || (visual.isYard &&
