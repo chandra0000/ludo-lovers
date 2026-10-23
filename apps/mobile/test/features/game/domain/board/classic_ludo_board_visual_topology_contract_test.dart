@@ -121,6 +121,61 @@ void main() {
       }
     });
 
+
+    test('audits every shared-track edge, including the 51-to-0 wrap', () {
+      const track = ClassicLudoBoardDefinition.sharedTrackCells;
+      expect(track, hasLength(52));
+
+      const diagonalEdges = <int>{4, 17, 30, 43};
+      for (var index = 0; index < track.length; index++) {
+        final from = track[index];
+        final to = track[(index + 1) % track.length];
+        final dx = (from.column - to.column).abs();
+        final dy = (from.row - to.row).abs();
+        final isOrthogonal = dx + dy == 1;
+        final isDocumentedCornerConnector =
+            diagonalEdges.contains(index) && dx == 1 && dy == 1;
+
+        expect(
+          isOrthogonal || isDocumentedCornerConnector,
+          isTrue,
+          reason: 'Unmapped route edge ${index} -> ${(index + 1) % track.length}: '
+              '($from) -> ($to)',
+        );
+      }
+
+      final last = track[51];
+      final first = track[0];
+      expect(last, const BoardGridCell(column: 0, row: 6));
+      expect(first, const BoardGridCell(column: 1, row: 6));
+      expect((last.column - first.column).abs() +
+          (last.row - first.row).abs(), 1,
+          reason: 'The shared route must wrap continuously from 51 to 0.');
+    });
+
+    test('home-lane branch and five movement cells are explicit for every seat', () {
+      const track = ClassicLudoBoardDefinition.sharedTrackCells;
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final approachIndex =
+            (seat.provisionalTrackEntryIndex + 50) % track.length;
+        final approach = track[approachIndex];
+        final firstLane = seat.homeLaneCells.first;
+        final dx = (approach.column - firstLane.column).abs();
+        final dy = (approach.row - firstLane.row).abs();
+
+        expect(dx <= 1 && dy <= 1 && dx + dy > 0, isTrue,
+            reason: '${seat.id} lane must branch from its final main-track cell');
+        expect(seat.homeLaneCells, hasLength(5), reason: seat.id);
+        for (var step = 1; step < seat.homeLaneCells.length; step++) {
+          final previous = seat.homeLaneCells[step - 1];
+          final current = seat.homeLaneCells[step];
+          expect((previous.column - current.column).abs() +
+              (previous.row - current.row).abs(), 1,
+              reason: '${seat.id} home-lane movement step $step');
+        }
+      }
+    });
+
     test('gameplay stays blocked until the visual topology is explicitly approved', () {
       expect(ClassicLudoBoardDefinition.isVisualTopologyApproved, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
