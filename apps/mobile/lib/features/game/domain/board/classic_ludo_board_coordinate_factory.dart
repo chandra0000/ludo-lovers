@@ -15,8 +15,9 @@ class ClassicLudoBoardCoordinateFactory {
 
   /// Indexes whose next route cell is diagonal rather than orthogonally adjacent.
   ///
-  /// These four corner transitions also appear in the independent reference.
-  /// They remain visible for review, but are not by themselves geometry defects.
+  /// The current candidate route has four such transitions. They are tracked as
+  /// release blockers because the approved route contract requires edge-sharing
+  /// (orthogonal) adjacency; visual proximity alone is not sufficient.
   static List<int> get nonOrthogonalTransitionIndexes {
     final indexes = <int>[];
     for (var index = 0; index < sharedTrack.length; index++) {
@@ -53,22 +54,18 @@ class ClassicLudoBoardCoordinateFactory {
     return '$index (${cell.column},${cell.row})';
   }
 
-  /// Only the four documented one-cell diagonal corner links are permitted.
-  /// Any other gap, jump, or non-neighbour transition is a geometry defect.
-  static List<int> get invalidTransitionIndexes {
-    const expectedDiagonalCorners = <int>{4, 17, 30, 43};
-    final invalid = <int>[];
-    for (var index = 0; index < sharedTrack.length; index++) {
-      final current = sharedTrack[index];
-      final next = sharedTrack[(index + 1) % sharedTrack.length];
-      final dx = (current.column - next.column).abs();
-      final dy = (current.row - next.row).abs();
-      final orthogonal = dx + dy == 1;
-      final expectedDiagonal = expectedDiagonalCorners.contains(index) && dx == 1 && dy == 1;
-      if (!orthogonal && !expectedDiagonal) invalid.add(index);
-    }
-    return List<int>.unmodifiable(invalid);
-  }
+  /// Every transition that violates the release contract.
+  ///
+  /// Unlike the older permissive check, this does not whitelist diagonal
+  /// corners. The canonical route must be orthogonally continuous, including
+  /// the wrap from cell 51 back to cell 0.
+  static List<int> get invalidTransitionIndexes =>
+      nonOrthogonalTransitionIndexes;
+
+  /// True only when all 52 cells form an orthogonally continuous cycle.
+  static bool get isOrthogonallyContinuous =>
+      sharedTrack.length == ClassicLudoBoardDefinition.sharedTrackLength &&
+      nonOrthogonalTransitionIndexes.isEmpty;
 
   /// Conservative release gate for consuming this geometry in game rules.
   ///
@@ -79,6 +76,7 @@ class ClassicLudoBoardCoordinateFactory {
     if (sharedTrack.length != ClassicLudoBoardDefinition.sharedTrackLength ||
         sharedTrack.toSet().length != sharedTrack.length ||
         !sharedTrack.every((cell) => cell.isInsideBoard) ||
+        !isOrthogonallyContinuous ||
         invalidTransitionIndexes.isNotEmpty ||
         !ClassicLudoBoardDefinition.isVisualTopologyApproved) {
       return false;
