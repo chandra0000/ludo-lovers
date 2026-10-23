@@ -65,9 +65,9 @@ class ClassicLudoBoardCoordinateFactory {
         (index) => !referenceCornerConnectorIndexes.contains(index),
       ));
 
-  /// Non-orthogonal edges are retained as a review signal for compatibility.
-  /// Call [unmappedTransitionIndexes] to detect unexpected route defects.
-  static List<int> get invalidTransitionIndexes => unmappedTransitionIndexes;
+  /// Non-orthogonal edges retained as a release-review signal for compatibility.
+  /// This includes documented connectors; it is not the same as an unknown jump.
+  static List<int> get invalidTransitionIndexes => nonOrthogonalTransitionIndexes;
 
   /// True only when all 52 cells form an orthogonally continuous cycle.
   static bool get isOrthogonallyContinuous =>
