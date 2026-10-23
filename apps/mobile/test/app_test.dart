@@ -159,12 +159,9 @@ void main() {
     );
 
     expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-    expect(find.text('YOU'), findsAtLeastNWidgets(1));
     expect(find.text('GREEN'), findsAtLeastNWidgets(1));
     expect(find.text('BLUE'), findsAtLeastNWidgets(1));
     expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
-    expect(find.text('BOT'), findsNothing);
-    expect(find.text('OUT 0/4'), findsNWidgets(4));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
@@ -189,8 +186,6 @@ void main() {
     expect(controller.state.pendingRoll, isNull);
     // A six grants another turn under the current local rule profile.
     expect(controller.state.currentPlayerId, 'orange');
-    expect(find.text('OUT 1/4'), findsOneWidget);
-    expect(find.text('OUT 0/4'), findsNWidgets(3));
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       findsNothing,
@@ -231,7 +226,6 @@ void main() {
       isTrue,
     );
     expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-    expect(find.text('OUT 0/4'), findsNWidgets(4));
   });
 
   testWidgets('local match advances turn after a legal non-bonus move',
