@@ -231,6 +231,70 @@ The current baseline is a proposal. Confirm or revise:
 
 These decisions must be settled before coding the engine so tests describe one unambiguous behavior.
 
+
+## 16. Team Up mode — confirmed product rules
+
+Team Up is a separate 2-vs-2 variant. These rules must not alter Classic mode.
+
+### Teams and fixed scheduled order
+
+- **Team A:** Orange + Magenta.
+- **Team B:** Green + Blue.
+- Scheduled seat order is always **Orange → Green → Magenta → Blue → repeat**.
+- The scheduled order never changes, even when a player finishes all four pawns.
+
+### Friendly stacks and opposing stacks
+
+- Teammates are friendly regardless of pawn colour. Orange and Magenta are friendly; Green and Blue are friendly.
+- Friendly teammate pawns may share a cell and form a friendly stack. They never capture one another.
+- Opposing teams can interact under the Team Up stack-capture rule.
+- Safe cells protect every pawn, including opposing-team pawns; no capture occurs on a safe cell.
+- For a non-safe cell with a mixed opposing-team encounter, the last-arriving pawn/stack has capture priority. Initially, all occupants may remain present. If a pawn from the protected opposing stack leaves and the last-arriving side remains, the remaining opposing pawn(s) are captured immediately and returned to their yard. If the last-arriving side leaves first, the earlier stack remains.
+- Equal-sized opposing stacks use the same last-arrival priority: the last-arriving stack wins and the opposing stack is returned to its yard.
+- Capture priority and stack membership must be represented in domain state/events, not inferred from animation positions. Every colour combination must use team membership, not hard-coded colour-specific capture logic.
+- The exact lifecycle for stacks with more than two opposing occupants must be covered by engine tests before the mode is marked gameplay-ready.
+
+### Dice-turn transfer for a finished player
+
+A player who has all four pawns in final home still has their scheduled dice roll. The result is transferred to their teammate for that teammate to use. The fixed scheduled seat order remains unchanged.
+
+- When Orange has finished all four pawns, Orange's scheduled roll is transferred to Magenta.
+- When Magenta has finished all four pawns, Magenta's scheduled roll is transferred to Orange.
+- When Green has finished all four pawns, Green's scheduled roll is transferred to Blue.
+- When Blue has finished all four pawns, Blue's scheduled roll is transferred to Green.
+- A teammate receives both their own scheduled rolls and rolls transferred by their finished teammate.
+- A six's bonus roll is transferred to the same receiving teammate and follows the same bonus-roll rules. Transfer does not itself advance or reorder the scheduled seats.
+- If both teammates have finished all four pawns, there is no eligible recipient and that scheduled roll is skipped normally.
+- The match ends immediately when either team has all eight pawns in final home.
+
+### Team victory
+
+- Team A wins only when all four Orange pawns and all four Magenta pawns are finished.
+- Team B wins only when all four Green pawns and all four Blue pawns are finished.
+- Finishing one player's four pawns is not a team victory; it activates the teammate roll-transfer rule.
+
+### Team Up acceptance tests
+
+| ID | Scenario | Expected result |
+|---|---|---|
+| TEAM-001 | Orange and Magenta occupy the same non-safe cell | Friendly stack; no capture |
+| TEAM-002 | Green and Blue occupy the same non-safe cell | Friendly stack; no capture |
+| TEAM-003 | Orange meets Green or Blue on a safe cell | All pawns are protected |
+| TEAM-004 | Opposing pawn arrives on a non-safe cell occupied by a stack | Arrival priority is recorded; occupants are not prematurely removed |
+| TEAM-005 | A pawn from the earlier opposing stack leaves first | Remaining pawn(s) from that stack are captured immediately if the last-arriving side remains |
+| TEAM-006 | Last-arriving pawn/stack leaves first | Earlier stack remains |
+| TEAM-007 | Equal-sized opposing stacks meet | Last-arriving stack wins according to the documented priority |
+| TEAM-008 | Orange has finished all four pawns and Orange's scheduled turn arrives | Orange rolls; result is assigned to Magenta |
+| TEAM-009 | Green has finished all four pawns and Green's scheduled turn arrives | Green rolls; result is assigned to Blue |
+| TEAM-010 | Transferred roll is a six | Bonus roll transfers to the same recipient |
+| TEAM-011 | Both Orange and Magenta have finished | Orange and Magenta scheduled turns have no recipient and are skipped |
+| TEAM-012 | All Orange and Magenta pawns are finished | Team A wins immediately |
+| TEAM-013 | Only one Team A player has finished | Team A has not won |
+| TEAM-014 | Classic mode uses the existing profile | Team Up transfer/stack rules do not affect Classic |
+| TEAM-015 | Any colour combination from opposing teams meets | Same team-based rule is applied; no colour-specific special case |
+
+Team Up remains a specification until these behaviors are integrated into the live local engine, exercised by engine-level tests, and the complete Flutter analyze/test/Android debug APK pipeline passes. The helper-level rule tests alone do not establish gameplay readiness.
+
 ## 15. Scope and next step
 
 This document remains the rules specification. A provisional profile and part of the local engine are implemented, but the full acceptance matrix is not yet executable and board topology is not approved. Next, expand classic 52-cell route tests and convert compatibility string events to typed event payloads before connecting the visual board.
