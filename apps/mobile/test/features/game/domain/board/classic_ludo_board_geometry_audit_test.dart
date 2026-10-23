@@ -6,7 +6,7 @@ import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixtur
 
 void main() {
   group('ClassicLudoBoardGeometryAudit', () {
-    test('reports diagonal corner links as geometry blockers', () {
+    test('reports known diagonal connectors without treating them as unknown jumps', () {
       final issues = ClassicLudoBoardGeometryAudit.inspect();
 
       expect(
@@ -17,8 +17,11 @@ void main() {
         ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
-      expect(issues.where((issue) => issue.contains('not an approved neighbouring-cell connection')), hasLength(4));
-      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isFalse);
+      expect(ClassicLudoBoardCoordinateFactory.unmappedTransitionIndexes, isEmpty);
+      expect(issues.where((issue) => issue.contains('neither orthogonal nor a documented')), isEmpty);
+      expect(ClassicLudoBoardGeometryAudit.isStructurallyConsistent, isTrue);
+      expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse,
+          reason: 'Structural consistency is not visual approval.');
     });
 
     test('center finish is in bounds and separate from track and lanes', () {
