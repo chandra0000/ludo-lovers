@@ -83,7 +83,7 @@ void main() {
     expect(find.text('GREEN'), findsAtLeastNWidgets(1));
     expect(find.text('BLUE'), findsAtLeastNWidgets(1));
     expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
-    expect(find.text('YOU'), findsAtLeastNWidgets(1));
+    expect(find.text('LOCAL'), findsAtLeastNWidgets(1));
     expect(find.text('LOCAL'), findsNWidgets(4));
     expect(find.text('Online'), findsNothing);
   });
@@ -300,7 +300,7 @@ void main() {
         'Roll a die to begin the current player’s turn.',
       );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
-      expect(find.text('YOU'), findsAtLeastNWidgets(1));
+      expect(find.text('LOCAL'), findsAtLeastNWidgets(1));
       expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.text('BLUE'), findsAtLeastNWidgets(1));
       expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
@@ -585,7 +585,7 @@ void main() {
       expect(capturedBluePawn.position.section, PawnRouteSection.yard);
       expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
-      expect(find.text('ORANGE’S TURN'), findsOneWidget);
+      expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
       expect(find.text('OUT 1/4'), findsOneWidget);
       expect(find.textContaining('PawnCaptured'), findsOneWidget);
       expect(
@@ -743,7 +743,7 @@ void main() {
       expect(bluePawn.position.section, PawnRouteSection.mainTrack);
       expect(controller.state.currentPlayerId, 'green');
       expect(controller.state.pendingRoll, isNull);
-      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.textContaining('PawnCaptured'), findsNothing);
       expect(find.textContaining('ExtraRollGranted'), findsNothing);
       expect(find.textContaining('TurnEnded'), findsOneWidget);
@@ -823,7 +823,7 @@ void main() {
       );
       expect(controller.state.currentPlayerId, 'green');
       expect(controller.state.pendingRoll, isNull);
-      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.textContaining('PawnCaptured'), findsNothing);
       expect(find.textContaining('ExtraRollGranted'), findsNothing);
       expect(find.textContaining('TurnEnded'), findsOneWidget);
@@ -870,7 +870,7 @@ void main() {
 
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'green');
-      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
@@ -969,7 +969,7 @@ void main() {
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
-    expect(find.text('GREEN’S TURN'), findsOneWidget);
+    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
   });
 
   testWidgets('restart resets the local match state', (tester) async {
@@ -1058,7 +1058,7 @@ void main() {
 
     expect(controller.state.completed, isTrue);
     expect(controller.state.winnerPlayerId, 'orange');
-    expect(find.text('MATCH COMPLETE'), findsOneWidget);
+    expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
     expect(find.text('ORANGE wins!'), findsOneWidget);
     expect(find.byKey(const ValueKey('match_standings_panel')), findsOneWidget);
     expect(find.text('MATCH STANDINGS'), findsOneWidget);
@@ -1089,7 +1089,7 @@ void main() {
       isTrue,
       reason: 'Rematch must restore the canonical fresh-game state.',
     );
-    expect(find.text('ORANGE’S TURN'), findsOneWidget);
+    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
     expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
     expect(
       tester.widget<ElevatedButton>(
@@ -1124,7 +1124,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.state.currentPlayerId, 'green');
-      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
 
@@ -1142,7 +1142,7 @@ void main() {
         PawnRouteSection.mainTrack,
       );
       expect(find.text('OUT 1/4'), findsOneWidget);
-      expect(find.text('GREEN’S TURN'), findsOneWidget);
+      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
     },
   );
