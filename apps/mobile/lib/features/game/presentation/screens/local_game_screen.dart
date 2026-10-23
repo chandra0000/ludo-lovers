@@ -1551,7 +1551,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      if (_controller.lastMessage != null) ...<Widget>[                      if (_controller.lastMessage != null) ...<Widget>[
+                      if (_controller.lastMessage != null) ...<Widget>[
                         const SizedBox(height: 8),
                         Semantics(
                           liveRegion: true,
