@@ -1004,9 +1004,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           builder: (context, constraints) {
             // The scroll view applies 10 px of horizontal padding on
             // each side, so size the board against its usable content width.
+            final availableWidth = math.max(0.0, constraints.maxWidth - 20);
+            // Reserve room for the player profile row and dice/actions on
+            // short displays while allowing the board to use wide phone space.
+            final availableHeight = math.max(0.0, constraints.maxHeight - 220);
             final boardSize = math.min(
-              math.max(0.0, constraints.maxWidth - 20),
-              constraints.maxHeight * 0.78,
+              availableWidth,
+              math.min(constraints.maxHeight * 0.78, availableHeight),
             );
             return AnimatedBuilder(
               animation: _controller,
