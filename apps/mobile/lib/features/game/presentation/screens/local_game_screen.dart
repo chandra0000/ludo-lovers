@@ -1319,7 +1319,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        'LOCAL',
+                                        _playAgainstAi
+                                            ? (state.players[playerIndex] == _humanPlayerId
+                                                ? 'YOU'
+                                                : 'AI')
+                                            : (state.players[playerIndex] == current
+                                                ? 'YOUR TURN'
+                                                : 'LOCAL'),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
