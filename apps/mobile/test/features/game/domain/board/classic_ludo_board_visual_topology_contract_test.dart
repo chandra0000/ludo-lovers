@@ -139,7 +139,7 @@ void main() {
         expect(
           isOrthogonal || isDocumentedCornerConnector,
           isTrue,
-          reason: 'Unmapped route edge ${index} -> ${(index + 1) % track.length}: '
+          reason: 'Unmapped route edge $index -> ${(index + 1) % track.length}: '
               '($from) -> ($to)',
         );
       }
