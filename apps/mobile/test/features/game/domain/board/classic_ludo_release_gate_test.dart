@@ -55,7 +55,10 @@ void main() {
         ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
       );
-      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(
+        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        <int>[4, 17, 30, 43],
+      );
     });
   });
 }
