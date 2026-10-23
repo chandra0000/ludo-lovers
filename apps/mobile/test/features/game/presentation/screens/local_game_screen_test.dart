@@ -304,12 +304,12 @@ void main() {
       expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.text('BLUE'), findsAtLeastNWidgets(1));
       expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
-      for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
-        expect(
-          find.byKey(ValueKey('match_player_$playerId')),
-          findsOneWidget,
-        );
-      }
+      expect(
+        find.byKey(const ValueKey('local_match_player_strip')),
+        findsOneWidget,
+      );
+      expect(find.byType(CircleAvatar), findsNothing);
+      expect(find.byIcon(Icons.person_rounded), findsNWidgets(4));
       expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
       expect(find.text('Chat'), findsOneWidget);
