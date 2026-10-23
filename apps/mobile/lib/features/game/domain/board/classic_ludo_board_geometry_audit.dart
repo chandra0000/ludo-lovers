@@ -40,10 +40,15 @@ class ClassicLudoBoardGeometryAudit {
       final dx = (current.column - next.column).abs();
       final dy = (current.row - next.row).abs();
       final isOrthogonal = dx + dy == 1;
-      if (!isOrthogonal) {
+      final isDocumentedCorner =
+          ClassicLudoBoardCoordinateFactory.referenceCornerConnectorIndexes
+                  .contains(index) &&
+              dx == 1 &&
+              dy == 1;
+      if (!isOrthogonal && !isDocumentedCorner) {
         issues.add(
           'Track transition $index to ${(index + 1) % track.length} '
-          'is not an approved neighbouring-cell connection.',
+          'is neither orthogonal nor a documented reference corner connector.',
         );
       }
     }
@@ -226,10 +231,10 @@ class ClassicLudoBoardGeometryAudit {
       issues.add('Player route fixture could not be validated: $error');
     }
 
-    if (ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.isNotEmpty) {
+    if (ClassicLudoBoardCoordinateFactory.unmappedTransitionIndexes.isNotEmpty) {
       issues.add(
-        'Shared track is not orthogonally continuous at transitions '
-        '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.join(', ')}.',
+        'Shared track contains undocumented transitions '
+        '${ClassicLudoBoardCoordinateFactory.unmappedTransitionIndexes.join(', ')}.',
       );
     }
 
