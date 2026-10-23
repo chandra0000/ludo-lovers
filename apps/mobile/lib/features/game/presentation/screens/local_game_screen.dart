@@ -1532,11 +1532,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           legalIds.contains(visual.pawnId))
                                         Positioned(
                                           left: visual.point.x * size.width -
-                                              cellSize * 0.48,
+                                              cellSize * 0.5,
                                           top: visual.point.y * size.height -
-                                              cellSize * 0.48,
-                                          width: cellSize * 0.96,
-                                          height: cellSize * 0.96,
+                                              cellSize * 0.5,
+                                          // Keep the hit target aligned to one complete
+                                          // logical cell so taps stay predictable on phones.
+                                          width: cellSize,
+                                          height: cellSize,
                                           child: Semantics(
                                             button: true,
                                             label: _accessiblePawnName(visual.pawnId),
@@ -1828,30 +1830,45 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     final point = _pawnLayout.layout.forCell(destinationCell);
     return Positioned(
       key: ValueKey<String>('destination_cell_${destinationCell}_${visual.pawnId}'),
-      left: point.x * boardSize.width - cellSize * 0.31,
-      top: point.y * boardSize.height - cellSize * 0.31,
-      width: cellSize * 0.62,
-      height: cellSize * 0.62,
+      left: point.x * boardSize.width - cellSize * 0.36,
+      top: point.y * boardSize.height - cellSize * 0.36,
+      width: cellSize * 0.72,
+      height: cellSize * 0.72,
       child: IgnorePointer(
         child: DecoratedBox(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppTheme.gold.withValues(alpha: 0.16),
-            border: Border.all(color: AppTheme.gold, width: 2),
+            color: AppTheme.gold.withValues(alpha: 0.20),
+            border: Border.all(
+              color: const Color(0xFFFFF4B8),
+              width: math.max(1.5, cellSize * 0.075),
+            ),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: AppTheme.gold.withValues(alpha: 0.28),
-                blurRadius: 8,
+                color: AppTheme.gold.withValues(alpha: 0.42),
+                blurRadius: cellSize * 0.34,
+                spreadRadius: cellSize * 0.035,
+              ),
+              BoxShadow(
+                color: AppTheme.gold.withValues(alpha: 0.18),
+                blurRadius: cellSize * 0.62,
+                spreadRadius: cellSize * 0.08,
               ),
             ],
           ),
           child: Center(
             child: Container(
-              width: cellSize * 0.12,
-              height: cellSize * 0.12,
-              decoration: const BoxDecoration(
-                color: AppTheme.gold,
+              width: cellSize * 0.15,
+              height: cellSize * 0.15,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF8D6),
                 shape: BoxShape.circle,
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: AppTheme.gold.withValues(alpha: 0.9),
+                    blurRadius: cellSize * 0.18,
+                  ),
+                ],
               ),
             ),
           ),
