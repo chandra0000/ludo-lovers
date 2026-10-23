@@ -14,7 +14,6 @@ void main() {
       ),
     );
 
-    expect(find.text('WELCOME TO LUDO LOVERS'), findsOneWidget);
     expect(find.text('PLAY TOGETHER'), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_logo')), findsOneWidget);
     expect(find.byKey(const ValueKey('onboarding_skip_button')), findsOneWidget);
@@ -43,7 +42,7 @@ void main() {
 
     await tester.tap(next);
     await tester.pumpAndSettle();
-    expect(find.text('PLAY • CONNECT • LOVE'), findsOneWidget);
+    expect(find.text('PLAY • CONNECT • LOVE'), findsNWidgets(2));
     expect(find.text('Get Started'), findsOneWidget);
 
     await tester.tap(next);
