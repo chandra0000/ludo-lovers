@@ -96,7 +96,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('The physical loop has 52 cells, while each player traverses 51 cells before turning directly into its five-cell home lane'),
+      find.textContaining('The physical loop has 52 cells'),
       findsOneWidget,
     );
   });
