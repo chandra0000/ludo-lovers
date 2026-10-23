@@ -1044,59 +1044,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   child: Column(
                     children: <Widget>[
-                      // Compact turn feedback preserves accessibility and
-                      // testable game status without restoring the large banner.
-                      Semantics(
-                        key: const ValueKey('turn_status_semantics'),
-                        liveRegion: true,
-                        excludeSemantics: true,
-                        label: state.completed
-                            ? 'Match complete. ${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins.'
-                            : '${current.toUpperCase()} player turn.',
-                        child: Container(
-                          key: const ValueKey('compact_turn_status'),
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: AppTheme.panel.withValues(alpha: 0.78),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.45)),
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 5,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: _colors[current] ?? AppTheme.gold,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      state.completed ? 'MATCH COMPLETE' : '${current.toUpperCase()}’S TURN',
-                                      style: TextStyle(color: _colors[current] ?? AppTheme.cream, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.6),
-                                    ),
-                                    Text(
-                                      state.completed
-                                          ? '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} wins!'
-                                          : state.pendingRoll == null
-                                              ? 'Roll the dice to start your turn.'
-                                              : 'Rolled ${state.pendingRoll} · Tap a glowing pawn.',
-                                      style: const TextStyle(color: AppTheme.readableText, fontSize: 10),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      // Turn state is conveyed through accessible dice and pawn controls.
                       // Compact seat/profile strip: keeps colour and seat
                       // identity visible without the old oversized duplicate banner.
                       Container(
@@ -1131,15 +1079,38 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      CircleAvatar(
-                                        radius: 11,
-                                        backgroundColor: playerColor,
-                                        child: Icon(isAiSeat ? Icons.smart_toy_rounded : Icons.person_rounded, size: 13, color: Colors.black87),
+                                      Container(
+                                        width: 42,
+                                        height: 42,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: <Color>[playerColor, playerColor.withValues(alpha: 0.48)],
+                                          ),
+                                          border: Border.all(
+                                            color: playerId == current ? AppTheme.gold : playerColor.withValues(alpha: 0.7),
+                                            width: playerId == current ? 2.2 : 1.2,
+                                          ),
+                                          boxShadow: <BoxShadow>[
+                                            BoxShadow(color: playerColor.withValues(alpha: 0.22), blurRadius: 12),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          isAiSeat ? Icons.smart_toy_rounded : Icons.person_rounded,
+                                          size: 23,
+                                          color: Colors.black87,
+                                        ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(playerId.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(color: playerColor, fontSize: 8, fontWeight: FontWeight.w900)),
-                                      Text(seatLabel, style: const TextStyle(color: AppTheme.readableText, fontSize: 7, fontWeight: FontWeight.w700)),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        playerId == 'orange' && _playAgainstAi ? 'YOU' : playerId.toUpperCase(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(color: playerColor, fontSize: 9, fontWeight: FontWeight.w900),
+                                      ),
+                                      Text(seatLabel, style: const TextStyle(color: AppTheme.mutedText, fontSize: 8, fontWeight: FontWeight.w700)),
                                     ],
                                   ),
                                 ),
@@ -1341,36 +1312,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 6),
-                      Row(
-                        children: <Widget>[
-                          for (final player in <({String id, String name, String title, IconData avatar})>[
-                            (id: 'orange', name: 'You', title: 'YOU', avatar: Icons.person_rounded),
-                            (id: 'green', name: 'Green', title: _playAgainstAi ? 'BOT' : 'GREEN', avatar: _playAgainstAi ? Icons.smart_toy_rounded : Icons.person_outline_rounded),
-                            (id: 'blue', name: 'Blue', title: _playAgainstAi ? 'BOT' : 'BLUE', avatar: _playAgainstAi ? Icons.smart_toy_rounded : Icons.person_outline_rounded),
-                            (id: 'magenta', name: 'Magenta', title: _playAgainstAi ? 'BOT' : 'MAGENTA', avatar: _playAgainstAi ? Icons.smart_toy_rounded : Icons.person_outline_rounded),
-                          ])
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  right: player.id == 'magenta' ? 0 : 6,
-                                ),
-                                child: _MatchPlayerCard(
-                                  key: ValueKey('match_player_${player.id}'),
-                                  title: player.title,
-                                  name: player.name,
-                                  color: _colors[player.id]!,
-                                  avatar: player.avatar,
-                                  isActive: current == player.id,
-                                  pawnsOut: state.pawns.where((pawn) =>
-                                    pawn.playerId == player.id &&
-                                    pawn.position.section != PawnRouteSection.yard).length,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      if (_playAgainstAi) ...<Widget>[
+                      if (_playAgainstAi)                      if (_playAgainstAi) ...<Widget>[
                         const SizedBox(height: 6),
                         const Text(
                           'AI OPPONENTS ON · YOU PLAY ORANGE',
@@ -1419,34 +1361,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         semanticLabel: 'Ludo Lovers live game board',
                                       ),
                                     ),
-                                    if (!state.completed)
-                                      Positioned(
-                                        left: current == 'orange' || current == 'blue' ? 0 : size.width * 0.6,
-                                        top: current == 'orange' || current == 'green' ? 0 : size.height * 0.6,
-                                        width: size.width * 0.4,
-                                        height: size.height * 0.4,
-                                        child: IgnorePointer(
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 320),
-                                            decoration: BoxDecoration(
-                                              color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.10),
-                                              border: Border.all(
-                                                color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.85),
-                                                width: 2,
-                                              ),
-                                              borderRadius: BorderRadius.circular(14),
-                                              boxShadow: <BoxShadow>[
-                                                BoxShadow(
-                                                  color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.30),
-                                                  blurRadius: 28,
-                                                  spreadRadius: 2,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    for (final visual in visuals)
+                                    for (final visual in visuals)                                    for (final visual in visuals)
                                       _buildAnimatedPawnMarker(
                                         visual: visual,
                                         boardSize: size,
@@ -1636,13 +1551,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text(
-                        state.completed ? 'PLAY AGAIN' : isAiTurn ? 'OPPONENT’S TURN' : 'YOUR TURN',
-                        key: const ValueKey('match_turn_caption'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: state.completed ? AppTheme.gold : (_colors[current] ?? AppTheme.gold), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.4),
-                      ),
-                      if (_controller.lastMessage != null) ...<Widget>[
+                      if (_controller.lastMessage != null) ...<Widget>[                      if (_controller.lastMessage != null) ...<Widget>[
                         const SizedBox(height: 8),
                         Semantics(
                           liveRegion: true,
