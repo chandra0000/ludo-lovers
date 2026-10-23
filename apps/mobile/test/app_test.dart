@@ -167,7 +167,7 @@ void main() {
     await tester.pump();
 
     expect(controller.state.pendingRoll, 6);
-    expect(find.text('Rolled 6 · Tap a glowing pawn.'), findsOneWidget);
+    expect(find.text('You rolled 6. Choose a glowing pawn.'), findsOneWidget);
     expect(find.byKey(const ValueKey('last_game_action_semantics')), findsOneWidget);
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
