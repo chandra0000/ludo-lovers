@@ -143,7 +143,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'The owner-confirmed safe-cell map contains eight cells: the four player starts and star cells at IDs 8, 21, 34, and 47. The physical loop has 52 cells, while each player traverses 51 cells before turning directly into its five-cell home lane; the outer corner beside each lane entrance is skipped. The four shared-loop corner diagonals pass structural checks. A fresh phone screenshot is still required to confirm rendered cell-center alignment before enabling release gameplay.',
+                'The owner-confirmed safe-cell map contains eight cells: the four player starts and star cells at IDs 8, 21, 34, and 47. The physical loop has 52 cells. The current candidate route still has four diagonal shared-loop transitions, so it does not pass the orthogonal-continuity release gate. Entry indexes and safe-cell IDs remain provisional until the route is reconciled against the approved artwork. A fresh phone screenshot is also required to confirm rendered cell-center alignment before enabling release gameplay.',
                 style: TextStyle(color: AppTheme.mutedText, height: 1.4),
               ),
             ],
