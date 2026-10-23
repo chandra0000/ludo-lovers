@@ -42,8 +42,21 @@ void main() {
         );
       }
       expect(
-        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        ClassicLudoBoardCoordinateFactory.referenceCornerConnectorIndexes,
+        <int>{4, 17, 30, 43},
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
         <int>[4, 17, 30, 43],
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.unmappedTransitionIndexes,
+        isEmpty,
+        reason: 'Known corner connectors must not be confused with accidental jumps.',
+      );
+      expect(
+        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        isEmpty,
       );
     });
 
@@ -174,6 +187,14 @@ void main() {
               reason: '${seat.id} home-lane movement step $step');
         }
       }
+    });
+
+    test('documented corner connectors do not silently approve gameplay', () {
+      expect(ClassicLudoBoardCoordinateFactory.isOrthogonallyContinuous, isFalse,
+          reason: 'The four diagonal connectors remain explicit review signals.');
+      expect(ClassicLudoBoardCoordinateFactory.unmappedTransitionIndexes, isEmpty);
+      expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse,
+          reason: 'Visual approval remains a separate release gate.');
     });
 
     test('gameplay stays blocked until the visual topology is explicitly approved', () {
