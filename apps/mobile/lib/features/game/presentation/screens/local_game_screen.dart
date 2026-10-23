@@ -75,6 +75,24 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
+  /// Lightweight, offline animal identities for local matches. The same
+  /// selection is rendered beside a player's colour and turn status.
+  static const Map<String, String> _animalAvatars = <String, String>{
+    'cat': '🐱',
+    'dog': '🐶',
+    'fox': '🦊',
+    'rabbit': '🐰',
+    'lion': '🦁',
+    'panda': '🐼',
+    'tiger': '🐯',
+    'koala': '🐨',
+    'bear': '🐻',
+    'monkey': '🐵',
+    'penguin': '🐧',
+    'frog': '🐸',
+  };
+  final Map<String, String> _selectedAnimalByPlayer = <String, String>{};
+
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
     'green': AppTheme.green,
@@ -98,6 +116,60 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _diceRollTimer?.cancel();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _chooseAnimalAvatar(String playerId) async {
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        key: const ValueKey('animal_avatar_picker'),
+        backgroundColor: AppTheme.panel,
+        title: const Text(
+          'Choose your animal',
+          style: TextStyle(color: AppTheme.readableText, fontWeight: FontWeight.w900),
+        ),
+        content: SizedBox(
+          width: 320,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: <Widget>[
+              for (final entry in _animalAvatars.entries)
+                InkWell(
+                  key: ValueKey<String>('animal_avatar_option_${entry.key}'),
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () => Navigator.of(dialogContext).pop(entry.key),
+                  child: Container(
+                    width: 58,
+                    height: 58,
+                    decoration: BoxDecoration(
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: _selectedAnimalByPlayer[playerId] == entry.key
+                            ? AppTheme.gold
+                            : AppTheme.gold.withValues(alpha: 0.22),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(entry.value, style: const TextStyle(fontSize: 30)),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('CANCEL'),
+          ),
+        ],
+      ),
+    );
+    if (selected != null && mounted) {
+      setState(() => _selectedAnimalByPlayer[playerId] = selected);
+    }
   }
 
   void _rollDice(LocalGameState state) {
@@ -1321,18 +1393,38 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           scale: state.players[playerIndex] == current
                                               ? 1.08
                                               : 1,
-                                          child: CircleAvatar(
-                                            radius: 13,
-                                            backgroundColor:
-                                                _colors[state.players[playerIndex]] ??
-                                                    AppTheme.cream,
-                                            child: Text(
-                                              state.players[playerIndex]
-                                                  .characters.first.toUpperCase(),
-                                              style: const TextStyle(
-                                                color: Color(0xFF17120A),
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w900,
+                                          child: Semantics(
+                                            button: true,
+                                            label: 'Choose animal avatar for ${state.players[playerIndex]}',
+                                            child: InkWell(
+                                              key: ValueKey<String>(
+                                                'choose_animal_avatar_${state.players[playerIndex]}',
+                                              ),
+                                              customBorder: const CircleBorder(),
+                                              onTap: () => _chooseAnimalAvatar(
+                                                state.players[playerIndex],
+                                              ),
+                                              child: CircleAvatar(
+                                                radius: 13,
+                                                backgroundColor:
+                                                    _colors[state.players[playerIndex]] ??
+                                                        AppTheme.cream,
+                                                child: Text(
+                                                  _animalAvatars[
+                                                          _selectedAnimalByPlayer[state.players[playerIndex]] ??
+                                                              <String, String>{
+                                                                'orange': 'fox',
+                                                                'green': 'frog',
+                                                                'blue': 'panda',
+                                                                'magenta': 'cat',
+                                                              }[state.players[playerIndex]] ??
+                                                              'cat'] ??
+                                                      '🐾',
+                                                  key: ValueKey<String>(
+                                                    'animal_avatar_${state.players[playerIndex]}',
+                                                  ),
+                                                  style: const TextStyle(fontSize: 18),
+                                                ),
                                               ),
                                             ),
                                           ),
