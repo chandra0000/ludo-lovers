@@ -71,6 +71,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _playAgainstAi = false;
   bool _aiThinking = false;
   bool _soundEnabled = true;
+  bool _diceRolling = false;
+  Timer? _diceRollTimer;
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
@@ -94,8 +96,20 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _controller.removeListener(_handleControllerChanged);
     _aiTimer?.cancel();
     _pawnStepTimer?.cancel();
+    _diceRollTimer?.cancel();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
+  }
+
+  void _rollDice(LocalGameState state) {
+    if (state.completed || state.pendingRoll != null || _diceRolling) return;
+    setState(() => _diceRolling = true);
+    _playFeedbackSound();
+    _controller.rollDice(expectedVersion: state.version);
+    _diceRollTimer?.cancel();
+    _diceRollTimer = Timer(const Duration(milliseconds: 620), () {
+      if (mounted) setState(() => _diceRolling = false);
+    });
   }
 
   void _playFeedbackSound({bool important = false}) {
@@ -1566,7 +1580,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   key: const ValueKey('roll_dice_button'),
                                   onPressed: state.completed || isAiTurn || state.pendingRoll != null
                                       ? null
-                                      : () => _controller.rollDice(expectedVersion: state.version),
+                                      : () => _rollDice(state),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
                                     disabledBackgroundColor: Colors.transparent,
@@ -1598,11 +1612,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       child: AnimatedSwitcher(
                                         duration: const Duration(milliseconds: 260),
                                         child: (state.pendingRoll == null
-                                                ? const Icon(
-                                                    Icons.casino_rounded,
-                                                    key: ValueKey('dice_idle'),
-                                                    size: 44,
-                                                    color: Color(0xFF3B2600),
+                                                ? AnimatedRotation(
+                                                    turns: _diceRolling ? 2.5 : 0,
+                                                    duration: Duration(milliseconds: _diceRolling ? 620 : 180),
+                                                    curve: Curves.easeInOutCubic,
+                                                    child: const Icon(
+                                                      Icons.casino_rounded,
+                                                      key: ValueKey('dice_idle'),
+                                                      size: 44,
+                                                      color: Color(0xFF3B2600),
+                                                    ),
                                                   )
                                                 : Container(
                                                     key: ValueKey<String>(
