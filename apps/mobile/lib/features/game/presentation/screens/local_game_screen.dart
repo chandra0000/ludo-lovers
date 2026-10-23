@@ -1443,6 +1443,33 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         painter: ClassicLudoBoardPainter(),
                                       ),
                                     ),
+                                    if (!state.completed)
+                                      Positioned(
+                                        left: current == 'orange' || current == 'blue' ? 0 : size.width * 0.6,
+                                        top: current == 'orange' || current == 'green' ? 0 : size.height * 0.6,
+                                        width: size.width * 0.4,
+                                        height: size.height * 0.4,
+                                        child: IgnorePointer(
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 320),
+                                            decoration: BoxDecoration(
+                                              color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.10),
+                                              border: Border.all(
+                                                color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.85),
+                                                width: 2,
+                                              ),
+                                              borderRadius: BorderRadius.circular(14),
+                                              boxShadow: <BoxShadow>[
+                                                BoxShadow(
+                                                  color: (_colors[current] ?? AppTheme.gold).withValues(alpha: 0.30),
+                                                  blurRadius: 28,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     for (final visual in visuals)
                                       _buildAnimatedPawnMarker(
                                         visual: visual,
