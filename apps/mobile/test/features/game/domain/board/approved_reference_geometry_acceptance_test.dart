@@ -72,7 +72,10 @@ void main() {
     test('only the four reference corner links are diagonal', () {
       const expectedDiagonalIndexes = <int>[4, 17, 30, 43];
       expect(ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes, expectedDiagonalIndexes);
-      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(
+        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        expectedDiagonalIndexes,
+      );
       for (final index in expectedDiagonalIndexes) {
         final from = expectedTrack[index];
         final to = expectedTrack[(index + 1) % expectedTrack.length];
