@@ -102,7 +102,7 @@ void main() {
       );
     });
 
-    test('four diagonal corner links are explicitly accepted structural connectors', () {
+    test('four diagonal corner links remain explicit release blockers', () {
       const track = ClassicLudoBoardCoordinateFactory.sharedTrack;
       const expected = <int, (BoardGridCell, BoardGridCell)>{
         4: (BoardGridCell(column: 5, row: 6), BoardGridCell(column: 6, row: 5)),
@@ -120,7 +120,10 @@ void main() {
         expect(track[(entry.key + 1) % track.length], entry.value.$2,
             reason: 'transition ${entry.key}');
       }
-      expect(ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes, isEmpty);
+      expect(
+        ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes,
+        <int>[4, 17, 30, 43],
+      );
       // Accepted for the provisional trace only. Artwork approval remains a
       // separate release gate; this test must not enable gameplay by itself.
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
