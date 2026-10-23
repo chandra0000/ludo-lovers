@@ -1401,9 +1401,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   children: <Widget>[
                                     // Keep the static board artwork on its own
                                     // layer while pawns and destination markers animate.
+                                    // Use the approved board artwork as the live match surface.
+                                    // BoxFit.cover crops the portrait mockup to its central square
+                                    // board area; animated pawns and interaction markers stay above it.
                                     const RepaintBoundary(
-                                      child: CustomPaint(
-                                        painter: ClassicLudoBoardPainter(),
+                                      child: Image(
+                                        key: ValueKey('live_game_board_artwork'),
+                                        image: AssetImage(
+                                          'assets/images/ludo_board_final.png',
+                                        ),
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.center,
+                                        filterQuality: FilterQuality.high,
+                                        semanticLabel: 'Ludo Lovers live game board',
                                       ),
                                     ),
                                     if (!state.completed)
