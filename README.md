@@ -91,6 +91,20 @@ This repository now contains a foundation layer that is intentionally engineerin
 - The Board Preview and Local Game Lab include a board-backed local-match prototype for testing legal pawn selection, movement, captures, safe cells, finishing, and rematches. It is not release-approved gameplay.
 - Recent route-acceptance tests cover each seat's track wrap, home-lane entry, exact finish, and overshoot behavior. These tests verify movement-model boundaries, not whether the physical route matches the intended board art.
 
+
+### Team Up mode rules (specification; engine integration pending)
+
+The confirmed 2-vs-2 rules are documented in [the Ludo game rules and acceptance tests](docs/game-rules/ludo-game-rules.md#16-team-up-mode--confirmed-product-rules):
+
+- Team A: Orange + Magenta. Team B: Green + Blue.
+- Scheduled order stays Orange → Green → Magenta → Blue.
+- Friendly teammates may stack; safe cells protect all pawns; opposing stacks follow last-arrival capture priority.
+- A player who finishes all four pawns still rolls on their scheduled turns; the result and any bonus six roll transfer to their teammate.
+- A scheduled roll is skipped when both teammates are finished.
+- A team wins only when all eight of its pawns reach final home.
+
+The initial Team Up helper and helper-level tests exist, but full gameplay-engine integration and end-to-end acceptance are still pending. Do not treat Team Up as gameplay-ready until engine-level capture/turn-transfer/victory tests and the Flutter analysis, test, and Android debug APK checks pass.
+
 ## Initial alpha target
 
 The first playable prototype should focus on a small, testable slice:
