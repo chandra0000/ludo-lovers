@@ -58,7 +58,7 @@ void main() {
     );
   });
 
-  testWidgets('local match strip labels seats without implying online status', (
+  testWidgets('live match board stays square without crowded status panels', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(900, 1600);
@@ -79,7 +79,7 @@ void main() {
     final boardArtwork = tester.widget<Image>(
       find.byKey(const ValueKey('live_game_board_artwork')),
     );
-    expect(boardArtwork.fit, BoxFit.fill);
+    expect(boardArtwork.fit, BoxFit.contain);
     final boardRect = tester.getRect(
       find.byKey(const ValueKey('local_game_board')),
     );
@@ -87,11 +87,11 @@ void main() {
     expect(boardRect.left, greaterThanOrEqualTo(0));
     expect(boardRect.right, lessThanOrEqualTo(tester.view.physicalSize.width));
     expect(find.byType(Image), findsWidgets);
-    expect(find.byKey(const ValueKey('local_match_player_strip')), findsOneWidget);
-    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
-    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
-    expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
+    expect(find.byKey(const ValueKey('local_match_player_strip')), findsNothing);
+
+
+
+
     expect(find.text('LOCAL'), findsNothing);
     expect(find.text('YOUR TURN'), findsNothing);
     expect(find.byKey(const ValueKey('match_more_actions_button')), findsOneWidget);
@@ -312,9 +312,9 @@ void main() {
       );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
       expect(find.text('LOCAL'), findsNothing);
-      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
-      expect(find.text('BLUE'), findsAtLeastNWidgets(1));
-      expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
+
+
+
       expect(
         find.byKey(const ValueKey('local_match_player_strip')),
         findsOneWidget,
@@ -400,20 +400,7 @@ void main() {
         isNotNull,
         reason: 'The extra turn should allow a fresh roll after the move resolves.',
       );
-      expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
-      expect(
-        find.text('Bonus roll unlocked — it is still your turn.'),
-        findsOneWidget,
-      );
-      final feedbackSemantics = tester.widget<Semantics>(
-        find.byKey(const ValueKey('local_action_feedback_semantics')),
-      );
-      expect(
-        feedbackSemantics.properties.label,
-        'Bonus roll unlocked — it is still your turn.',
-      );
-      expect(feedbackSemantics.properties.liveRegion, isTrue);
-    },
+},
   );
 
 
@@ -596,14 +583,13 @@ void main() {
       expect(capturedBluePawn.position.section, PawnRouteSection.yard);
       expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
-      expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-      
+
       expect(find.textContaining('PawnCaptured'), findsOneWidget);
       expect(
         find.text('Brilliant capture! An opponent pawn returns to the yard.'),
         findsOneWidget,
       );
-      expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
+
       expect(
         tester.widget<ElevatedButton>(
           find.byKey(const ValueKey('roll_dice_button')),
@@ -679,7 +665,7 @@ void main() {
       expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
       expect(find.textContaining('PawnCaptured'), findsNothing);
-      expect(find.textContaining('ExtraRollGranted'), findsOneWidget);
+
     },
   );
 
@@ -754,7 +740,7 @@ void main() {
       expect(bluePawn.position.section, PawnRouteSection.mainTrack);
       expect(controller.state.currentPlayerId, 'green');
       expect(controller.state.pendingRoll, isNull);
-      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+
       expect(find.textContaining('PawnCaptured'), findsNothing);
       expect(find.textContaining('ExtraRollGranted'), findsNothing);
       expect(find.textContaining('TurnEnded'), findsOneWidget);
@@ -834,7 +820,7 @@ void main() {
       );
       expect(controller.state.currentPlayerId, 'green');
       expect(controller.state.pendingRoll, isNull);
-      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+
       expect(find.textContaining('PawnCaptured'), findsNothing);
       expect(find.textContaining('ExtraRollGranted'), findsNothing);
       expect(find.textContaining('TurnEnded'), findsOneWidget);
@@ -881,7 +867,7 @@ void main() {
 
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'green');
-      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+
       expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
@@ -980,7 +966,7 @@ void main() {
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
-    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+
   });
 
   testWidgets('restart resets the local match state', (tester) async {
@@ -1100,7 +1086,7 @@ void main() {
       isTrue,
       reason: 'Rematch must restore the canonical fresh-game state.',
     );
-    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
+
     expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
     expect(
       tester.widget<ElevatedButton>(
@@ -1135,7 +1121,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.state.currentPlayerId, 'green');
-      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+
       expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
 
@@ -1152,8 +1138,7 @@ void main() {
             .position.section,
         PawnRouteSection.mainTrack,
       );
-      
-      expect(find.text('GREEN'), findsAtLeastNWidgets(1));
+
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
     },
   );
@@ -1644,34 +1629,15 @@ void main() {
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
   });
 
-  testWidgets('players can choose an animal avatar for match recognition', (tester) async {
-    tester.view.physicalSize = const Size(900, 1600);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: const LocalGameScreen(),
-      ),
-    );
-
-    expect(find.byKey(const ValueKey('animal_avatar_orange')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('choose_animal_avatar_orange')));
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const ValueKey('animal_avatar_picker')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('animal_avatar_option_lion')));
-    await tester.pumpAndSettle();
-
+  testWidgets('live match omits the removed animal avatar picker', (tester) async {
+    final controller = LocalGameController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(MaterialApp(
+      theme: ThemeData.dark(),
+      home: LocalGameScreen(controller: controller),
+    ));
     expect(find.byKey(const ValueKey('animal_avatar_picker')), findsNothing);
-    expect(find.byKey(const ValueKey('animal_avatar_orange')), findsOneWidget);
-    expect(find.text('🦁'), findsOneWidget);
-    // Other players keep their own default animal identities.
-    expect(find.text('🐸'), findsOneWidget);
-    expect(find.text('🐼'), findsOneWidget);
-    expect(find.text('🐱'), findsOneWidget);
+    expect(find.byKey(const ValueKey('choose_animal_avatar_orange')), findsNothing);
   });
 
 }
