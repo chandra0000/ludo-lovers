@@ -118,60 +118,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     super.dispose();
   }
 
-  Future<void> _chooseAnimalAvatar(String playerId) async {
-    final selected = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        key: const ValueKey('animal_avatar_picker'),
-        backgroundColor: AppTheme.panel,
-        title: const Text(
-          'Choose your animal',
-          style: TextStyle(color: AppTheme.readableText, fontWeight: FontWeight.w900),
-        ),
-        content: SizedBox(
-          width: 320,
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: <Widget>[
-              for (final entry in _animalAvatars.entries)
-                InkWell(
-                  key: ValueKey<String>('animal_avatar_option_${entry.key}'),
-                  borderRadius: BorderRadius.circular(14),
-                  onTap: () => Navigator.of(dialogContext).pop(entry.key),
-                  child: Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: AppTheme.black,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: _selectedAnimalByPlayer[playerId] == entry.key
-                            ? AppTheme.gold
-                            : AppTheme.gold.withValues(alpha: 0.22),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(entry.value, style: const TextStyle(fontSize: 30)),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('CANCEL'),
-          ),
-        ],
-      ),
-    );
-    if (selected != null && mounted) {
-      setState(() => _selectedAnimalByPlayer[playerId] = selected);
-    }
-  }
-
   void _rollDice(LocalGameState state) {
     if (state.completed || state.pendingRoll != null) return;
     setState(() => _diceRolling = true);
@@ -1114,7 +1060,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     return pawnsOnBoard(right).compareTo(pawnsOnBoard(left));
                   });
                 final visuals = _visuals(state.pawns);
-                final actionFeedback = _friendlyActionFeedback(state);
                 return SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   child: Column(
