@@ -1383,52 +1383,52 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     child: Center(
                                       child: AnimatedSwitcher(
                                         duration: const Duration(milliseconds: 260),
-                                        child: (_diceRolling || state.pendingRoll == null
-                                                ? AnimatedScale(
-                                                    scale: _diceRolling ? 1.16 : 1,
-                                                    duration: Duration(milliseconds: _diceRolling ? 310 : 180),
-                                                    curve: Curves.easeInOutBack,
-                                                    child: AnimatedRotation(
-                                                      turns: _diceRolling ? 2.5 : 0,
-                                                      duration: Duration(milliseconds: _diceRolling ? 620 : 180),
-                                                      curve: Curves.easeInOutCubic,
-                                                      child: Icon(
-                                                        Icons.casino_rounded,
-                                                        key: const ValueKey('dice_idle'),
-                                                        size: 44,
-                                                        color: const Color(0xFF3B2600),
-                                                        shadows: _diceRolling
-                                                            ? const <Shadow>[
-                                                                Shadow(color: Color(0x88FFFFFF), blurRadius: 12),
-                                                              ]
-                                                            : null,
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    key: ValueKey<String>(
-                                                      'dice_result_${state.pendingRoll}',
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    child: Semantics(
-                                                      key: const ValueKey(
-                                                        'dice_result_semantics',
-                                                      ),
-                                                      label:
-                                                          'Dice result: ${state.pendingRoll}',
-                                                      liveRegion: true,
-                                                      excludeSemantics: true,
-                                                      child: Text(
-                                                        '${state.pendingRoll}',
-                                                        style: const TextStyle(
-                                                          color: Color(0xFF3B2600),
-                                                          fontSize: 36,
-                                                          fontWeight: FontWeight.w900,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ))
-                                            ,
+                                         child: state.pendingRoll == null
+                                             ? AnimatedScale(
+                                                 scale: _diceRolling ? 1.16 : 1,
+                                                 duration: Duration(
+                                                   milliseconds: _diceRolling ? 310 : 180,
+                                                 ),
+                                                 curve: Curves.easeInOutBack,
+                                                 child: AnimatedRotation(
+                                                   turns: _diceRolling ? 2.5 : 0,
+                                                   duration: Duration(
+                                                     milliseconds: _diceRolling ? 620 : 180,
+                                                   ),
+                                                   curve: Curves.easeInOutCubic,
+                                                   child: Icon(
+                                                     Icons.casino_rounded,
+                                                     key: const ValueKey('dice_idle'),
+                                                     size: 44,
+                                                     color: const Color(0xFF3B2600),
+                                                     shadows: _diceRolling
+                                                         ? const <Shadow>[
+                                                             Shadow(
+                                                               color: Color(0x88FFFFFF),
+                                                               blurRadius: 12,
+                                                             ),
+                                                           ]
+                                                         : null,
+                                                   ),
+                                                 ),
+                                               )
+                                             : Container(
+                                                 key: ValueKey<String>(
+                                                   'dice_result_${state.pendingRoll}',
+                                                 ),
+                                                 alignment: Alignment.center,
+                                                 child: Semantics(
+                                                   key: const ValueKey(
+                                                     'dice_result_semantics',
+                                                   ),
+                                                   label: 'Dice result: ${state.pendingRoll}',
+                                                   liveRegion: true,
+                                                   excludeSemantics: true,
+                                                   child: _DicePips(
+                                                     value: state.pendingRoll!,
+                                                   ),
+                                                 ),
+                                               ),
                                       ),
                                     ),
                                   ),
@@ -1881,6 +1881,53 @@ class _DicePips extends StatelessWidget {
   }
 }
 
+/// Standard pip face; the visible die never prints a digital roll number.
+class _DicePips extends StatelessWidget {
+  const _DicePips({required this.value});
+
+  final int value;
+
+  static const Map<int, Set<int>> _pipPositions = <int, Set<int>>{
+    1: <int>{4},
+    2: <int>{0, 8},
+    3: <int>{0, 4, 8},
+    4: <int>{0, 2, 6, 8},
+    5: <int>{0, 2, 4, 6, 8},
+    6: <int>{0, 2, 3, 5, 6, 8},
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final visible = _pipPositions[value] ?? _pipPositions[1]!;
+    return SizedBox(
+      key: const ValueKey('dice_face_pips'),
+      width: 48,
+      height: 48,
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(3),
+        itemCount: 9,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 2,
+          crossAxisSpacing: 2,
+        ),
+        itemBuilder: (context, index) => Center(
+          child: visible.contains(index)
+              ? Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF3B2600),
+                    shape: BoxShape.circle,
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ),
+    );
+  }
+}
 class _PawnVisual {
   const _PawnVisual({
     required this.pawnId,
