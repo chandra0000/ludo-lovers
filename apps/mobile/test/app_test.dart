@@ -137,7 +137,9 @@ void main() {
       MaterialApp(home: LocalGameScreen(controller: LocalGameController(nextDiceValue: () => 3))),
     );
 
-    await tester.tap(find.byTooltip('How to play'));
+    await tester.tap(find.byKey(const ValueKey('match_more_actions_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('How to play').last);
     await tester.pumpAndSettle();
 
     expect(find.text('How to play'), findsOneWidget);
