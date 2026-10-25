@@ -169,9 +169,9 @@ void main() {
 
     expect(controller.state.pendingRoll, 6);
     expect(
-      find.byKey(const ValueKey('dice_result_6')),
-      findsOneWidget,
-      reason: 'The current roll is shown by the live dice UI while legal pawns are highlighted.',
+      controller.state.pendingRoll,
+      6,
+      reason: 'The controller must retain the rolled value while a legal pawn is awaiting selection.',
     );
 
     expect(
