@@ -323,14 +323,16 @@ void main() {
       expect(find.byIcon(Icons.person_rounded), findsNothing);
       expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
-      expect(find.text('Chat'), findsOneWidget);
-      expect(find.text('React'), findsOneWidget);
+      expect(find.text('Chat'), findsNothing);
+      expect(find.text('React'), findsNothing);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
 
       expect(controller.state.pendingRoll, 6);
       expect(find.byKey(const ValueKey('dice_result_6')), findsOneWidget);
+      expect(find.byKey(const ValueKey('dice_face_pips')), findsOneWidget);
+      expect(find.text('6'), findsNothing);
       final diceSemantics = tester.widget<Semantics>(
         find.byKey(const ValueKey('dice_result_semantics')),
       );
