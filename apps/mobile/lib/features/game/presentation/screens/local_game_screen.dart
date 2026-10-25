@@ -85,6 +85,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   void initState() {
     super.initState();
+    // Use the full Android viewport for gameplay. Keep app navigation inside
+    // the game UI and restore system bars when leaving the match.
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _playAgainstAi = widget.playAgainstAi;
     _lastObservedState = _controller.state;
     _controller.addListener(_handleControllerChanged);
@@ -92,6 +95,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   @override
   void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _controller.removeListener(_handleControllerChanged);
     _aiTimer?.cancel();
     _pawnStepTimer?.cancel();
@@ -970,16 +974,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // The scroll view applies 10 px of horizontal padding on
-            // each side, so size the board against its usable content width.
-            final availableWidth = math.max(0.0, constraints.maxWidth - 20);
-            // Reserve room for the player profile row and dice/actions on
-            // short displays while allowing the board to use wide phone space.
-            final availableHeight = math.max(0.0, constraints.maxHeight - 150);
-            final boardSize = math.min(
-              availableWidth,
-              math.min(constraints.maxHeight * 0.88, availableHeight),
-            );
+            // Immersive gameplay: maximize the square board within the
+            // viewport while reserving only the compact dice/action row.
+            final availableWidth = math.max(0.0, constraints.maxWidth - 8);
+            final availableHeight = math.max(0.0, constraints.maxHeight - 112);
+            final boardSize = math.min(availableWidth, availableHeight);
             return AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
@@ -1008,7 +1007,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                   });
                 final visuals = _visuals(state.pawns);
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                   child: Column(
                     children: <Widget>[
                       AnimatedSwitcher(
@@ -1243,15 +1243,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     // Keep the static board artwork on its own
                                     // layer while pawns and destination markers animate.
                                     // Use the approved board artwork as the live match surface.
-                                    // BoxFit.cover crops the portrait mockup to its central square
-                                    // board area; animated pawns and interaction markers stay above it.
+                                    // The board is a square coordinate plane. Cover removes the
+                                    // portrait asset's outer padding so artwork and pawn overlays
+                                    // share the same square instead of drifting into margins.
                                     const RepaintBoundary(
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
                                           'assets/images/ludo_board_glass.png',
                                         ),
-                                        fit: BoxFit.contain,
+                                        fit: BoxFit.cover,
                                         alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
                                         semanticLabel: 'Ludo Lovers glass board for live gameplay review',
