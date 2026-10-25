@@ -83,8 +83,10 @@ void main() {
     expect(find.text('GREEN'), findsAtLeastNWidgets(1));
     expect(find.text('BLUE'), findsAtLeastNWidgets(1));
     expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
-    expect(find.text('LOCAL'), findsNWidgets(3));
-    expect(find.text('YOUR TURN'), findsOneWidget);
+    expect(find.text('LOCAL'), findsNothing);
+    expect(find.text('YOUR TURN'), findsNothing);
+    expect(find.byKey(const ValueKey('match_more_actions_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('toggle_sound_button')), findsNothing);
     expect(find.text('Online'), findsNothing);
   });
 
@@ -300,7 +302,7 @@ void main() {
         'Roll a die to begin the current player’s turn.',
       );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
-      expect(find.text('LOCAL'), findsAtLeastNWidgets(1));
+      expect(find.text('LOCAL'), findsNothing);
       expect(find.text('GREEN'), findsAtLeastNWidgets(1));
       expect(find.text('BLUE'), findsAtLeastNWidgets(1));
       expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
@@ -1166,7 +1168,10 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byTooltip('How to play'));
+    await tester.tap(find.byKey(const ValueKey('match_more_actions_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('How to play'), findsOneWidget);
+    await tester.tap(find.text('How to play').last);
     await tester.pumpAndSettle();
 
     expect(find.text('How to play'), findsOneWidget);
