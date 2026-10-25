@@ -79,7 +79,7 @@ void main() {
     final boardArtwork = tester.widget<Image>(
       find.byKey(const ValueKey('live_game_board_artwork')),
     );
-    expect(boardArtwork.fit, BoxFit.contain);
+    expect(boardArtwork.fit, BoxFit.cover);
     final boardRect = tester.getRect(
       find.byKey(const ValueKey('local_game_board')),
     );
