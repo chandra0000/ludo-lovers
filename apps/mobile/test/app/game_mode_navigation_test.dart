@@ -80,8 +80,11 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 50));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
-    expect(find.text('YOU'), findsAtLeastNWidgets(1));
-    expect(find.text('AI'), findsNWidgets(3));
+    expect(find.byKey(const ValueKey('player_profile_orange')), findsOneWidget);
+    expect(find.byKey(const ValueKey('player_profile_green')), findsOneWidget);
+    expect(find.byKey(const ValueKey('player_profile_blue')), findsOneWidget);
+    expect(find.byKey(const ValueKey('player_profile_magenta')), findsOneWidget);
+    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
     expect(find.text('LOCAL'), findsNothing);
   });
 }
