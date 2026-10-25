@@ -75,24 +75,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
-  /// Lightweight, offline animal identities for local matches. The same
-  /// selection is rendered beside a player's colour and turn status.
-  static const Map<String, String> _animalAvatars = <String, String>{
-    'cat': '🐱',
-    'dog': '🐶',
-    'fox': '🦊',
-    'rabbit': '🐰',
-    'lion': '🦁',
-    'panda': '🐼',
-    'tiger': '🐯',
-    'koala': '🐨',
-    'bear': '🐻',
-    'monkey': '🐵',
-    'penguin': '🐧',
-    'frog': '🐸',
-  };
-  final Map<String, String> _selectedAnimalByPlayer = <String, String>{};
-
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
     'green': AppTheme.green,
@@ -534,41 +516,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       _ => playerId,
     };
     return '$playerName pawn $pawnNumber';
-  }
-
-  String? _friendlyActionFeedback(LocalGameState state) {
-    final message = _controller.lastMessage;
-    if (message == null) return null;
-    if (state.completed || message.contains('GameCompleted')) {
-      return '${(state.winnerPlayerId ?? state.currentPlayerId).toUpperCase()} wins the match!';
-    }
-    if (message.contains('PawnCaptured')) {
-      return 'Brilliant capture! An opponent pawn returns to the yard.';
-    }
-    if (message.contains('PawnFinished')) {
-      return 'Home at last! Your pawn reached the centre.';
-    }
-    if (message.contains('NoLegalMove') && message.contains('ExtraRollGranted')) {
-      return 'No legal move this time, but you earned another roll.';
-    }
-    if (message.contains('ExtraRollGranted')) {
-      return 'Bonus roll unlocked — it is still your turn.';
-    }
-    if (message.contains('NoLegalMove')) {
-      return 'No legal moves. Your turn has passed.';
-    }
-    if (message.contains('DiceRolled')) {
-      return state.pendingRoll == null
-          ? 'No move available for that roll.'
-          : 'You rolled ${state.pendingRoll}. Choose a glowing pawn.';
-    }
-    if (message.contains('PawnMoved')) {
-      return 'Pawn moved. Keep the momentum going!';
-    }
-    if (message.contains('TurnEnded')) {
-      return 'Turn complete. The next player is up.';
-    }
-    return null;
   }
 
   void _showLocalActionNotice(String message) {
