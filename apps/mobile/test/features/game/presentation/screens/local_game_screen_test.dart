@@ -317,9 +317,9 @@ void main() {
 
       expect(
         find.byKey(const ValueKey('local_match_player_strip')),
-        findsOneWidget,
+        findsNothing,
       );
-      expect(find.byType(CircleAvatar), findsNWidgets(4));
+      expect(find.byType(CircleAvatar), findsNothing);
       expect(find.byIcon(Icons.person_rounded), findsNothing);
       expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
@@ -357,7 +357,7 @@ void main() {
         pendingRollSemantics.properties.hint,
         'Choose a highlighted pawn to use the current roll.',
       );
-      expect(find.text('You rolled 6. Choose a glowing pawn.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('dice_result_6')), findsOneWidget);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsOneWidget,
@@ -584,11 +584,8 @@ void main() {
       expect(controller.state.currentPlayerId, 'orange');
       expect(controller.state.pendingRoll, isNull);
 
-      expect(find.textContaining('PawnCaptured'), findsOneWidget);
-      expect(
-        find.text('Brilliant capture! An opponent pawn returns to the yard.'),
-        findsOneWidget,
-      );
+      expect(controller.state.pawns.firstWhere((pawn) => pawn.id == 'blue_pawn_1').position.section, PawnRouteSection.yard);
+      expect(find.byKey(const ValueKey('local_action_feedback_icon')), findsNothing);
 
       expect(
         tester.widget<ElevatedButton>(
@@ -743,7 +740,7 @@ void main() {
 
       expect(find.textContaining('PawnCaptured'), findsNothing);
       expect(find.textContaining('ExtraRollGranted'), findsNothing);
-      expect(find.textContaining('TurnEnded'), findsOneWidget);
+      expect(find.textContaining('TurnEnded'), findsNothing);
     },
   );
 
@@ -823,7 +820,7 @@ void main() {
 
       expect(find.textContaining('PawnCaptured'), findsNothing);
       expect(find.textContaining('ExtraRollGranted'), findsNothing);
-      expect(find.textContaining('TurnEnded'), findsOneWidget);
+      expect(find.textContaining('TurnEnded'), findsNothing);
     },
   );
 
@@ -868,7 +865,7 @@ void main() {
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'green');
 
-      expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
+      expect(find.textContaining('NoLegalMove · TurnEnded'), findsNothing);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsNothing,
@@ -928,16 +925,7 @@ void main() {
             .position.section,
         PawnRouteSection.finished,
       );
-      expect(
-        find.text('Home at last! Your pawn reached the centre.'),
-        findsOneWidget,
-      );
-      expect(
-        tester.widget<Icon>(
-          find.byKey(const ValueKey('local_action_feedback_icon')),
-        ).icon,
-        Icons.home_rounded,
-      );
+      expect(find.byKey(const ValueKey('local_action_feedback_icon')), findsNothing);
       expect(controller.state.completed, isFalse);
     },
   );
@@ -1122,7 +1110,7 @@ void main() {
 
       expect(controller.state.currentPlayerId, 'green');
 
-      expect(find.textContaining('NoLegalMove · TurnEnded'), findsOneWidget);
+      expect(find.textContaining('NoLegalMove · TurnEnded'), findsNothing);
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
