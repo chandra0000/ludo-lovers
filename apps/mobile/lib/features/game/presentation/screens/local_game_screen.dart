@@ -1483,7 +1483,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         image: AssetImage(
                                           'assets/images/ludo_board_glass.png',
                                         ),
-                                        fit: BoxFit.contain,
+                                        fit: BoxFit.fill,
                                         alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
                                         semanticLabel: 'Ludo Lovers glass board for live gameplay review',
