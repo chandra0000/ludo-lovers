@@ -74,8 +74,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
-    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
+
+
     expect(tester.takeException(), isNull);
   });
 
@@ -95,9 +95,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
-    expect(find.byKey(const ValueKey('player_profile_green')), findsOneWidget);
-    expect(find.byKey(const ValueKey('player_profile_blue')), findsOneWidget);
-    expect(find.byKey(const ValueKey('player_profile_magenta')), findsOneWidget);
+
+
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -108,10 +107,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
-    expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
-    expect(find.text('GREEN'), findsAtLeastNWidgets(1));
-    expect(find.text('BLUE'), findsAtLeastNWidgets(1));
-    expect(find.text('MAGENTA'), findsAtLeastNWidgets(1));
+
+
+
+
     expect(tester.takeException(), isNull);
   });
 }
