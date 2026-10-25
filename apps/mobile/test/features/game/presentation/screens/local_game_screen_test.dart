@@ -76,7 +76,16 @@ void main() {
       ),
     );
 
-    expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
+    final boardArtwork = tester.widget<Image>(
+      find.byKey(const ValueKey('live_game_board_artwork')),
+    );
+    expect(boardArtwork.fit, BoxFit.fill);
+    final boardRect = tester.getRect(
+      find.byKey(const ValueKey('local_game_board')),
+    );
+    expect(boardRect.width, closeTo(boardRect.height, 0.1));
+    expect(boardRect.left, greaterThanOrEqualTo(0));
+    expect(boardRect.right, lessThanOrEqualTo(tester.view.physicalSize.width));
     expect(find.byType(Image), findsWidgets);
     expect(find.byKey(const ValueKey('local_match_player_strip')), findsOneWidget);
     expect(find.text('ORANGE'), findsAtLeastNWidgets(1));
