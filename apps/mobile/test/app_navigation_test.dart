@@ -95,7 +95,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
-    expect(find.text('AI'), findsNWidgets(3));
+    expect(find.byKey(const ValueKey('player_profile_green')), findsOneWidget);
+    expect(find.byKey(const ValueKey('player_profile_blue')), findsOneWidget);
+    expect(find.byKey(const ValueKey('player_profile_magenta')), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
