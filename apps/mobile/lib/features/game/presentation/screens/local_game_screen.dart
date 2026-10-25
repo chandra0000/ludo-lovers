@@ -976,7 +976,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           builder: (context, constraints) {
             // Immersive gameplay: maximize the square board within the
             // viewport while reserving only the compact dice/action row.
-            final availableWidth = math.max(0.0, constraints.maxWidth - 8);
+            final availableWidth = math.max(0.0, constraints.maxWidth - 20);
             final availableHeight = math.max(0.0, constraints.maxHeight - 112);
             final boardSize = math.min(availableWidth, availableHeight);
             return AnimatedBuilder(
@@ -1314,17 +1314,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(2, 2, 2, 0),
-                        child: Row(
-                          children: <Widget>[
-                            _RoundActionButton(
-                              icon: Icons.chat_bubble_rounded,
-                              label: 'Chat',
-                              color: AppTheme.gold,
-                              onPressed: () => _showLocalActionNotice('Chat will be available in online rooms.'),
-                            ),
+                      const SizedBox(height: 6),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
                             const Spacer(),
                             Semantics(
                               key: const ValueKey('roll_dice_button_semantics'),
@@ -1439,17 +1435,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 ),
                               ),
                             ),
-                            const Spacer(),
-                            _RoundActionButton(
-                              icon: Icons.emoji_emotions_rounded,
-                              label: 'React',
-                              color: AppTheme.magenta,
-                              onPressed: () => _showLocalActionNotice('Reactions will be available in online rooms.'),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
                       
                       
                       if (_controller.lastError != null) ...<Widget>[
@@ -1836,6 +1826,59 @@ class _GlassConePawnPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _GlassConePawnPainter oldDelegate) =>
       oldDelegate.color != color || oldDelegate.isActive != isActive;
+}
+
+
+/// Standard die-face pips. The numeric roll stays in game state and semantics,
+/// never as a digital number in the visible gameplay UI.
+class _DicePips extends StatelessWidget {
+  const _DicePips({required this.value});
+
+  final int value;
+
+  static const Map<int, Set<int>> _pipPositions = <int, Set<int>>{
+    1: <int>{4},
+    2: <int>{0, 8},
+    3: <int>{0, 4, 8},
+    4: <int>{0, 2, 6, 8},
+    5: <int>{0, 2, 4, 6, 8},
+    6: <int>{0, 2, 3, 5, 6, 8},
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final visible = _pipPositions[value] ?? _pipPositions[1]!;
+    return SizedBox(
+      key: const ValueKey('dice_face_pips'),
+      width: 48,
+      height: 48,
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(3),
+        itemCount: 9,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 2,
+          crossAxisSpacing: 2,
+        ),
+        itemBuilder: (context, index) => Center(
+          child: visible.contains(index)
+              ? Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF3B2600),
+                    shape: BoxShape.circle,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(color: Color(0x55000000), blurRadius: 1),
+                    ],
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ),
+    );
+  }
 }
 
 class _PawnVisual {
