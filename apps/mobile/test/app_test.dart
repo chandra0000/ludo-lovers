@@ -168,7 +168,11 @@ void main() {
     await tester.pump();
 
     expect(controller.state.pendingRoll, 6);
-    expect(find.text('You rolled 6. Choose a glowing pawn.'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('dice_result_6')),
+      findsOneWidget,
+      reason: 'The current roll is shown by the live dice UI while legal pawns are highlighted.',
+    );
 
     expect(
       find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
