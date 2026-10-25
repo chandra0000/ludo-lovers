@@ -1677,48 +1677,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 }
 
-class _RoundActionButton extends StatelessWidget {
-  const _RoundActionButton({required this.icon, required this.label, required this.color, required this.onPressed});
-
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(18),
-        child: SizedBox(
-          width: 62,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(17),
-                  border: Border.all(color: color.withValues(alpha: 0.65)),
-                  boxShadow: <BoxShadow>[BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 12)],
-                ),
-                child: Icon(icon, color: color, size: 23),
-              ),
-              const SizedBox(height: 4),
-              Text(label, style: const TextStyle(color: AppTheme.mutedText, fontSize: 10, fontWeight: FontWeight.w700)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _GlassConePawn extends StatelessWidget {
   const _GlassConePawn({
     required this.color,
