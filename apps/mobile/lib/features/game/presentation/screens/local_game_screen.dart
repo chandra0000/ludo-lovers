@@ -1082,10 +1082,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             final availableWidth = math.max(0.0, constraints.maxWidth - 20);
             // Reserve room for the player profile row and dice/actions on
             // short displays while allowing the board to use wide phone space.
-            final availableHeight = math.max(0.0, constraints.maxHeight - 220);
+            final availableHeight = math.max(0.0, constraints.maxHeight - 150);
             final boardSize = math.min(
               availableWidth,
-              math.min(constraints.maxHeight * 0.78, availableHeight),
+              math.min(constraints.maxHeight * 0.88, availableHeight),
             );
             return AnimatedBuilder(
               animation: _controller,
@@ -1328,131 +1328,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       // Player identity cards sit immediately above the board.
                       // In local mode the selected player ID is the display name;
                       // online profiles can replace this with a verified username later.
-                      Container(
-                        key: const ValueKey('local_match_player_strip'),
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: 4, bottom: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            for (var playerIndex = 0;
-                                playerIndex < state.players.length;
-                                playerIndex++) ...<Widget>[
-                              if (playerIndex > 0) const SizedBox(width: 6),
-                              Expanded(
-                                child: Container(
-                                  key: ValueKey<String>(
-                                    'player_profile_${state.players[playerIndex]}',
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 5,
-                                    vertical: 7,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.panel,
-                                    borderRadius: BorderRadius.circular(11),
-                                    border: Border.all(
-                                      color: state.players[playerIndex] == current
-                                          ? AppTheme.gold
-                                          : (_colors[state.players[playerIndex]] ??
-                                                  AppTheme.cream)
-                                              .withValues(alpha: 0.58),
-                                      width: state.players[playerIndex] == current
-                                          ? 1.7
-                                          : 1,
-                                    ),
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      AnimatedContainer(
-                                        key: ValueKey<String>(
-                                          'active_avatar_ring_${state.players[playerIndex]}',
-                                        ),
-                                        duration: const Duration(milliseconds: 240),
-                                        curve: Curves.easeOutCubic,
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: state.players[playerIndex] == current
-                                                ? AppTheme.gold
-                                                : Colors.transparent,
-                                            width: 2,
-                                          ),
-                                          boxShadow: state.players[playerIndex] == current
-                                              ? <BoxShadow>[
-                                                  BoxShadow(
-                                                    color: AppTheme.gold.withValues(alpha: 0.32),
-                                                    blurRadius: 9,
-                                                    spreadRadius: 1,
-                                                  ),
-                                                ]
-                                              : const <BoxShadow>[],
-                                        ),
-                                        child: AnimatedScale(
-                                          duration: const Duration(milliseconds: 240),
-                                          curve: Curves.easeOutBack,
-                                          scale: state.players[playerIndex] == current
-                                              ? 1.08
-                                              : 1,
-                                          child: Semantics(
-                                            button: true,
-                                            label: 'Choose animal avatar for ${state.players[playerIndex]}',
-                                            child: InkWell(
-                                              key: ValueKey<String>(
-                                                'choose_animal_avatar_${state.players[playerIndex]}',
-                                              ),
-                                              customBorder: const CircleBorder(),
-                                              onTap: () => _chooseAnimalAvatar(
-                                                state.players[playerIndex],
-                                              ),
-                                              child: CircleAvatar(
-                                                radius: 13,
-                                                backgroundColor:
-                                                    _colors[state.players[playerIndex]] ??
-                                                        AppTheme.cream,
-                                                child: Text(
-                                                  _animalAvatars[
-                                                          _selectedAnimalByPlayer[state.players[playerIndex]] ??
-                                                              <String, String>{
-                                                                'orange': 'fox',
-                                                                'green': 'frog',
-                                                                'blue': 'panda',
-                                                                'magenta': 'cat',
-                                                              }[state.players[playerIndex]] ??
-                                                              'cat'] ??
-                                                      '🐾',
-                                                  key: ValueKey<String>(
-                                                    'animal_avatar_${state.players[playerIndex]}',
-                                                  ),
-                                                  style: const TextStyle(fontSize: 18),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        state.players[playerIndex].toUpperCase(),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: AppTheme.readableText,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
+                      
                       const SizedBox(height: 4),
                       Center(
                         child: SizedBox(
@@ -1483,7 +1359,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         image: AssetImage(
                                           'assets/images/ludo_board_glass.png',
                                         ),
-                                        fit: BoxFit.fill,
+                                        fit: BoxFit.contain,
                                         alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
                                         semanticLabel: 'Ludo Lovers glass board for live gameplay review',
@@ -1681,79 +1557,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      if (_controller.lastMessage != null) ...<Widget>[
-                        const SizedBox(height: 8),
-                        Semantics(
-                          liveRegion: true,
-                          key: const ValueKey('last_game_action_semantics'),
-                          child: Text(
-                            _controller.lastMessage!,
-                            key: const ValueKey('last_game_action'),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppTheme.mutedText,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                      ],
-                      if (actionFeedback != null) ...<Widget>[
-                        const SizedBox(height: 8),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 220),
-                          child: Container(
-                            key: ValueKey<String>('local_action_feedback_$actionFeedback'),
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.gold.withValues(alpha: 0.09),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppTheme.gold.withValues(alpha: 0.4),
-                              ),
-                            ),
-                            child: Row(
-                              children: <Widget>[
-                                Icon(
-                                  actionFeedback.contains('capture')
-                                      ? Icons.flash_on_rounded
-                                      : actionFeedback.contains('Home at last')
-                                          ? Icons.home_rounded
-                                          : actionFeedback.contains('Bonus roll')
-                                              ? Icons.casino_rounded
-                                              : actionFeedback.contains('wins the match')
-                                                  ? Icons.emoji_events_rounded
-                                                  : Icons.auto_awesome_rounded,
-                                  key: const ValueKey('local_action_feedback_icon'),
-                                  color: AppTheme.gold,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 9),
-                                Expanded(
-                                  child: Semantics(
-                                    key: const ValueKey('local_action_feedback_semantics'),
-                                    label: actionFeedback,
-                                    liveRegion: true,
-                                    child: Text(
-                                      actionFeedback,
-                                      key: const ValueKey('local_action_feedback'),
-                                      style: const TextStyle(
-                                        color: AppTheme.cream,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.35,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                      
+                      
                       if (_controller.lastError != null) ...<Widget>[
                         const SizedBox(height: 6),
                         Text(
@@ -1765,15 +1570,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ],
                       const SizedBox(height: 8),
-                      const Text(
-                        'Glowing gold rings mark legal pawns. Tap one to move it. If no pawn glows after a roll, the engine advances the turn automatically.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppTheme.mutedText,
-                          fontSize: 11,
-                          height: 1.35,
-                        ),
-                      ),
+                      
                     ],
                   ),
                 );
