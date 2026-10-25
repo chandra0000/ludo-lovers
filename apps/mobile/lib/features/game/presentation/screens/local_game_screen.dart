@@ -1002,13 +1002,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               icon: const Icon(Icons.smart_toy_rounded),
             ),
           ],
-          IconButton(
-            key: const ValueKey('toggle_sound_button'),
-            tooltip: _soundEnabled ? 'Mute sound effects' : 'Enable sound effects',
-            onPressed: () => setState(() => _soundEnabled = !_soundEnabled),
-            color: _soundEnabled ? AppTheme.gold : null,
-            icon: Icon(_soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded),
-          ),
           if (MediaQuery.sizeOf(context).width >= 420)
             IconButton(
               key: const ValueKey('pause_match_button'),
@@ -1016,11 +1009,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               onPressed: _showPauseMenu,
               icon: const Icon(Icons.pause_circle_outline_rounded),
             ),
-          IconButton(
-            tooltip: 'How to play',
-            onPressed: _showRules,
-            icon: const Icon(Icons.help_outline_rounded),
-          ),
           IconButton(
             key: const ValueKey('leave_match_button'),
             tooltip: 'Leave match',
@@ -1033,24 +1021,38 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             onPressed: _confirmRestart,
             icon: const Icon(Icons.restart_alt_rounded),
           ),
-          if (MediaQuery.sizeOf(context).width < 420)
-            PopupMenuButton<String>(
-              key: const ValueKey('match_more_actions_button'),
-              tooltip: 'More match actions',
-              onSelected: (action) {
-                switch (action) {
-                  case 'players':
-                    _showPlayerSetup();
-                    break;
-                  case 'ai':
-                    _toggleAiMode();
-                    break;
-                  case 'pause':
-                    _showPauseMenu();
-                    break;
-                }
-              },
-              itemBuilder: (context) => <PopupMenuEntry<String>>[
+          PopupMenuButton<String>(
+            key: const ValueKey('match_more_actions_button'),
+            tooltip: 'More match actions',
+            onSelected: (action) {
+              switch (action) {
+                case 'sound':
+                  setState(() => _soundEnabled = !_soundEnabled);
+                  break;
+                case 'help':
+                  _showRules();
+                  break;
+                case 'players':
+                  _showPlayerSetup();
+                  break;
+                case 'ai':
+                  _toggleAiMode();
+                  break;
+                case 'pause':
+                  _showPauseMenu();
+                  break;
+              }
+            },
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'sound',
+                child: Text(_soundEnabled ? 'Mute sound effects' : 'Enable sound effects'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'help',
+                child: Text('How to play'),
+              ),
+              if (MediaQuery.sizeOf(context).width < 420) ...<PopupMenuEntry<String>>[
                 const PopupMenuItem<String>(
                   value: 'players',
                   child: Text('Choose player colours'),
@@ -1068,7 +1070,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                   child: Text('Pause match'),
                 ),
               ],
-            ),
+            ],
+          ),
         ],
       ),
       body: SafeArea(
@@ -1442,27 +1445,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        _playAgainstAi
-                                            ? (state.players[playerIndex] == _humanPlayerId
-                                                ? 'YOU'
-                                                : 'AI')
-                                            : (state.players[playerIndex] == current
-                                                ? 'YOUR TURN'
-                                                : 'LOCAL'),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: state.players[playerIndex] == current
-                                              ? AppTheme.gold
-                                              : AppTheme.mutedText,
-                                          fontSize: 8,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -1499,12 +1481,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
-                                          'assets/images/ludo_board_final.png',
+                                          'assets/images/ludo_board_glass.png',
                                         ),
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.contain,
                                         alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
-                                        semanticLabel: 'Ludo Lovers live game board',
+                                        semanticLabel: 'Ludo Lovers glass board for live gameplay review',
                                       ),
                                     ),
                                     for (final visual in visuals)
