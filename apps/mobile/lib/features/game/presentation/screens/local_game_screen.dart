@@ -1177,8 +1177,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           builder: (context, constraints) {
             // Immersive gameplay: maximize the square board within the
             // viewport while reserving only the compact dice/action row.
-            final availableWidth = math.max(0.0, constraints.maxWidth - 20);
-            final availableHeight = math.max(0.0, constraints.maxHeight - 112);
+            final availableWidth = math.max(0.0, constraints.maxWidth - 8);
+            final availableHeight = math.max(0.0, constraints.maxHeight - 72);
             final boardSize = math.min(availableWidth, availableHeight);
             return AnimatedBuilder(
               animation: _controller,
@@ -1539,16 +1539,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     // Keep the static board artwork on its own
                                     // layer while pawns and destination markers animate.
                                     // Use the approved board artwork as the live match surface.
-                                    // The board is a square coordinate plane. Cover removes the
-                                    // portrait asset's outer padding so artwork and pawn overlays
-                                    // share the same square instead of drifting into margins.
+                                    // Fill the square board canvas on narrow Android screens. This asset is
+                                    // the board surface (not the full portrait mockup), so cover
+                                    // prevents the board from shrinking inside the pawn coordinate plane.
                                     const RepaintBoundary(
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
                                           'assets/images/ludo_board.jpg',
                                         ),
-                                        fit: BoxFit.contain,
+                                        fit: BoxFit.cover,
                                         alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
                                         semanticLabel: 'Ludo Lovers classic board artwork',
