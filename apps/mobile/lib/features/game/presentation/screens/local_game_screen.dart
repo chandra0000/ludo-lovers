@@ -81,8 +81,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   static const String _humanPlayerId = 'orange';
   static const BorderRadius _dieBorderRadius =
       BorderRadius.all(Radius.circular(22));
-  static const RoundedRectangleBorder _dieButtonShape =
-      RoundedRectangleBorder(borderRadius: _dieBorderRadius);
   static const BorderRadius _reactionBorderRadius =
       BorderRadius.all(Radius.circular(18));
   static const BoxDecoration _reactionChipDecoration = BoxDecoration(
@@ -2004,7 +2002,7 @@ class _GlassConePawnPainter extends CustomPainter {
 /// Standard die-face pips. The numeric roll stays in game state and semantics,
 /// never as a digital number in the visible gameplay UI.
 class _DicePips extends StatelessWidget {
-  const _DicePips({super.key, required this.value});
+  const _DicePips({required this.value});
 
   final int value;
 
