@@ -126,6 +126,20 @@ void main() {
     expect(boardRect.width, closeTo(boardRect.height, 0.1));
     expect(boardRect.left, greaterThanOrEqualTo(0));
     expect(boardRect.right, lessThanOrEqualTo(tester.view.physicalSize.width));
+
+    // The live die must be positioned on the board canvas, not in a row below
+    // it, and must remain fully visible at a phone-sized viewport.
+    final diceRect = tester.getRect(
+      find.byKey(const ValueKey('roll_dice_button')),
+    );
+    expect(diceRect.left, greaterThanOrEqualTo(boardRect.left));
+    expect(diceRect.top, greaterThanOrEqualTo(boardRect.top));
+    expect(diceRect.right, lessThanOrEqualTo(boardRect.right));
+    expect(diceRect.bottom, lessThanOrEqualTo(boardRect.bottom));
+    expect(
+      find.byKey(const ValueKey('roll_dice_button_semantics')),
+      findsOneWidget,
+    );
     expect(find.byType(Image), findsWidgets);
     expect(find.byKey(const ValueKey('local_match_player_strip')), findsNothing);
 
