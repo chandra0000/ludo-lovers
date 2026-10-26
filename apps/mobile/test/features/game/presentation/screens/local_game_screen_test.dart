@@ -8,6 +8,46 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
+  testWidgets('chat sends local preview messages and reactions animate feedback', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = LocalGameController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('match_chat_sheet')), findsOneWidget);
+    expect(find.text('Local preview · messages stay on this device.'), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('match_chat_input')),
+      'Hello players!',
+    );
+    await tester.tap(find.byKey(const ValueKey('send_match_chat_button')));
+    await tester.pump();
+    expect(find.text('You: Hello players!'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('close_match_chat_button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('reaction_heart')));
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('active_reaction_feedback')), findsOneWidget);
+    expect(find.text('❤️'), findsWidgets);
+  });
+
   testWidgets('starts a local two-player match with user-selected colours', (
     tester,
   ) async {
@@ -323,10 +363,15 @@ void main() {
       expect(find.byIcon(Icons.person_rounded), findsNothing);
       expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
-      expect(find.text('Chat'), findsNothing);
-      expect(find.text('React'), findsNothing);
+      expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
+      expect(find.byKey(const ValueKey('reaction_laugh')), findsOneWidget);
+      expect(find.byKey(const ValueKey('reaction_heart')), findsOneWidget);
+      expect(find.byKey(const ValueKey('reaction_angry')), findsOneWidget);
+      expect(find.byKey(const ValueKey('reaction_gift')), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pump();
+      expect(find.byKey(const ValueKey('dice_rolling_face')), findsOneWidget);
       await tester.pumpAndSettle();
 
       expect(controller.state.pendingRoll, 6);
