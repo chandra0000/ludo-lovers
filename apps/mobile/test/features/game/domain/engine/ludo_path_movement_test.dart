@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/ludo_board_paths.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixture.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
 
 void main() {
@@ -184,5 +185,62 @@ void main() {
       requireExactFinishRoll: true,
     );
     expect(finished.failure, PawnMoveFailure.alreadyFinished);
+  });
+
+  test('animates every intermediate route cell for Orange, Green, Blue, and Magenta', () {
+    final board = ClassicLudoBoardFixture.create();
+    for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
+      final playerPath = board.forPlayer(playerId);
+      final positions = movement.positionsBetween(
+        path: playerPath,
+        fromProgress: 0,
+        toProgress: playerPath.finishProgress,
+      );
+      final visitedCells = positions
+          .where((position) => position.section != PawnRouteSection.finished)
+          .map((position) => playerPath.cellAtProgress(position.progress!))
+          .toList();
+
+      expect(
+        visitedCells,
+        <int>[
+          ...playerPath.mainTrackCells.skip(1).take(playerPath.trackLength - 1),
+          ...playerPath.homeLaneCells,
+        ],
+        reason: 'The $playerId pawn must visit each intermediate cell once and in order.',
+      );
+      expect(positions.last.section, PawnRouteSection.finished);
+      expect(positions.last.progress, playerPath.finishProgress);
+      expect(
+        positions.where((position) => position.section == PawnRouteSection.homeLane),
+        hasLength(5),
+        reason: 'The $playerId pawn must visit all five home-lane cells.',
+      );
+    }
+  });
+
+  test('single-step moves agree with the fixture across the wrap and lane branch', () {
+    final board = ClassicLudoBoardFixture.create();
+    for (final playerId in <String>['orange', 'green', 'blue', 'magenta']) {
+      final playerPath = board.forPlayer(playerId);
+      for (final progress in <int>[0, 1, 10, 20, 30, 40, 49, 50]) {
+        final result = movement.resolve(
+          path: playerPath,
+          current: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ),
+          diceValue: 1,
+          sixRequiredToEnter: true,
+          requireExactFinishRoll: true,
+        );
+        expect(result.isSuccess, isTrue, reason: '$playerId at progress $progress');
+        expect(
+          result.resolution!.destinationCell,
+          playerPath.cellAtProgress(progress + 1),
+          reason: '$playerId must land on the next route cell',
+        );
+      }
+    }
   });
 }
