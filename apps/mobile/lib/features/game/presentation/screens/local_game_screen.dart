@@ -1546,12 +1546,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
-                                          'assets/images/ludo_board_glass.png',
+                                          'assets/images/ludo_board.jpg',
                                         ),
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.contain,
                                         alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
-                                        semanticLabel: 'Ludo Lovers glass board for live gameplay review',
+                                        semanticLabel: 'Ludo Lovers classic board artwork',
                                       ),
                                     ),
                                     // Keep the die on the reference canvas and scale it
