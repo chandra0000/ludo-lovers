@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 /// Normalized rendering coordinates for a logical Ludo board.
@@ -42,7 +40,7 @@ class BoardPoint {
     if (gridSize <= 0) {
       throw ArgumentError.value(gridSize, 'gridSize', 'Must be positive.');
     }
-    final side = math.min(width, height);
+    final side = width < height ? width : height;
     final left = (width - side) / 2;
     final top = (height - side) / 2;
     return BoardPixelPoint(
