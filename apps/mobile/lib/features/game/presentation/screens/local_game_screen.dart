@@ -1699,6 +1699,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             (id: 'angry', emoji: '😡', label: 'Angry'),
                             (id: 'gift', emoji: '🎁', label: 'Gift'),
                           ])
+                            // The tooltip label is runtime data from the reaction.
+                            // ignore: prefer_const_constructors
                             Tooltip(
                               message: reaction.label,
                               child: InkWell(
