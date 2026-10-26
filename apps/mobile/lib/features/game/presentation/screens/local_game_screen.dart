@@ -81,6 +81,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   Timer? _reactionTimer;
   String? _latestReaction;
   final List<String> _chatMessages = <String>[];
+  late final TextEditingController _chatInputController =
+      TextEditingController();
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
   static const BorderRadius _dieBorderRadius =
@@ -124,6 +126,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _pawnStepTimer?.cancel();
     _diceRollTimer?.cancel();
     _reactionTimer?.cancel();
+    _chatInputController.dispose();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
@@ -568,7 +571,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 
   Future<void> _showMatchChat() async {
-    final inputController = TextEditingController();
+    final inputController = _chatInputController;
     void sendMessage() {
       final message = inputController.text.trim();
       if (message.isEmpty) return;
@@ -576,8 +579,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       inputController.clear();
     }
 
-    try {
-      await showModalBottomSheet<void>(
+    await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         backgroundColor: AppTheme.panel,
@@ -715,9 +717,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           ),
         ),
       );
-    } finally {
-      inputController.dispose();
-    }
   }
 
   void _sendReaction(String reaction, String label) {
