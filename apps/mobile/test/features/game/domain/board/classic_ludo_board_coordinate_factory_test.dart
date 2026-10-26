@@ -189,5 +189,82 @@ void main() {
       expect(large.x, closeTo(small.x * 2, 0.000001));
       expect(large.y, closeTo(small.y * 2, 0.000001));
     });
+
+    test('locks the four known diagonal connectors to exact grid coordinates', () {
+      const expected = <int, (BoardGridCell, BoardGridCell)>{
+        4: (BoardGridCell(column: 5, row: 6), BoardGridCell(column: 6, row: 5)),
+        17: (BoardGridCell(column: 8, row: 5), BoardGridCell(column: 9, row: 6)),
+        30: (BoardGridCell(column: 9, row: 8), BoardGridCell(column: 8, row: 9)),
+        43: (BoardGridCell(column: 6, row: 9), BoardGridCell(column: 5, row: 8)),
+      };
+      expect(ClassicLudoBoardCoordinateFactory.referenceCornerConnectorIndexes,
+          expected.keys.toSet());
+      expect(
+        ClassicLudoBoardCoordinateFactory.nonOrthogonalTransitionIndexes,
+        expected.keys.toList()..sort(),
+        reason: 'Any additional or shifted diagonal is a topology regression.',
+      );
+      for (final connector in expected.entries) {
+        expect(ClassicLudoBoardCoordinateFactory.sharedTrack[connector.key],
+            connector.value.$1);
+        expect(
+          ClassicLudoBoardCoordinateFactory.sharedTrack[(connector.key + 1) % 52],
+          connector.value.$2,
+        );
+      }
+    });
+
+    test('locks all eight safe-cell IDs to their defined grid coordinates', () {
+      const expected = <int, BoardGridCell>{
+        0: BoardGridCell(column: 1, row: 6),
+        8: BoardGridCell(column: 6, row: 2),
+        13: BoardGridCell(column: 8, row: 1),
+        21: BoardGridCell(column: 12, row: 6),
+        26: BoardGridCell(column: 13, row: 8),
+        34: BoardGridCell(column: 8, row: 12),
+        39: BoardGridCell(column: 6, row: 13),
+        47: BoardGridCell(column: 2, row: 8),
+      };
+      expect(ClassicLudoBoardDefinition.approvedSafeTrackCellIds,
+          expected.keys.toSet());
+      for (final safe in expected.entries) {
+        expect(ClassicLudoBoardCoordinateFactory.sharedTrack[safe.key], safe.value);
+      }
+    });
+
+    test('checks every home-lane step and every track-to-lane branch is orthogonal', () {
+      final track = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      final laneCells = <BoardGridCell>{};
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(seat.homeLaneCells, hasLength(5), reason: seat.id);
+        for (var i = 0; i < seat.homeLaneCells.length; i++) {
+          final cell = seat.homeLaneCells[i];
+          expect(cell.isInsideBoard, isTrue, reason: seat.id);
+          expect(track.contains(cell), isFalse, reason: seat.id);
+          expect(laneCells.add(cell), isTrue, reason: 'Lanes must not overlap');
+          if (i > 0) {
+            final previous = seat.homeLaneCells[i - 1];
+            expect(
+              (cell.column - previous.column).abs() +
+                  (cell.row - previous.row).abs(),
+              1,
+              reason: 'Every lane cell must touch its predecessor orthogonally',
+            );
+          }
+        }
+        final approachIndex =
+            (seat.provisionalTrackEntryIndex +
+                ClassicLudoBoardDefinition.playerTrackLength - 1) %
+            ClassicLudoBoardDefinition.sharedTrackLength;
+        final approach = track[approachIndex];
+        final firstLane = seat.homeLaneCells.first;
+        expect(
+          (approach.column - firstLane.column).abs() +
+              (approach.row - firstLane.row).abs(),
+          1,
+          reason: 'The route must enter its home lane orthogonally',
+        );
+      }
+    });
   });
 }
