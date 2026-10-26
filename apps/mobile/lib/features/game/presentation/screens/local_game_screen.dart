@@ -1402,7 +1402,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ],
-                      if (_playAgainstAi)                      if (_playAgainstAi) ...<Widget>[
+                      if (_playAgainstAi) ...<Widget>[
                         const SizedBox(height: 6),
                         const Text(
                           'AI OPPONENTS ON · YOU PLAY ORANGE',
@@ -1482,12 +1482,22 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                                       : 'Choose a highlighted pawn to use the current roll.',
                                               child: Material(
                                                 color: Colors.transparent,
-                                                child: InkWell(
+                                                child: ElevatedButton(
                                                   key: const ValueKey('roll_dice_button'),
-                                                  borderRadius: _dieBorderRadius,
-                                                  onTap: state.completed || isAiTurn || state.pendingRoll != null
+                                                  onPressed: state.completed || isAiTurn || state.pendingRoll != null
                                                       ? null
                                                       : () => _rollDice(state),
+                                                  style: ElevatedButton.styleFrom(
+                                                    padding: EdgeInsets.zero,
+                                                    minimumSize: Size(dieSize, dieSize),
+                                                    maximumSize: Size(dieSize, dieSize),
+                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                    elevation: 0,
+                                                    backgroundColor: Colors.transparent,
+                                                    disabledBackgroundColor: Colors.transparent,
+                                                    shadowColor: Colors.transparent,
+                                                    shape: RoundedRectangleBorder(borderRadius: _dieBorderRadius),
+                                                  ),
                                                   child: AnimatedContainer(
                                                     duration: const Duration(milliseconds: 180),
                                                     width: dieSize,
