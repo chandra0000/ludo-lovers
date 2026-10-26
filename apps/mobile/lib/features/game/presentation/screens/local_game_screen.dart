@@ -1603,7 +1603,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           width: 1.5,
                                         ),
                                       ),
-                                      boxShadow: const <BoxShadow>[
+                                      boxShadow: <BoxShadow>[
                                         BoxShadow(
                                           color: Color(0x6BFFD700),
                                           blurRadius: 24,
