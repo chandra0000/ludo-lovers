@@ -1450,7 +1450,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
-                                          'assets/images/ludo_board_glass.png',
+                                          'assets/images/ludo_board_final.png',
                                         ),
                                         fit: BoxFit.cover,
                                         alignment: Alignment.center,
@@ -1458,35 +1458,53 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         semanticLabel: 'Ludo Lovers glass board for live gameplay review',
                                       ),
                                     ),
-                                    for (final visual in visuals)
-                                      _buildAnimatedPawnMarker(
-                                        visual: visual,
-                                        boardSize: size,
-                                        cellSize: cellSize,
-                                        isLegal: legalIds.contains(visual.pawnId),
-                                      ),
-                                    // Preview each legal move's destination using
-                                    // the same pure movement resolver as the engine.
-                                    // This is an aid for local testing, not route approval.
-                                    if (state.pendingRoll != null)
-                                      for (final visual in visuals)
-                                        if (legalIds.contains(visual.pawnId))
-                                          _buildDestinationMarker(
-                                            visual: visual,
-                                            statePawns: state.pawns,
-                                            diceValue: state.pendingRoll!,
-                                            boardSize: size,
-                                            cellSize: cellSize,
-                                          ),
-                                    for (final visual in visuals)
-                                      if (!isAiTurn &&
-                                          !_diceRolling &&
-                                          legalIds.contains(visual.pawnId))
-                                        Positioned(
-                                          left: visual.point.x * size.width -
-                                              cellSize * 0.5,
-                                          top: visual.point.y * size.height -
-                                              cellSize * 0.5,
+                                    // Dice are anchored to the reference board canvas itself.
+                                    // Keep their footprint proportional to the square board.
+                                    Positioned(
+                                      right: size.width * 0.045,
+                                      bottom: size.height * 0.045,
+                                      child: Builder(
+                                        builder: (context) {
+                                          final dieSize = (size.shortestSide * 0.18)
+                                              .clamp(56.0, 78.0);
+                                          return                             Semantics(
+                                        key: const ValueKey('roll_dice_button_semantics'),
+                                        button: true,
+                                        enabled: !state.completed &&
+                                            !isAiTurn &&
+                                            state.pendingRoll == null,
+                                        label: state.completed
+                                            ? 'Dice unavailable. Match complete.'
+                                            : isAiTurn
+                                                ? 'Dice unavailable. AI opponent turn.'
+                                                : _diceRolling
+                                                    ? 'Dice is rolling.'
+                                                    : state.pendingRoll != null
+                                                        ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
+                                                        : 'Roll dice',
+                                        hint: state.completed
+                                            ? 'The match is finished. Choose Rematch to start a new match.'
+                                            : isAiTurn
+                                                ? 'The AI is choosing its move. Please wait.'
+                                                : _diceRolling
+                                                    ? 'Wait for the dice animation to finish.'
+                                                    : state.pendingRoll != null
+                                                        ? 'Choose a highlighted pawn to use the current roll.'
+                                                        : 'Roll a die to begin the current player’s turn.',
+                                        child: Tooltip(
+                                          message: _diceRolling
+                                              ? 'Dice is rolling…'
+                                              : state.pendingRoll != null
+                                                  ? 'Choose a highlighted pawn to use the current roll.'
+                                                  : isAiTurn
+                                                      ? 'AI is choosing its move…'
+                                                      : 'Roll a die to begin the current player’s turn.',
+                                          child: ElevatedButton(
+                                            key: const ValueKey('roll_dice_button'),
+                                            onPressed: state.completed || isAiTurn || state.pendingRoll != null
+                                                ? null
+                                                : () => _rollDice(state),
+                                            style: ElevatedButton.st                                  cellSize * 0.5,
                                           // Keep the hit target aligned to one complete
                                           // logical cell so taps stay predictable on phones.
                                           width: cellSize,
