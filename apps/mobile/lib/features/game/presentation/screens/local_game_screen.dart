@@ -1676,7 +1676,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     color: AppTheme.panelRaised,
-                                    borderRadius: BorderRadius.circular(18),
+                                    borderRadius: const BorderRadius.all(Radius.circular(18)),
                                     border: Border.all(
                                       color: AppTheme.gold.withValues(alpha: 0.32),
                                     ),
