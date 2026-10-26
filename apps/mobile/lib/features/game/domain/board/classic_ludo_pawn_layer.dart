@@ -75,11 +75,15 @@ class ClassicLudoPawnLayer extends CustomPainter {
     for (final entry in grouped.entries) {
       final first = entry.value.first;
       final normalized = first.pointOverride;
-      final point = normalized?.toPixels(width: size.width, height: size.height) ??
-          layout.pixelForCell(
-            cellId: first.cellId,
+      final point = normalized?.toSquareBoardPixels(
             width: size.width,
             height: size.height,
+            gridSize: gridSize,
+          ) ??
+          layout.forCell(first.cellId).toSquareBoardPixels(
+            width: size.width,
+            height: size.height,
+            gridSize: gridSize,
           );
       final occupants = entry.value;
       for (var index = 0; index < occupants.length; index++) {
