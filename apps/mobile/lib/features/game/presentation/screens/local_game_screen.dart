@@ -1458,8 +1458,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         semanticLabel: 'Ludo Lovers glass board for live gameplay review',
                                       ),
                                     ),
-                                    // Dice are anchored to the reference board canvas itself.
-                                    // Keep their footprint proportional to the square board.
+                                    // Keep the die on the reference canvas and scale it
+                                    // with the square board instead of allocating a row below it.
                                     Positioned(
                                       right: size.width * 0.045,
                                       bottom: size.height * 0.045,
@@ -1467,44 +1467,97 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         builder: (context) {
                                           final dieSize = (size.shortestSide * 0.18)
                                               .clamp(56.0, 78.0);
-                                          return                             Semantics(
-                                        key: const ValueKey('roll_dice_button_semantics'),
-                                        button: true,
-                                        enabled: !state.completed &&
-                                            !isAiTurn &&
-                                            state.pendingRoll == null,
-                                        label: state.completed
-                                            ? 'Dice unavailable. Match complete.'
-                                            : isAiTurn
-                                                ? 'Dice unavailable. AI opponent turn.'
-                                                : _diceRolling
-                                                    ? 'Dice is rolling.'
-                                                    : state.pendingRoll != null
-                                                        ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
-                                                        : 'Roll dice',
-                                        hint: state.completed
-                                            ? 'The match is finished. Choose Rematch to start a new match.'
-                                            : isAiTurn
-                                                ? 'The AI is choosing its move. Please wait.'
-                                                : _diceRolling
-                                                    ? 'Wait for the dice animation to finish.'
-                                                    : state.pendingRoll != null
-                                                        ? 'Choose a highlighted pawn to use the current roll.'
-                                                        : 'Roll a die to begin the current player’s turn.',
-                                        child: Tooltip(
-                                          message: _diceRolling
-                                              ? 'Dice is rolling…'
-                                              : state.pendingRoll != null
-                                                  ? 'Choose a highlighted pawn to use the current roll.'
-                                                  : isAiTurn
-                                                      ? 'AI is choosing its move…'
-                                                      : 'Roll a die to begin the current player’s turn.',
-                                          child: ElevatedButton(
-                                            key: const ValueKey('roll_dice_button'),
-                                            onPressed: state.completed || isAiTurn || state.pendingRoll != null
-                                                ? null
-                                                : () => _rollDice(state),
-                                            style: ElevatedButton.st                                  cellSize * 0.5,
+                                          return Semantics(
+                                            key: const ValueKey('roll_dice_button_semantics'),
+                                            button: true,
+                                            enabled: !state.completed && !isAiTurn && state.pendingRoll == null,
+                                            label: _diceRolling
+                                                ? 'Dice is rolling.'
+                                                : state.pendingRoll == null
+                                                    ? 'Roll dice'
+                                                    : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
+                                            child: Tooltip(
+                                              message: _diceRolling
+                                                  ? 'Dice is rolling…'
+                                                  : state.pendingRoll == null
+                                                      ? 'Roll dice'
+                                                      : 'Choose a highlighted pawn to use the current roll.',
+                                              child: Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  key: const ValueKey('roll_dice_button'),
+                                                  borderRadius: _dieBorderRadius,
+                                                  onTap: state.completed || isAiTurn || state.pendingRoll != null
+                                                      ? null
+                                                      : () => _rollDice(state),
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(milliseconds: 180),
+                                                    width: dieSize,
+                                                    height: dieSize,
+                                                    decoration: const BoxDecoration(
+                                                      borderRadius: _dieBorderRadius,
+                                                      gradient: LinearGradient(
+                                                        begin: Alignment.topLeft,
+                                                        end: Alignment.bottomRight,
+                                                        colors: <Color>[
+                                                          Color(0xFFFFFDF3),
+                                                          Color(0xFFFFF0D2),
+                                                          Color(0xFFE7C68C),
+                                                        ],
+                                                      ),
+                                                      border: Border(
+                                                        top: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
+                                                        right: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
+                                                        bottom: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
+                                                        left: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
+                                                      ),
+                                                      boxShadow: <BoxShadow>[
+                                                        BoxShadow(color: Color(0x6BFFD700), blurRadius: 24, spreadRadius: 1),
+                                                        BoxShadow(color: Color(0x2EFFD700), blurRadius: 6, offset: Offset(0, 4)),
+                                                      ],
+                                                    ),
+                                                    child: Center(
+                                                      child: _diceRolling || state.pendingRoll != null
+                                                          ? _DicePips(value: _diceRolling ? _rollingFace : state.pendingRoll!)
+                                                          : Icon(Icons.casino_rounded, size: dieSize * 0.56, color: const Color(0xFF3B2600)),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    for (final visual in visuals
+                                      _buildAnimatedPawnMarker(
+                                        visual: visual,
+                                        boardSize: size,
+                                        cellSize: cellSize,
+                                        isLegal: legalIds.contains(visual.pawnId),
+                                      ),
+                                    // Preview each legal move's destination using
+                                    // the same pure movement resolver as the engine.
+                                    // This is an aid for local testing, not route approval.
+                                    if (state.pendingRoll != null)
+                                      for (final visual in visuals)
+                                        if (legalIds.contains(visual.pawnId))
+                                          _buildDestinationMarker(
+                                            visual: visual,
+                                            statePawns: state.pawns,
+                                            diceValue: state.pendingRoll!,
+                                            boardSize: size,
+                                            cellSize: cellSize,
+                                          ),
+                                    for (final visual in visuals)
+                                      if (!isAiTurn &&
+                                          !_diceRolling &&
+                                          legalIds.contains(visual.pawnId))
+                                        Positioned(
+                                          left: visual.point.x * size.width -
+                                              cellSize * 0.5,
+                                          top: visual.point.y * size.height -
+                                              cellSize * 0.5,
                                           // Keep the hit target aligned to one complete
                                           // logical cell so taps stay predictable on phones.
                                           width: cellSize,
@@ -1530,160 +1583,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 );
                               },
                             ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                            const Spacer(),
-                            Semantics(
-                              key: const ValueKey('roll_dice_button_semantics'),
-                              button: true,
-                              enabled: !state.completed &&
-                                  !isAiTurn &&
-                                  state.pendingRoll == null,
-                              label: state.completed
-                                  ? 'Dice unavailable. Match complete.'
-                                  : isAiTurn
-                                      ? 'Dice unavailable. AI opponent turn.'
-                                      : _diceRolling
-                                          ? 'Dice is rolling.'
-                                          : state.pendingRoll != null
-                                              ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
-                                              : 'Roll dice',
-                              hint: state.completed
-                                  ? 'The match is finished. Choose Rematch to start a new match.'
-                                  : isAiTurn
-                                      ? 'The AI is choosing its move. Please wait.'
-                                      : _diceRolling
-                                          ? 'Wait for the dice animation to finish.'
-                                          : state.pendingRoll != null
-                                              ? 'Choose a highlighted pawn to use the current roll.'
-                                              : 'Roll a die to begin the current player’s turn.',
-                              child: Tooltip(
-                                message: _diceRolling
-                                    ? 'Dice is rolling…'
-                                    : state.pendingRoll != null
-                                        ? 'Choose a highlighted pawn to use the current roll.'
-                                        : isAiTurn
-                                            ? 'AI is choosing its move…'
-                                            : 'Roll a die to begin the current player’s turn.',
-                                child: ElevatedButton(
-                                  key: const ValueKey('roll_dice_button'),
-                                  onPressed: state.completed || isAiTurn || state.pendingRoll != null
-                                      ? null
-                                      : () => _rollDice(state),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    disabledBackgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    disabledForegroundColor: const Color(0xFF3B2600),
-                                    foregroundColor: const Color(0xFF3B2600),
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: const Size(78, 78),
-                                    shape: _dieButtonShape,
-                                  ),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 180),
-                                    width: 78,
-                                    height: 78,
-                                    decoration: const BoxDecoration(
-                                      borderRadius: _dieBorderRadius,
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: <Color>[
-                                          Color(0xFFFFFDF3),
-                                          Color(0xFFFFF0D2),
-                                          Color(0xFFE7C68C),
-                                        ],
-                                      ),
-                                      border: Border(
-                                        top: BorderSide(
-                                          color: Color(0xFFFFDCA0),
-                                          width: 1.5,
-                                        ),
-                                        right: BorderSide(
-                                          color: Color(0xFFFFDCA0),
-                                          width: 1.5,
-                                        ),
-                                        bottom: BorderSide(
-                                          color: Color(0xFFFFDCA0),
-                                          width: 1.5,
-                                        ),
-                                        left: BorderSide(
-                                          color: Color(0xFFFFDCA0),
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                      boxShadow: <BoxShadow>[
-                                        BoxShadow(
-                                          color: Color(0x6BFFD700),
-                                          blurRadius: 24,
-                                          spreadRadius: 1,
-                                        ),
-                                        BoxShadow(
-                                          color: Color(0x2EFFD700),
-                                          blurRadius: 6,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: AnimatedSwitcher(
-                                        duration: const Duration(milliseconds: 260),
-                                         child: _diceRolling
-                                             ? AnimatedRotation(
-                                                 key: const ValueKey('dice_rolling_face'),
-                                                 turns: _diceRollTicks * 0.24,
-                                                 duration: const Duration(milliseconds: 80),
-                                                 curve: Curves.easeOutCubic,
-                                                 child: AnimatedScale(
-                                                   scale: _diceRollTicks.isEven ? 1.12 : 0.92,
-                                                   duration: const Duration(milliseconds: 80),
-                                                   curve: Curves.easeInOut,
-                                                   child: _DicePips(
-                                                     value: _rollingFace,
-                                                     key: const ValueKey('dice_rolling_pips'),
-                                                   ),
-                                                 ),
-                                               )
-                                             : state.pendingRoll == null
-                                                 ? Icon(
-                                                     Icons.casino_rounded,
-                                                     key: const ValueKey('dice_idle'),
-                                                     size: 44,
-                                                     color: const Color(0xFF3B2600),
-                                                   )
-                                                 : Container(
-                                                 key: ValueKey<String>(
-                                                   'dice_result_${state.pendingRoll}',
-                                                 ),
-                                                 alignment: Alignment.center,
-                                                 child: Semantics(
-                                                   key: const ValueKey(
-                                                     'dice_result_semantics',
-                                                   ),
-                                                   label: 'Dice result: ${state.pendingRoll}',
-                                                   liveRegion: true,
-                                                   excludeSemantics: true,
-                                                   child: _DicePips(
-                                                     value: state.pendingRoll!,
-                                                   ),
-                                                 ),
-                                               ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            ],
                           ),
                         ),
                       ),
