@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_fixture.dart';
+import 'package:ludo_lovers/features/game/domain/board/classic_ludo_board_definition.dart';
 
 void main() {
   group('ClassicLudoBoardFixture', () {
@@ -75,6 +76,54 @@ void main() {
         board.forPlayer('orange').mainTrackCells.toSet(),
         board.forPlayer('blue').mainTrackCells.toSet(),
       );
+    });
+
+    test('verifies every traversed intermediate cell for all four player routes', () {
+      final board = ClassicLudoBoardFixture.create();
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = board.forPlayer(seat.id);
+        expect(path.entryCell, seat.provisionalTrackEntryIndex, reason: seat.id);
+        expect(path.cellAtProgress(0), path.mainTrackCells.first, reason: seat.id);
+        for (var progress = 0; progress < path.trackLength; progress++) {
+          expect(
+            path.cellAtProgress(progress),
+            path.mainTrackCells[progress],
+            reason: 'Unexpected shared-track position for player at progress $progress',
+          );
+        }
+        for (var laneIndex = 0; laneIndex < path.homeLaneLength; laneIndex++) {
+          expect(
+            path.cellAtProgress(path.trackLength + laneIndex),
+            seat.homeLaneCellIds[laneIndex],
+            reason: 'Unexpected home-lane position for player',
+          );
+        }
+        expect(path.cellAtProgress(path.finishProgress), isNull, reason: seat.id);
+      }
+    });
+
+    test('checks the 51-to-0 wraparound and the player-specific route rotations', () {
+      final board = ClassicLudoBoardFixture.create();
+      final physical = ClassicLudoBoardDefinition.sharedTrackCells;
+      expect(physical, hasLength(52));
+      expect(physical[51], const BoardGridCell(column: 0, row: 6));
+      expect(physical[0], const BoardGridCell(column: 1, row: 6));
+      expect(
+        (physical[51].column - physical[0].column).abs() +
+            (physical[51].row - physical[0].row).abs(),
+        1,
+      );
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        final path = board.forPlayer(seat.id);
+        for (var progress = 0; progress < 52; progress++) {
+          expect(
+            path.mainTrackCells[progress],
+            (seat.provisionalTrackEntryIndex + progress) % 52,
+            reason: 'Route rotation mismatch for player at shared index $progress',
+          );
+        }
+      }
     });
   });
 }
