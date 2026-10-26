@@ -83,6 +83,18 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       BorderRadius.all(Radius.circular(22));
   static const RoundedRectangleBorder _dieButtonShape =
       RoundedRectangleBorder(borderRadius: _dieBorderRadius);
+  static const BorderRadius _reactionBorderRadius =
+      BorderRadius.all(Radius.circular(18));
+  static const BoxDecoration _reactionChipDecoration = BoxDecoration(
+    color: AppTheme.panelRaised,
+    borderRadius: _reactionBorderRadius,
+    border: Border(
+      top: BorderSide(color: Color(0x52FFD700)),
+      right: BorderSide(color: Color(0x52FFD700)),
+      bottom: BorderSide(color: Color(0x52FFD700)),
+      left: BorderSide(color: Color(0x52FFD700)),
+    ),
+  );
 
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
@@ -1669,7 +1681,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               message: reaction.label,
                               child: InkWell(
                                 key: ValueKey<String>('reaction_${reaction.id}'),
-                                borderRadius: const BorderRadius.all(Radius.circular(18)),
+                                borderRadius: _reactionBorderRadius,
                                 onTap: () => _sendReaction(
                                   reaction.emoji,
                                   reaction.label,
@@ -1678,16 +1690,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   width: 42,
                                   height: 42,
                                   alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
-                                    color: AppTheme.panelRaised,
-                                    borderRadius: BorderRadius.all(Radius.circular(18)),
-                                    border: Border(
-                                      top: BorderSide(color: Color(0x52FFD700)),
-                                      right: BorderSide(color: Color(0x52FFD700)),
-                                      bottom: BorderSide(color: Color(0x52FFD700)),
-                                      left: BorderSide(color: Color(0x52FFD700)),
-                                    ),
-                                  ),
+                                  decoration: _reactionChipDecoration,
                                   child: Text(
                                     reaction.emoji,
                                     style: const TextStyle(fontSize: 20),
