@@ -161,6 +161,10 @@ void main() {
       find.byKey(const ValueKey('live_game_board_artwork')),
     );
     expect(boardArtwork.fit, BoxFit.cover);
+    expect(
+      (boardArtwork.image as AssetImage).assetName,
+      'assets/images/ludo_board_glass.png',
+    );
     final boardRect = tester.getRect(
       find.byKey(const ValueKey('local_game_board')),
     );
