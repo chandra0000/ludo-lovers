@@ -1906,7 +1906,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     required double cellSize,
     required bool isLegal,
   }) {
-    final diameter = cellSize * (visual.isFinished ? 0.34 : visual.isYard ? 0.42 : visual.isStacked ? 0.44 : 0.58);
+    final diameter = cellSize * (visual.isFinished ? 0.30 : visual.isYard ? 0.38 : visual.isStacked ? 0.38 : 0.50);
     final centerX = visual.point.x * boardSize.width + visual.stackOffset.dx * cellSize;
     final centerY = visual.point.y * boardSize.height + visual.stackOffset.dy * cellSize;
     final isSelectable = isLegal || (visual.isYard &&
@@ -1932,7 +1932,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           builder: (context, angle, child) {
             final hop = math.sin(angle).clamp(0.0, 1.0);
             return Transform.translate(
-              offset: Offset(0, -cellSize * 0.58 * hop),
+              offset: Offset(0, -cellSize * 0.42 * hop),
               child: Transform.scale(
                 scale: 1 + 0.12 * hop,
                 child: Stack(
@@ -1976,10 +1976,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   static const List<Offset> _stackOffsets = <Offset>[
     Offset.zero,
-    Offset(-0.34, -0.34),
-    Offset(0.34, -0.34),
-    Offset(-0.34, 0.34),
-    Offset(0.34, 0.34),
+    Offset(-0.28, -0.28),
+    Offset(0.28, -0.28),
+    Offset(-0.28, 0.28),
+    Offset(0.28, 0.28),
   ];
 
   List<_PawnVisual> _visuals(List<dynamic> pawns) {
