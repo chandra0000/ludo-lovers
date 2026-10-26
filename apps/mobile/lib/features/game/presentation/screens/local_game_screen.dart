@@ -1539,24 +1539,31 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                                       ],
                                                     ),
                                                     child: Center(
-                                                      child: _diceRolling
-                                                          ? Semantics(
-                                                              key: const ValueKey('dice_rolling_face'),
-                                                              label: 'Dice is rolling',
-                                                              liveRegion: true,
-                                                              child: _DicePips(value: _rollingFace),
-                                                            )
-                                                          : state.pendingRoll != null
-                                                              ? Semantics(
-                                                                  key: const ValueKey('dice_result_semantics'),
-                                                                  label: 'Dice result: ${state.pendingRoll}',
-                                                                  liveRegion: true,
-                                                                  child: KeyedSubtree(
-                                                                    key: ValueKey<String>('dice_result_${state.pendingRoll}'),
-                                                                    child: _DicePips(value: state.pendingRoll!),
+                                                      child: AnimatedSwitcher(
+                                                        duration: const Duration(milliseconds: 260),
+                                                        child: _diceRolling
+                                                            ? Semantics(
+                                                                key: const ValueKey('dice_rolling_face'),
+                                                                label: 'Dice is rolling',
+                                                                liveRegion: true,
+                                                                child: _DicePips(value: _rollingFace),
+                                                              )
+                                                            : state.pendingRoll != null
+                                                                ? Semantics(
+                                                                    key: const ValueKey('dice_result_semantics'),
+                                                                    label: 'Dice result: ${state.pendingRoll}',
+                                                                    liveRegion: true,
+                                                                    child: KeyedSubtree(
+                                                                      key: ValueKey<String>('dice_result_${state.pendingRoll}'),
+                                                                      child: _DicePips(value: state.pendingRoll!),
+                                                                    ),
+                                                                  )
+                                                                : const Icon(
+                                                                    Icons.casino_rounded,
+                                                                    size: 42,
+                                                                    color: Color(0xFF3B2600),
                                                                   ),
-                                                                )
-                                                              : Icon(Icons.casino_rounded, size: dieSize * 0.56, color: const Color(0xFF3B2600)),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
