@@ -1539,17 +1539,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     // Keep the static board artwork on its own
                                     // layer while pawns and destination markers animate.
                                     // Use the approved board artwork as the live match surface.
-                                    // Fill the square board canvas on narrow Android screens. This asset is
-                                    // the board surface (not the full portrait mockup), so cover
-                                    // prevents the board from shrinking inside the pawn coordinate plane.
+                                    // Show the complete original glass-board artwork without cropping.
+                                    // Contain preserves the source image's full bounds and aspect ratio.
+                                    // The square gameplay canvas remains unchanged for the current pawn overlay.
                                     const RepaintBoundary(
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
                                           'assets/images/ludo_board_glass.png',
                                         ),
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment(0, -0.07),
+                                        fit: BoxFit.contain,
+                                        alignment: Alignment.center,
                                         filterQuality: FilterQuality.high,
                                         semanticLabel: 'Ludo Lovers glass board artwork',
                                       ),
