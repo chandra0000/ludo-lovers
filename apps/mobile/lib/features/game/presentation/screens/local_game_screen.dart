@@ -1665,7 +1665,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               message: reaction.label,
                               child: InkWell(
                                 key: ValueKey<String>('reaction_${reaction.id}'),
-                                borderRadius: BorderRadius.circular(18),
+                                borderRadius: const BorderRadius.all(Radius.circular(18)),
                                 onTap: () => _sendReaction(
                                   reaction.emoji,
                                   reaction.label,
