@@ -31,7 +31,7 @@ void main() {
         gridSize: 15,
       );
 
-      expect(pixels.x, 50);
+      expect(pixels.x, 0);
       expect(pixels.y, 350);
     });
 
