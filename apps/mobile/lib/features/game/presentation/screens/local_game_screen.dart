@@ -1418,11 +1418,106 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ],
-                      // Player identity cards sit immediately above the board.
-                      // In local mode the selected player ID is the display name;
-                      // online profiles can replace this with a verified username later.
-                      
-                      const SizedBox(height: 4),
+                      // Compact identity chips keep player colours and the active
+                      // turn visible immediately above the actual board canvas.
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Wrap(
+                          key: const ValueKey('player_identity_strip'),
+                          alignment: WrapAlignment.center,
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: <Widget>[
+                            for (final playerId in state.players)
+                              Builder(
+                                builder: (context) {
+                                  final playerColor =
+                                      _colors[playerId] ?? AppTheme.cream;
+                                  final isCurrentPlayer =
+                                      playerId == state.currentPlayerId;
+                                  final finishedCount = state.pawns
+                                      .where(
+                                        (pawn) =>
+                                            pawn.playerId == playerId &&
+                                            pawn.position.section ==
+                                                PawnRouteSection.finished,
+                                      )
+                                      .length;
+                                  final displayName = playerId.toUpperCase();
+                                  return Tooltip(
+                                    message: '$displayName · '
+                                        '${isCurrentPlayer ? 'current turn' : 'player'} · '
+                                        '$finishedCount of 4 pawns home',
+                                    child: Container(
+                                      key: ValueKey<String>(
+                                        'player_identity_$playerId',
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 7,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isCurrentPlayer
+                                            ? playerColor.withValues(alpha: 0.14)
+                                            : AppTheme.panel,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isCurrentPlayer
+                                              ? playerColor
+                                              : AppTheme.panelRaised,
+                                          width: isCurrentPlayer ? 1.5 : 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: BoxDecoration(
+                                              color: playerColor,
+                                              shape: BoxShape.circle,
+                                              boxShadow: isCurrentPlayer
+                                                  ? <BoxShadow>[
+                                                      BoxShadow(
+                                                        color: playerColor
+                                                            .withValues(alpha: 0.45),
+                                                        blurRadius: 6,
+                                                      ),
+                                                    ]
+                                                  : const <BoxShadow>[],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            displayName,
+                                            style: TextStyle(
+                                              color: isCurrentPlayer
+                                                  ? AppTheme.cream
+                                                  : AppTheme.readableText,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 0.4,
+                                            ),
+                                          ),
+                                          if (isCurrentPlayer) ...<Widget>[
+                                            const SizedBox(width: 5),
+                                            const Icon(
+                                              Icons.circle,
+                                              size: 5,
+                                              color: AppTheme.gold,
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
                       Center(
                         child: SizedBox(
                           key: const ValueKey('local_game_board'),
