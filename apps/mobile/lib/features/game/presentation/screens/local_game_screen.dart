@@ -1674,12 +1674,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   width: 42,
                                   height: 42,
                                   alignment: Alignment.center,
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: AppTheme.panelRaised,
-                                    borderRadius: const BorderRadius.all(Radius.circular(18)),
-                                    border: Border.all(
-                                      color: AppTheme.gold.withValues(alpha: 0.32),
-                                    ),
+                                    borderRadius: BorderRadius.all(Radius.circular(18)),
+                                    border: Border.all(color: Color(0x52FFD700)),
                                   ),
                                   child: Text(
                                     reaction.emoji,
