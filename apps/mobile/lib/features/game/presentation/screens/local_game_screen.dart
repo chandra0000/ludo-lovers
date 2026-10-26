@@ -1693,7 +1693,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               ),
                             ),
                           ),
-                          for (final reaction in <({String id, String emoji, String label})>[
+                          for (final reaction in const <({String id, String emoji, String label})>[
                             (id: 'laugh', emoji: '😂', label: 'Laugh'),
                             (id: 'heart', emoji: '❤️', label: 'Love'),
                             (id: 'angry', emoji: '😡', label: 'Angry'),
