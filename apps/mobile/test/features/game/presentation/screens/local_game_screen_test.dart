@@ -1401,6 +1401,120 @@ void main() {
     expect(settled.dy, closeTo(expectedTopLeft(3).dy, 1.5));
   });
 
+  testWidgets(
+    'captured pawn stays at the collision cell, then retraces to its yard',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final initialState = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id == 'orange_pawn_1') {
+            return pawn.copyWith(
+              position: const PawnRoutePosition(
+                section: PawnRouteSection.mainTrack,
+                progress: 1,
+              ),
+            );
+          }
+          if (pawn.id == 'blue_pawn_1') {
+            return pawn.copyWith(
+              position: const PawnRoutePosition(
+                section: PawnRouteSection.mainTrack,
+                progress: 15,
+              ),
+            );
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+      final controller = LocalGameController(
+        nextDiceValue: () => 1,
+        gameSetup: setup,
+        initialState: initialState,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      final board = find.byKey(const ValueKey('local_game_board'));
+      final boardTopLeft = tester.getTopLeft(board);
+      final boardSize = tester.getSize(board).width;
+      final blueMarker = find.byKey(
+        const ValueKey('pawn_marker_blue_pawn_1'),
+      );
+      final pawnLayout = BoardPawnLayout.classic();
+
+      Offset expectedCenter(int progress) {
+        final visual = pawnLayout.resolve(
+          playerId: 'blue',
+          pawnId: 'blue_pawn_1',
+          position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ),
+        );
+        return boardTopLeft +
+            Offset(
+              visual.point.x * boardSize,
+              visual.point.y * boardSize,
+            );
+      }
+
+      final collisionCenter = tester.getCenter(blueMarker);
+      expect(collisionCenter.dx, closeTo(expectedCenter(15).dx, 1.5));
+      expect(collisionCenter.dy, closeTo(expectedCenter(15).dy, 1.5));
+
+      await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+      await tester.pump();
+
+      expect(
+        controller.state.pawns
+            .firstWhere((pawn) => pawn.id == 'blue_pawn_1')
+            .position.section,
+        PawnRouteSection.yard,
+        reason: 'The rules state records the capture immediately.',
+      );
+      final retainedCenter = tester.getCenter(blueMarker);
+      expect(
+        retainedCenter.dx,
+        closeTo(collisionCenter.dx, 1.5),
+        reason: 'The captured pawn must remain visible at the collision cell '
+            'until the attacking pawn finishes moving.',
+      );
+      expect(retainedCenter.dy, closeTo(collisionCenter.dy, 1.5));
+
+      // Let the attacker finish its one-cell movement, then let the captured
+      // pawn's AnimatedPositioned transition settle on the previous route cell.
+      await tester.pump(const Duration(milliseconds: 360));
+      await tester.pump(const Duration(milliseconds: 280));
+      final reverseCenter = tester.getCenter(blueMarker);
+      expect(reverseCenter.dx, closeTo(expectedCenter(14).dx, 1.5));
+      expect(reverseCenter.dy, closeTo(expectedCenter(14).dy, 1.5));
+
+      // The remaining reverse steps must eventually finish in the blue yard.
+      await tester.pumpAndSettle();
+      expect(
+        controller.state.pawns
+            .firstWhere((pawn) => pawn.id == 'blue_pawn_1')
+            .position.section,
+        PawnRouteSection.yard,
+      );
+      final yardCenter = tester.getCenter(blueMarker);
+      expect(yardCenter, isNot(reverseCenter));
+    },
+  );
+
   testWidgets('AI opponents take turns and return control to orange', (
     tester,
   ) async {
