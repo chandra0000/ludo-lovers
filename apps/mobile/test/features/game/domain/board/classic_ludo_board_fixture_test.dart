@@ -104,7 +104,7 @@ void main() {
 
     test('checks the 51-to-0 wraparound and the player-specific route rotations', () {
       final board = ClassicLudoBoardFixture.create();
-      final physical = ClassicLudoBoardDefinition.sharedTrackCells;
+      const physical = ClassicLudoBoardDefinition.sharedTrackCells;
       expect(physical, hasLength(52));
       expect(physical[51], const BoardGridCell(column: 0, row: 6));
       expect(physical[0], const BoardGridCell(column: 1, row: 6));
