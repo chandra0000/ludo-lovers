@@ -1477,8 +1477,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                                 : isAiTurn
                                                     ? 'Dice unavailable. AI opponent turn.'
                                                     : state.pendingRoll == null
-                                                        ? 'Roll a die to begin the current player’s turn.'
+                                                        ? 'Roll dice'
                                                         : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
+                                            hint: state.completed
+                                                ? 'The match is finished. Choose Rematch to start a new match.'
+                                                : isAiTurn
+                                                    ? 'The AI is choosing its move. Please wait.'
+                                                    : state.pendingRoll == null
+                                                        ? 'Roll a die to begin the current player’s turn.'
+                                                        : 'Choose a highlighted pawn to use the current roll.',
                                             child: Tooltip(
                                               message: state.completed
                                                   ? 'Dice unavailable. Match complete.'
@@ -1608,6 +1615,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         spacing: 8,
                         runSpacing: 6,
                         children: <Widget>[
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              'React',
+                              style: TextStyle(
+                                color: AppTheme.mutedText,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
                           OutlinedButton.icon(
                             key: const ValueKey('open_match_chat_button'),
                             onPressed: _showMatchChat,
