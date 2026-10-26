@@ -1464,6 +1464,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           ),
                                     for (final visual in visuals)
                                       if (!isAiTurn &&
+                                          !_diceRolling &&
                                           legalIds.contains(visual.pawnId))
                                         Positioned(
                                           left: visual.point.x * size.width -
@@ -1516,22 +1517,28 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   ? 'Dice unavailable. Match complete.'
                                   : isAiTurn
                                       ? 'Dice unavailable. AI opponent turn.'
-                                      : state.pendingRoll != null
-                                          ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
-                                          : 'Roll dice',
+                                      : _diceRolling
+                                          ? 'Dice is rolling.'
+                                          : state.pendingRoll != null
+                                              ? 'Dice result ${state.pendingRoll}. Select a highlighted pawn.'
+                                              : 'Roll dice',
                               hint: state.completed
                                   ? 'The match is finished. Choose Rematch to start a new match.'
                                   : isAiTurn
                                       ? 'The AI is choosing its move. Please wait.'
-                                      : state.pendingRoll != null
-                                          ? 'Choose a highlighted pawn to use the current roll.'
-                                          : 'Roll a die to begin the current player’s turn.',
+                                      : _diceRolling
+                                          ? 'Wait for the dice animation to finish.'
+                                          : state.pendingRoll != null
+                                              ? 'Choose a highlighted pawn to use the current roll.'
+                                              : 'Roll a die to begin the current player’s turn.',
                               child: Tooltip(
-                                message: state.pendingRoll != null
-                                    ? 'Choose a highlighted pawn to use the current roll.'
-                                    : isAiTurn
-                                        ? 'AI is choosing its move…'
-                                        : 'Roll a die to begin the current player’s turn.',
+                                message: _diceRolling
+                                    ? 'Dice is rolling…'
+                                    : state.pendingRoll != null
+                                        ? 'Choose a highlighted pawn to use the current roll.'
+                                        : isAiTurn
+                                            ? 'AI is choosing its move…'
+                                            : 'Roll a die to begin the current player’s turn.',
                                 child: ElevatedButton(
                                   key: const ValueKey('roll_dice_button'),
                                   onPressed: state.completed || isAiTurn || state.pendingRoll != null
