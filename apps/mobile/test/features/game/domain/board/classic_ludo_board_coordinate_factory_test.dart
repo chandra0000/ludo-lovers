@@ -233,7 +233,7 @@ void main() {
     });
 
     test('checks every home-lane step and every track-to-lane branch is orthogonal', () {
-      final track = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      const track = ClassicLudoBoardCoordinateFactory.sharedTrack;
       final laneCells = <BoardGridCell>{};
       for (final seat in ClassicLudoBoardDefinition.seats) {
         expect(seat.homeLaneCells, hasLength(5), reason: seat.id);
