@@ -98,6 +98,47 @@ void main() {
     );
   });
 
+  testWidgets(
+    'shows player identities and the active turn above the board on phones',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final controller = LocalGameController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: LocalGameScreen(controller: controller),
+        ),
+      );
+
+      expect(
+        find.byKey(const ValueKey('player_identity_strip')),
+        findsOneWidget,
+      );
+      for (final playerId in <String>[
+        'orange',
+        'green',
+        'magenta',
+        'blue',
+      ]) {
+        expect(
+          find.byKey(ValueKey<String>('player_identity_$playerId')),
+          findsOneWidget,
+        );
+      }
+      expect(
+        find.byTooltip('ORANGE · current turn · 0 of 4 pawns home'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('live match board stays square without crowded status panels', (
     tester,
   ) async {
