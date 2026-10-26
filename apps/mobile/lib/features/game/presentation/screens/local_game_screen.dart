@@ -1539,9 +1539,24 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                                       ],
                                                     ),
                                                     child: Center(
-                                                      child: _diceRolling || state.pendingRoll != null
-                                                          ? _DicePips(value: _diceRolling ? _rollingFace : state.pendingRoll!)
-                                                          : Icon(Icons.casino_rounded, size: dieSize * 0.56, color: const Color(0xFF3B2600)),
+                                                      child: _diceRolling
+                                                          ? Semantics(
+                                                              key: const ValueKey('dice_rolling_face'),
+                                                              label: 'Dice is rolling',
+                                                              liveRegion: true,
+                                                              child: _DicePips(value: _rollingFace),
+                                                            )
+                                                          : state.pendingRoll != null
+                                                              ? Semantics(
+                                                                  key: const ValueKey('dice_result_semantics'),
+                                                                  label: 'Dice result: ${state.pendingRoll}',
+                                                                  liveRegion: true,
+                                                                  child: KeyedSubtree(
+                                                                    key: ValueKey<String>('dice_result_${state.pendingRoll}'),
+                                                                    child: _DicePips(value: state.pendingRoll!),
+                                                                  ),
+                                                                )
+                                                              : Icon(Icons.casino_rounded, size: dieSize * 0.56, color: const Color(0xFF3B2600)),
                                                     ),
                                                   ),
                                                 ),
