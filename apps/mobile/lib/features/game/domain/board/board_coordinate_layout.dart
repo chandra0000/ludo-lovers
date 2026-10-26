@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 /// Normalized rendering coordinates for a logical Ludo board.
@@ -21,6 +23,32 @@ class BoardPoint {
       throw ArgumentError('Board width and height must be finite and positive.');
     }
     return BoardPixelPoint(x: x * width, y: y * height);
+  }
+
+  /// Converts a normalized point using the same centered square viewport as
+  /// [ClassicLudoBoardPainter]. This keeps pawn overlays aligned when their
+  /// CustomPaint canvas is wider or taller than the actual square board.
+  BoardPixelPoint toSquareBoardPixels({
+    required double width,
+    required double height,
+    required int gridSize,
+  }) {
+    if (!isValid) {
+      throw StateError('Cannot convert an invalid normalized board point.');
+    }
+    if (!width.isFinite || !height.isFinite || width <= 0 || height <= 0) {
+      throw ArgumentError('Board width and height must be finite and positive.');
+    }
+    if (gridSize <= 0) {
+      throw ArgumentError.value(gridSize, 'gridSize', 'Must be positive.');
+    }
+    final side = math.min(width, height);
+    final left = (width - side) / 2;
+    final top = (height - side) / 2;
+    return BoardPixelPoint(
+      x: left + x * side,
+      y: top + y * side,
+    );
   }
 }
 
