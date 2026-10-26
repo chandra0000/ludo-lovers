@@ -71,7 +71,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _aiThinking = false;
   bool _soundEnabled = true;
   bool _diceRolling = false;
+  int _rollingFace = 1;
+  int _diceRollTicks = 0;
   Timer? _diceRollTimer;
+  Timer? _reactionTimer;
+  String? _latestReaction;
+  final List<String> _chatMessages = <String>[];
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
@@ -100,18 +105,34 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _aiTimer?.cancel();
     _pawnStepTimer?.cancel();
     _diceRollTimer?.cancel();
+    _reactionTimer?.cancel();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
   void _rollDice(LocalGameState state) {
     if (state.completed || state.pendingRoll != null) return;
-    setState(() => _diceRolling = true);
+    setState(() {
+      _diceRolling = true;
+      _rollingFace = 1;
+      _diceRollTicks = 0;
+    });
     _playFeedbackSound();
     _controller.rollDice(expectedVersion: state.version);
     _diceRollTimer?.cancel();
-    _diceRollTimer = Timer(const Duration(milliseconds: 620), () {
-      if (mounted) setState(() => _diceRolling = false);
+    // Animate physical-looking die faces before revealing the engine result.
+    // This is presentation-only and never changes the dice value.
+    _diceRollTimer = Timer.periodic(const Duration(milliseconds: 85), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _diceRollTicks++;
+        _rollingFace = _rollingFace % 6 + 1;
+        if (_diceRollTicks >= 7) _diceRolling = false;
+      });
+      if (_diceRollTicks >= 7) timer.cancel();
     });
   }
 
@@ -526,6 +547,163 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
+  }
+
+  Future<void> _showMatchChat() async {
+    final inputController = TextEditingController();
+    void sendMessage() {
+      final message = inputController.text.trim();
+      if (message.isEmpty) return;
+      setState(() => _chatMessages.add('You: $message'));
+      inputController.clear();
+    }
+
+    try {
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppTheme.panel,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        builder: (sheetContext) => StatefulBuilder(
+          builder: (context, setSheetState) => Padding(
+            padding: EdgeInsets.fromLTRB(
+              18,
+              18,
+              18,
+              18 + MediaQuery.viewInsetsOf(context).bottom,
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                key: const ValueKey('match_chat_sheet'),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      const Icon(Icons.chat_bubble_rounded, color: AppTheme.gold),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'MATCH CHAT',
+                          style: TextStyle(
+                            color: AppTheme.gold,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        key: const ValueKey('close_match_chat_button'),
+                        tooltip: 'Close chat',
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    'Local preview · messages stay on this device.',
+                    style: TextStyle(color: AppTheme.mutedText, fontSize: 12),
+                  ),
+                  const SizedBox(height: 12),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 220),
+                    child: _chatMessages.isEmpty
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 18),
+                            child: Center(
+                              child: Text(
+                                'Say hello to the other players!',
+                                style: TextStyle(color: AppTheme.readableText),
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: _chatMessages.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 6),
+                            itemBuilder: (context, index) => Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 9,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.panelRaised,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppTheme.gold.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: Text(
+                                  _chatMessages[index],
+                                  style: const TextStyle(color: AppTheme.readableText),
+                                ),
+                              ),
+                            ),
+                          ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          key: const ValueKey('match_chat_input'),
+                          controller: inputController,
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (_) => sendMessage(),
+                          style: const TextStyle(color: AppTheme.readableText),
+                          decoration: InputDecoration(
+                            hintText: 'Write a message…',
+                            hintStyle: const TextStyle(color: AppTheme.mutedText),
+                            filled: true,
+                            fillColor: AppTheme.background,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton.filled(
+                        key: const ValueKey('send_match_chat_button'),
+                        tooltip: 'Send message',
+                        onPressed: sendMessage,
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppTheme.gold,
+                          foregroundColor: AppTheme.background,
+                        ),
+                        icon: const Icon(Icons.send_rounded),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    } finally {
+      inputController.dispose();
+    }
+  }
+
+  void _sendReaction(String reaction, String label) {
+    _reactionTimer?.cancel();
+    setState(() => _latestReaction = reaction);
+    _playFeedbackSound();
+    _showLocalActionNotice('$reaction  $label');
+    _reactionTimer = Timer(const Duration(milliseconds: 1800), () {
+      if (mounted) setState(() => _latestReaction = null);
+    });
   }
 
   Future<void> _showPlayerSetup() async {
