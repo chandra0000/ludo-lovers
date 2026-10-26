@@ -79,6 +79,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   final List<String> _chatMessages = <String>[];
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
+  static const BorderRadius _dieBorderRadius =
+      BorderRadius.all(Radius.circular(22));
+  static const RoundedRectangleBorder _dieButtonShape =
+      RoundedRectangleBorder(borderRadius: _dieBorderRadius);
 
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
@@ -1552,14 +1556,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     foregroundColor: const Color(0xFF3B2600),
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(78, 78),
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(22))),
+                                    shape: _dieButtonShape,
                                   ),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 180),
                                     width: 78,
                                     height: 78,
                                     decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(Radius.circular(22)),
+                                      borderRadius: _dieBorderRadius,
                                       gradient: const LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
