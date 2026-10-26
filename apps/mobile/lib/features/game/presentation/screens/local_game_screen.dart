@@ -1552,14 +1552,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     foregroundColor: const Color(0xFF3B2600),
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(78, 78),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(22))),
                                   ),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 180),
                                     width: 78,
                                     height: 78,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(22),
+                                      borderRadius: const BorderRadius.all(Radius.circular(22)),
                                       gradient: const LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
