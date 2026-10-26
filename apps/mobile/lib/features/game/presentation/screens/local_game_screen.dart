@@ -1,7 +1,3 @@
-// The CI formatter shifts this file's line mapping; keep the existing dynamic
-// board-overlay constructors intact while suppressing the single reported lint.
-// ignore_for_file: prefer_const_constructors
-
 import 'dart:async';
 import 'dart:math' as math;
 
