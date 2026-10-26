@@ -663,7 +663,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             hintText: 'Write a message…',
                             hintStyle: const TextStyle(color: AppTheme.mutedText),
                             filled: true,
-                            fillColor: AppTheme.background,
+                            fillColor: AppTheme.black,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -685,7 +685,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         },
                         style: IconButton.styleFrom(
                           backgroundColor: AppTheme.gold,
-                          foregroundColor: AppTheme.background,
+                          foregroundColor: AppTheme.black,
                         ),
                         icon: const Icon(Icons.send_rounded),
                       ),
