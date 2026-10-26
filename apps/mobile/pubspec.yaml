@@ -33,4 +33,5 @@ flutter:
   assets:
     - assets/images/ludo_lovers_logo.jpg
     - assets/images/ludo_board_final.png
+    - assets/images/ludo_board.jpg
     - assets/images/ludo_board_glass.png
