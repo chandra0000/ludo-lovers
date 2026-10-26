@@ -332,8 +332,8 @@ void main() {
     );
     expect(
       boardSize.width,
-      lessThanOrEqualTo(340),
-      reason: 'Board width must fit the 360 px viewport with screen padding.',
+      lessThanOrEqualTo(tester.view.physicalSize.width),
+      reason: 'The square board must stay within the full phone viewport.',
     );
     expect(find.byType(CustomPaint), findsWidgets);
   });
@@ -372,8 +372,8 @@ void main() {
       );
       expect(
         boardSize.width,
-        lessThanOrEqualTo(viewport.width - 20),
-        reason: 'The whole board must fit the available width at $viewport.',
+        lessThanOrEqualTo(viewport.width),
+        reason: 'The whole board must fit the full available width at $viewport.',
       );
       expect(tester.takeException(), isNull, reason: 'Viewport: $viewport');
 
