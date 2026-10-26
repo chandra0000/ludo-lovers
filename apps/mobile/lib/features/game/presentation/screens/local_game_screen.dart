@@ -1529,7 +1529,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                         },
                                       ),
                                     ),
-                                    for (final visual in visuals
+                                    for (final visual in visuals)
                                       _buildAnimatedPawnMarker(
                                         visual: visual,
                                         boardSize: size,
