@@ -1472,17 +1472,21 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                             key: const ValueKey('roll_dice_button_semantics'),
                                             button: true,
                                             enabled: !state.completed && !isAiTurn && state.pendingRoll == null,
-                                            label: _diceRolling
-                                                ? 'Dice is rolling.'
-                                                : state.pendingRoll == null
-                                                    ? 'Roll dice'
-                                                    : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
+                                            label: state.completed
+                                                ? 'Dice unavailable. Match complete.'
+                                                : isAiTurn
+                                                    ? 'Dice unavailable. AI opponent turn.'
+                                                    : state.pendingRoll == null
+                                                        ? 'Roll a die to begin the current player’s turn.'
+                                                        : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
                                             child: Tooltip(
-                                              message: _diceRolling
-                                                  ? 'Dice is rolling…'
-                                                  : state.pendingRoll == null
-                                                      ? 'Roll dice'
-                                                      : 'Choose a highlighted pawn to use the current roll.',
+                                              message: state.completed
+                                                  ? 'Dice unavailable. Match complete.'
+                                                  : isAiTurn
+                                                      ? 'Dice unavailable. AI opponent turn.'
+                                                      : state.pendingRoll == null
+                                                          ? 'Roll a die to begin the current player’s turn.'
+                                                          : 'Choose a highlighted pawn to use the current roll.',
                                               child: Material(
                                                 color: Colors.transparent,
                                                 child: ElevatedButton(
@@ -1562,7 +1566,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           ),
                                     for (final visual in visuals)
                                       if (!isAiTurn &&
-                                          !_diceRolling &&
                                           legalIds.contains(visual.pawnId))
                                         Positioned(
                                           left: visual.point.x * size.width -
