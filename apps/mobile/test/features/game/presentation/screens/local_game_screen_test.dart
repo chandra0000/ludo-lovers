@@ -160,7 +160,7 @@ void main() {
     final boardArtwork = tester.widget<Image>(
       find.byKey(const ValueKey('live_game_board_artwork')),
     );
-    expect(boardArtwork.fit, BoxFit.contain);
+    expect(boardArtwork.fit, BoxFit.cover);
     expect(
       (boardArtwork.image as AssetImage).assetName,
       'assets/images/ludo_board.jpg',
