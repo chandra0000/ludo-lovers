@@ -11,6 +11,41 @@ void main() {
       expect(pixels.y, 450);
     });
 
+    test('maps points into the centered square board inside a wide canvas', () {
+      const point = BoardPoint(x: 0.5, y: 0.5);
+      final pixels = point.toSquareBoardPixels(
+        width: 400,
+        height: 300,
+        gridSize: 15,
+      );
+
+      expect(pixels.x, 200);
+      expect(pixels.y, 150);
+    });
+
+    test('maps points into the centered square board inside a tall canvas', () {
+      const point = BoardPoint(x: 0, y: 1);
+      final pixels = point.toSquareBoardPixels(
+        width: 300,
+        height: 400,
+        gridSize: 15,
+      );
+
+      expect(pixels.x, 50);
+      expect(pixels.y, 350);
+    });
+
+    test('rejects invalid grid size for square-board conversion', () {
+      expect(
+        () => const BoardPoint(x: 0.5, y: 0.5).toSquareBoardPixels(
+          width: 300,
+          height: 300,
+          gridSize: 0,
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('rejects non-positive board dimensions', () {
       expect(
         () => const BoardPoint(x: 0.5, y: 0.5).toPixels(width: 0, height: 200),
