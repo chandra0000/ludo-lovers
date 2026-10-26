@@ -1677,7 +1677,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   decoration: const BoxDecoration(
                                     color: AppTheme.panelRaised,
                                     borderRadius: BorderRadius.all(Radius.circular(18)),
-                                    border: Border.all(color: Color(0x52FFD700)),
+                                    border: Border(
+                                      top: BorderSide(color: Color(0x52FFD700)),
+                                      right: BorderSide(color: Color(0x52FFD700)),
+                                      bottom: BorderSide(color: Color(0x52FFD700)),
+                                      left: BorderSide(color: Color(0x52FFD700)),
+                                    ),
                                   ),
                                   child: Text(
                                     reaction.emoji,
