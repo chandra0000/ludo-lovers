@@ -1574,9 +1574,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     duration: const Duration(milliseconds: 180),
                                     width: 78,
                                     height: 78,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       borderRadius: _dieBorderRadius,
-                                      gradient: const LinearGradient(
+                                      gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: <Color>[
@@ -1585,13 +1585,35 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                           Color(0xFFE7C68C),
                                         ],
                                       ),
-                                      border: Border.all(
-                                        color: const Color(0xFFFFDCA0),
-                                        width: 1.5,
+                                      border: Border(
+                                        top: BorderSide(
+                                          color: Color(0xFFFFDCA0),
+                                          width: 1.5,
+                                        ),
+                                        right: BorderSide(
+                                          color: Color(0xFFFFDCA0),
+                                          width: 1.5,
+                                        ),
+                                        bottom: BorderSide(
+                                          color: Color(0xFFFFDCA0),
+                                          width: 1.5,
+                                        ),
+                                        left: BorderSide(
+                                          color: Color(0xFFFFDCA0),
+                                          width: 1.5,
+                                        ),
                                       ),
                                       boxShadow: <BoxShadow>[
-                                        BoxShadow(color: AppTheme.gold.withValues(alpha: 0.42), blurRadius: 24, spreadRadius: 1),
-                                        BoxShadow(color: AppTheme.gold.withValues(alpha: 0.18), blurRadius: 6, offset: const Offset(0, 4)),
+                                        BoxShadow(
+                                          color: Color(0x6BFFD700),
+                                          blurRadius: 24,
+                                          spreadRadius: 1,
+                                        ),
+                                        BoxShadow(
+                                          color: Color(0x2EFFD700),
+                                          blurRadius: 6,
+                                          offset: Offset(0, 4),
+                                        ),
                                       ],
                                     ),
                                     child: Center(
