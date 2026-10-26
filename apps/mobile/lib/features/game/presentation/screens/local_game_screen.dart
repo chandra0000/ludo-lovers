@@ -654,7 +654,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           key: const ValueKey('match_chat_input'),
                           controller: inputController,
                           textInputAction: TextInputAction.send,
-                          onSubmitted: (_) => sendMessage(),
+                          onSubmitted: (_) {
+                            sendMessage();
+                            setSheetState(() {});
+                          },
                           style: const TextStyle(color: AppTheme.readableText),
                           decoration: InputDecoration(
                             hintText: 'Write a message…',
@@ -676,7 +679,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       IconButton.filled(
                         key: const ValueKey('send_match_chat_button'),
                         tooltip: 'Send message',
-                        onPressed: sendMessage,
+                        onPressed: () {
+                          sendMessage();
+                          setSheetState(() {});
+                        },
                         style: IconButton.styleFrom(
                           backgroundColor: AppTheme.gold,
                           foregroundColor: AppTheme.background,
@@ -1550,9 +1556,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                       gradient: const LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
-                                        colors: <Color>[Color(0xFFFFF0A6), Color(0xFFFFC928), Color(0xFFB97808)],
+                                        colors: <Color>[
+                                          Color(0xFFFFFDF3),
+                                          Color(0xFFFFF0D2),
+                                          Color(0xFFE7C68C),
+                                        ],
                                       ),
-                                      border: Border.all(color: const Color(0xFFFFF4C4), width: 1.5),
+                                      border: Border.all(
+                                        color: const Color(0xFFFFDCA0),
+                                        width: 1.5,
+                                      ),
                                       boxShadow: <BoxShadow>[
                                         BoxShadow(color: AppTheme.gold.withValues(alpha: 0.42), blurRadius: 24, spreadRadius: 1),
                                         BoxShadow(color: AppTheme.gold.withValues(alpha: 0.18), blurRadius: 6, offset: const Offset(0, 4)),
@@ -1561,36 +1574,30 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     child: Center(
                                       child: AnimatedSwitcher(
                                         duration: const Duration(milliseconds: 260),
-                                         child: state.pendingRoll == null
-                                             ? AnimatedScale(
-                                                 scale: _diceRolling ? 1.16 : 1,
-                                                 duration: Duration(
-                                                   milliseconds: _diceRolling ? 310 : 180,
-                                                 ),
-                                                 curve: Curves.easeInOutBack,
-                                                 child: AnimatedRotation(
-                                                   turns: _diceRolling ? 2.5 : 0,
-                                                   duration: Duration(
-                                                     milliseconds: _diceRolling ? 620 : 180,
+                                         child: _diceRolling
+                                             ? AnimatedRotation(
+                                                 key: const ValueKey('dice_rolling_face'),
+                                                 turns: _diceRollTicks * 0.24,
+                                                 duration: const Duration(milliseconds: 80),
+                                                 curve: Curves.easeOutCubic,
+                                                 child: AnimatedScale(
+                                                   scale: _diceRollTicks.isEven ? 1.12 : 0.92,
+                                                   duration: const Duration(milliseconds: 80),
+                                                   curve: Curves.easeInOut,
+                                                   child: _DicePips(
+                                                     value: _rollingFace,
+                                                     key: const ValueKey('dice_rolling_pips'),
                                                    ),
-                                                   curve: Curves.easeInOutCubic,
-                                                   child: Icon(
+                                                 ),
+                                               )
+                                             : state.pendingRoll == null
+                                                 ? Icon(
                                                      Icons.casino_rounded,
                                                      key: const ValueKey('dice_idle'),
                                                      size: 44,
                                                      color: const Color(0xFF3B2600),
-                                                     shadows: _diceRolling
-                                                         ? const <Shadow>[
-                                                             Shadow(
-                                                               color: Color(0x88FFFFFF),
-                                                               blurRadius: 12,
-                                                             ),
-                                                           ]
-                                                         : null,
-                                                   ),
-                                                 ),
-                                               )
-                                             : Container(
+                                                   )
+                                                 : Container(
                                                  key: ValueKey<String>(
                                                    'dice_result_${state.pendingRoll}',
                                                  ),
@@ -1617,8 +1624,79 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        key: const ValueKey('match_chat_reaction_controls'),
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: <Widget>[
+                          OutlinedButton.icon(
+                            key: const ValueKey('open_match_chat_button'),
+                            onPressed: _showMatchChat,
+                            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+                            label: const Text('Chat'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppTheme.gold,
+                              side: BorderSide(
+                                color: AppTheme.gold.withValues(alpha: 0.6),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 9,
+                              ),
+                            ),
+                          ),
+                          for (final reaction in <({String id, String emoji, String label})>[
+                            (id: 'laugh', emoji: '😂', label: 'Laugh'),
+                            (id: 'heart', emoji: '❤️', label: 'Love'),
+                            (id: 'angry', emoji: '😡', label: 'Angry'),
+                            (id: 'gift', emoji: '🎁', label: 'Gift'),
+                          ])
+                            Tooltip(
+                              message: reaction.label,
+                              child: InkWell(
+                                key: ValueKey<String>('reaction_${reaction.id}'),
+                                borderRadius: BorderRadius.circular(18),
+                                onTap: () => _sendReaction(
+                                  reaction.emoji,
+                                  reaction.label,
+                                ),
+                                child: Container(
+                                  width: 42,
+                                  height: 42,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.panelRaised,
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: AppTheme.gold.withValues(alpha: 0.32),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    reaction.emoji,
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        child: _latestReaction == null
+                            ? const SizedBox.shrink(key: ValueKey('no_active_reaction'))
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  '$_latestReaction',
+                                  key: const ValueKey('active_reaction_feedback'),
+                                  style: const TextStyle(fontSize: 28),
+                                ),
+                              ),
+                      ),
                       const SizedBox(height: 4),
-                      
                       
                       if (_controller.lastError != null) ...<Widget>[
                         const SizedBox(height: 6),
@@ -1968,7 +2046,7 @@ class _GlassConePawnPainter extends CustomPainter {
 /// Standard die-face pips. The numeric roll stays in game state and semantics,
 /// never as a digital number in the visible gameplay UI.
 class _DicePips extends StatelessWidget {
-  const _DicePips({required this.value});
+  const _DicePips({super.key, required this.value});
 
   final int value;
 
@@ -2017,53 +2095,6 @@ class _DicePips extends StatelessWidget {
   }
 }
 
-/// Standard pip face; the visible die never prints a digital roll number.
-class _DicePips extends StatelessWidget {
-  const _DicePips({required this.value});
-
-  final int value;
-
-  static const Map<int, Set<int>> _pipPositions = <int, Set<int>>{
-    1: <int>{4},
-    2: <int>{0, 8},
-    3: <int>{0, 4, 8},
-    4: <int>{0, 2, 6, 8},
-    5: <int>{0, 2, 4, 6, 8},
-    6: <int>{0, 2, 3, 5, 6, 8},
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final visible = _pipPositions[value] ?? _pipPositions[1]!;
-    return SizedBox(
-      key: const ValueKey('dice_face_pips'),
-      width: 48,
-      height: 48,
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(3),
-        itemCount: 9,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 2,
-          crossAxisSpacing: 2,
-        ),
-        itemBuilder: (context, index) => Center(
-          child: visible.contains(index)
-              ? Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF3B2600),
-                    shape: BoxShape.circle,
-                  ),
-                )
-              : const SizedBox.shrink(),
-        ),
-      ),
-    );
-  }
-}
 class _PawnVisual {
   const _PawnVisual({
     required this.pawnId,
