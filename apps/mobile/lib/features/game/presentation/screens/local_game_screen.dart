@@ -1211,7 +1211,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 final visuals = _visuals(state.pawns);
                 return SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                  padding: const EdgeInsets.fromLTRB(1, 0, 1, 4),
                   child: Column(
                     children: <Widget>[
                       AnimatedSwitcher(
