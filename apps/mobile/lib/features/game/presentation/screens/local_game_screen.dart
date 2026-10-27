@@ -1175,10 +1175,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Immersive gameplay: maximize the square board within the
-            // viewport while reserving only the compact dice/action row.
-            final availableWidth = math.max(0.0, constraints.maxWidth - 8);
-            final availableHeight = math.max(0.0, constraints.maxHeight - 72);
+            // Target common 6.1–6.9 inch Android phones. The board should
+            // use almost the entire available width; reserve only a small
+            // vertical safety margin instead of shrinking it for controls that
+            // can scroll below the board on shorter displays.
+            final availableWidth = math.max(0.0, constraints.maxWidth - 2);
+            final availableHeight = math.max(0.0, constraints.maxHeight - 16);
             final boardSize = math.min(availableWidth, availableHeight);
             return AnimatedBuilder(
               animation: _controller,
