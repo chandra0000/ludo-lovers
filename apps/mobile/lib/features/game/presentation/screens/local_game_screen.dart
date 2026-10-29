@@ -1175,13 +1175,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Target common 6.1–6.9 inch Android phones. The board should
-            // use almost the entire available width; reserve only a small
-            // vertical safety margin instead of shrinking it for controls that
-            // can scroll below the board on shorter displays.
-            final availableWidth = math.max(0.0, constraints.maxWidth - 20);
-            final availableHeight = math.max(0.0, constraints.maxHeight - 72);
-            final boardSize = math.min(availableWidth, availableHeight);
+            // Portrait gameplay prioritizes a large, square board that
+            // matches the reference artwork. Let surrounding match controls
+            // scroll vertically instead of shrinking the board to fit them.
+            // Keep only a 2 px inset on each side to use nearly all of the
+            // Android viewport width without clipping the board's outer edge.
+            final boardSize = math.max(0.0, constraints.maxWidth - 4);
             return AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
