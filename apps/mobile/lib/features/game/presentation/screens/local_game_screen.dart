@@ -1179,7 +1179,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // use almost the entire available width; reserve only a small
             // vertical safety margin instead of shrinking it for controls that
             // can scroll below the board on shorter displays.
-            final availableWidth = math.max(0.0, constraints.maxWidth - 2);
+            final availableWidth = math.max(0.0, constraints.maxWidth - 20);
             final availableHeight = math.max(0.0, constraints.maxHeight - 16);
             final boardSize = math.min(availableWidth, availableHeight);
             return AnimatedBuilder(
