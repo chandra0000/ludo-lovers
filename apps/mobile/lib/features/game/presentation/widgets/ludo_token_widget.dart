@@ -65,9 +65,8 @@ class LudoTokenWidget extends StatelessWidget {
 
     // Keep the token within its cell on compact devices. Use the smaller cell
     // dimension so non-square layout constraints cannot stretch or clip it.
-    final radius = tokenRadius.clamp(7.0, cellWidth < cellHeight
-        ? cellWidth * 0.42
-        : cellHeight * 0.42);
+    final maxRadius = (cellWidth < cellHeight ? cellWidth : cellHeight) * 0.42;
+    final radius = tokenRadius < maxRadius ? tokenRadius : maxRadius;
 
     return Positioned(
       left: center.dx - radius,
