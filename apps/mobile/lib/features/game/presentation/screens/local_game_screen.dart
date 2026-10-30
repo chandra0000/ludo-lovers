@@ -1175,11 +1175,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Use the available portrait width while reserving room for the board's
-            // parent padding and rounded outer edge. The previous 4 px inset
-            // overflowed the real laid-out width by 12 px on 360 px phones.
-            // Match controls scroll vertically; they must not shrink the board.
-            final boardSize = math.max(0.0, constraints.maxWidth - 24);
+            // Fit the square board to BOTH available dimensions. Width is the
+            // limiting axis on portrait phones; height becomes the limiting axis
+            // in short/landscape viewports and in compact widget-test surfaces.
+            // Reserve vertical room for the app bar, player HUD and action controls
+            // so the board and its interactive pawn cells remain on-screen.
+            final availableBoardWidth = math.max(0.0, constraints.maxWidth - 16);
+            final availableBoardHeight = math.max(0.0, constraints.maxHeight - 180);
+            final boardSize = math.min(
+              availableBoardWidth,
+              availableBoardHeight,
+            );
             return AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
