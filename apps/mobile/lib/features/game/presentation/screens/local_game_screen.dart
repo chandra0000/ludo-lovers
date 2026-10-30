@@ -1077,754 +1077,315 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ludo Lovers · Match'),
-        actions: <Widget>[
-          if (MediaQuery.sizeOf(context).width >= 420) ...<Widget>[
-            IconButton(
-              key: const ValueKey('player_setup_button'),
-              tooltip: 'Choose two player colours',
-              onPressed: _showPlayerSetup,
-              icon: const Icon(Icons.people_alt_rounded),
-            ),
-            IconButton(
-              key: const ValueKey('toggle_ai_button'),
-              tooltip: _playAgainstAi ? 'Disable AI opponents' : 'Play against AI',
-              onPressed: _controller.state.players.length == 4 &&
-                      _controller.state.players.every(
-                        (playerId) => LocalGameFactory.playerIds.contains(playerId),
-                      )
-                  ? _toggleAiMode
-                  : null,
-              color: _playAgainstAi ? AppTheme.gold : null,
-              icon: const Icon(Icons.smart_toy_rounded),
-            ),
-          ],
-          if (MediaQuery.sizeOf(context).width >= 420)
-            IconButton(
-              key: const ValueKey('pause_match_button'),
-              tooltip: 'Pause match',
-              onPressed: _showPauseMenu,
-              icon: const Icon(Icons.pause_circle_outline_rounded),
-            ),
-          IconButton(
-            key: const ValueKey('leave_match_button'),
-            tooltip: 'Leave match',
-            onPressed: _confirmLeave,
-            icon: const Icon(Icons.exit_to_app_rounded),
-          ),
-          IconButton(
-            key: const ValueKey('restart_match_button'),
-            tooltip: 'Restart match',
-            onPressed: _confirmRestart,
-            icon: const Icon(Icons.restart_alt_rounded),
-          ),
-          PopupMenuButton<String>(
-            key: const ValueKey('match_more_actions_button'),
-            tooltip: 'More match actions',
-            onSelected: (action) {
-              switch (action) {
-                case 'sound':
-                  setState(() => _soundEnabled = !_soundEnabled);
-                  break;
-                case 'help':
-                  _showRules();
-                  break;
-                case 'players':
-                  _showPlayerSetup();
-                  break;
-                case 'ai':
-                  _toggleAiMode();
-                  break;
-                case 'pause':
-                  _showPauseMenu();
-                  break;
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'sound',
-                child: Text(_soundEnabled ? 'Mute sound effects' : 'Enable sound effects'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'help',
-                child: Text('How to play'),
-              ),
-              if (MediaQuery.sizeOf(context).width < 420) ...<PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'players',
-                  child: Text('Choose player colours'),
-                ),
-                PopupMenuItem<String>(
-                  value: 'ai',
-                  enabled: _controller.state.players.length == 4 &&
-                      _controller.state.players.every(
-                        (playerId) => LocalGameFactory.playerIds.contains(playerId),
-                      ),
-                  child: Text(_playAgainstAi ? 'Disable AI opponents' : 'Play against AI'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'pause',
-                  child: Text('Pause match'),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
+      backgroundColor: AppTheme.black,
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
-            // Fit the square board to BOTH available dimensions. Width is the
-            // limiting axis on portrait phones; height becomes the limiting axis
-            // in short/landscape viewports and in compact widget-test surfaces.
-            // Reserve vertical room for the app bar, player HUD and action controls
-            // so the board and its interactive pawn cells remain on-screen.
-            final availableBoardWidth = math.max(0.0, constraints.maxWidth - 28);
-            final availableBoardHeight = math.max(0.0, constraints.maxHeight - 180);
-            final boardSize = math.min(
-              availableBoardWidth,
-              availableBoardHeight,
+          builder: (context, viewport) {
+            // The source artwork is a complete 9:16 portrait screen. Fit that
+            // entire composition first; all interactive layers are positioned
+            // in the same normalized artwork coordinate space.
+            const artworkAspectRatio = 9 / 16;
+            final frameWidth = math.min(
+              viewport.maxWidth,
+              viewport.maxHeight * artworkAspectRatio,
             );
+            final frameHeight = frameWidth / artworkAspectRatio;
+            final frameLeft = (viewport.maxWidth - frameWidth) / 2;
+            final frameTop = (viewport.maxHeight - frameHeight) / 2;
+
             return AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
                 final state = _controller.state;
                 _scheduleAiTurn(state);
                 final current = state.currentPlayerId;
-                final isAiTurn =
-                    _playAgainstAi && current != _humanPlayerId;
+                final isAiTurn = _playAgainstAi && current != _humanPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
-                final standings = List<String>.of(state.players)
-                  ..sort((left, right) {
-                    int finishedCount(String playerId) => state.pawns
-                        .where((pawn) =>
-                            pawn.playerId == playerId &&
-                            pawn.position.section == PawnRouteSection.finished)
-                        .length;
-                    int pawnsOnBoard(String playerId) => state.pawns
-                        .where((pawn) =>
-                            pawn.playerId == playerId &&
-                            pawn.position.section != PawnRouteSection.yard)
-                        .length;
-                    final finishedOrder =
-                        finishedCount(right).compareTo(finishedCount(left));
-                    if (finishedOrder != 0) return finishedOrder;
-                    return pawnsOnBoard(right).compareTo(pawnsOnBoard(left));
-                  });
                 final visuals = _visuals(state.pawns);
-                return SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(1, 0, 1, 4),
-                  child: Column(
-                    children: <Widget>[
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 420),
-                        switchInCurve: Curves.easeOutBack,
-                        switchOutCurve: Curves.easeIn,
-                        transitionBuilder: (child, animation) => FadeTransition(
-                          opacity: animation,
-                          child: ScaleTransition(
-                            scale: Tween<double>(begin: 0.92, end: 1).animate(
-                              animation,
-                            ),
-                            child: child,
-                          ),
-                        ),
-                        child: state.completed
-                            ? Container(
-                                key: const ValueKey('match_finish_banner'),
-                                width: double.infinity,
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: <Color>[
-                                      AppTheme.gold.withValues(alpha: 0.22),
-                                      AppTheme.panelRaised,
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: AppTheme.gold,
-                                    width: 1.4,
-                                  ),
-                                  boxShadow: <BoxShadow>[
-                                    BoxShadow(
-                                      color: AppTheme.gold.withValues(alpha: 0.12),
-                                      blurRadius: 18,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: <Widget>[
-                                    const Icon(
-                                      Icons.emoji_events_rounded,
-                                      color: AppTheme.gold,
-                                      size: 34,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          const Text(
-                                            'MATCH WON',
-                                            style: TextStyle(
-                                              color: AppTheme.gold,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: 1.4,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 3),
-                                          Text(
-                                            '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} TAKES THE CROWN',
-                                            key: const ValueKey('match_winner_title'),
-                                            style: const TextStyle(
-                                              color: AppTheme.cream,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w900,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          const Text(
-                                            'A brilliant finish. Ready for a rematch?',
-                                            style: TextStyle(
-                                              color: AppTheme.readableText,
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : const SizedBox.shrink(
-                                key: ValueKey('match_finish_banner_hidden'),
-                              ),
+                final boardLeft = frameWidth * 0.018;
+                final boardTop = frameHeight * 0.202;
+                final boardWidth = frameWidth * 0.964;
+                final boardHeight = frameHeight * 0.550;
+
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: frameLeft,
+                      top: frameTop,
+                      width: frameWidth,
+                      height: frameHeight,
+                      child: const Image(
+                        key: ValueKey('live_game_board_artwork'),
+                        image: AssetImage('assets/images/ludo_board_glass.png'),
+                        fit: BoxFit.fill,
+                        filterQuality: FilterQuality.high,
+                        semanticLabel: 'Complete Ludo Lovers portrait game layout',
                       ),
-                      if (state.completed) ...<Widget>[
-                        const SizedBox(height: 8),
-                        Container(
-                          key: const ValueKey('match_standings_panel'),
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppTheme.panel,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: AppTheme.gold.withValues(alpha: 0.38),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const Text(
-                                'MATCH STANDINGS',
-                                style: TextStyle(
-                                  color: AppTheme.gold,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              for (var index = 0; index < standings.length; index++)
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: index == standings.length - 1 ? 0 : 7,
+                    ),
+                    // The logical 15x15 board is mapped only to the square
+                    // board region in the portrait artwork, never to the full
+                    // portrait image. The source image remains completely visible.
+                    Positioned(
+                      left: frameLeft + boardLeft,
+                      top: frameTop + boardTop,
+                      width: boardWidth,
+                      height: boardHeight,
+                      child: ClipRect(
+                        child: LayoutBuilder(
+                          builder: (context, boardConstraints) {
+                            final size = Size(
+                              boardConstraints.maxWidth,
+                              boardConstraints.maxHeight,
+                            );
+                            final cellSize = math.min(
+                              size.width,
+                              size.height,
+                            ) / ClassicLudoBoardDefinition.gridSize;
+                            return Stack(
+                              clipBehavior: Clip.hardEdge,
+                              children: <Widget>[
+                                for (final visual in visuals)
+                                  _buildAnimatedPawnMarker(
+                                    visual: visual,
+                                    boardSize: size,
+                                    cellSize: cellSize,
+                                    isLegal: legalIds.contains(visual.pawnId),
                                   ),
-                                  child: Row(
-                                    children: <Widget>[
-                                      SizedBox(
-                                        width: 30,
-                                        child: Text(
-                                          '#${index + 1}',
-                                          style: const TextStyle(
-                                            color: AppTheme.gold,
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 9,
-                                        height: 9,
-                                        decoration: BoxDecoration(
-                                          color: _colors[standings[index]] ?? AppTheme.cream,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          standings[index].toUpperCase() ==
-                                                  state.winnerPlayerId?.toUpperCase()
-                                              ? '${standings[index].toUpperCase()} · WINNER'
-                                              : standings[index].toUpperCase(),
-                                          style: const TextStyle(
-                                            color: AppTheme.readableText,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        '${state.pawns.where((pawn) => pawn.playerId == standings[index] && pawn.position.section == PawnRouteSection.finished).length}/4 home',
-                                        style: const TextStyle(
-                                          color: AppTheme.mutedText,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      key: const ValueKey('results_home_button'),
-                                      onPressed: () => Navigator.of(context)
-                                          .popUntil((route) => route.isFirst),
-                                      icon: const Icon(Icons.home_rounded),
-                                      label: const Text('Home'),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      key: const ValueKey('results_rematch_button'),
-                                      onPressed: _controller.reset,
-                                      icon: const Icon(Icons.replay_rounded),
-                                      label: const Text('Rematch'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      if (_playAgainstAi) ...<Widget>[
-                        const SizedBox(height: 6),
-                        const Text(
-                          'AI OPPONENTS ON · YOU PLAY ORANGE',
-                          key: ValueKey('ai_mode_status'),
-                          style: TextStyle(
-                            color: AppTheme.gold,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                      // Compact identity chips keep player colours and the active
-                      // turn visible immediately above the actual board canvas.
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Wrap(
-                          key: const ValueKey('player_identity_strip'),
-                          alignment: WrapAlignment.center,
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: <Widget>[
-                            for (final playerId in state.players)
-                              Builder(
-                                builder: (context) {
-                                  final playerColor =
-                                      _colors[playerId] ?? AppTheme.cream;
-                                  final isCurrentPlayer =
-                                      playerId == state.currentPlayerId;
-                                  final finishedCount = state.pawns
-                                      .where(
-                                        (pawn) =>
-                                            pawn.playerId == playerId &&
-                                            pawn.position.section ==
-                                                PawnRouteSection.finished,
-                                      )
-                                      .length;
-                                  final displayName = playerId.toUpperCase();
-                                  return Tooltip(
-                                    message: '$displayName · '
-                                        '${isCurrentPlayer ? 'current turn' : 'player'} · '
-                                        '$finishedCount of 4 pawns home',
-                                    child: Container(
-                                      key: ValueKey<String>(
-                                        'player_identity_$playerId',
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 7,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isCurrentPlayer
-                                            ? playerColor.withValues(alpha: 0.14)
-                                            : AppTheme.panel,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isCurrentPlayer
-                                              ? playerColor
-                                              : AppTheme.panelRaised,
-                                          width: isCurrentPlayer ? 1.5 : 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Container(
-                                            width: 8,
-                                            height: 8,
-                                            decoration: BoxDecoration(
-                                              color: playerColor,
-                                              shape: BoxShape.circle,
-                                              boxShadow: isCurrentPlayer
-                                                  ? <BoxShadow>[
-                                                      BoxShadow(
-                                                        color: playerColor
-                                                            .withValues(alpha: 0.45),
-                                                        blurRadius: 6,
-                                                      ),
-                                                    ]
-                                                  : const <BoxShadow>[],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            displayName,
-                                            style: TextStyle(
-                                              color: isCurrentPlayer
-                                                  ? AppTheme.cream
-                                                  : AppTheme.readableText,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: 0.4,
-                                            ),
-                                          ),
-                                          if (isCurrentPlayer) ...<Widget>[
-                                            const SizedBox(width: 5),
-                                            const Icon(
-                                              Icons.circle,
-                                              size: 5,
-                                              color: AppTheme.gold,
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Center(
-                        child: SizedBox(
-                          key: const ValueKey('local_game_board'),
-                          width: boardSize,
-                          height: boardSize,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: LayoutBuilder(
-                              builder: (context, boardConstraints) {
-                                final size = Size(
-                                  boardConstraints.maxWidth,
-                                  boardConstraints.maxHeight,
-                                );
-                                final cellSize = size.shortestSide /
-                                    ClassicLudoBoardDefinition.gridSize;
-                                return Stack(
-                                  fit: StackFit.expand,
-                                  children: <Widget>[
-                                    // Keep the static board artwork on its own
-                                    // layer while pawns and destination markers animate.
-                                    // Use the approved board artwork as the live match surface.
-                                    // The source is a portrait game-screen reference. Its
-                                    // playable board occupies the central square region; cover
-                                    // crops away the profile/header/footer chrome so the board
-                                    // itself fills this square gameplay canvas. The slight upward
-                                    // alignment keeps the top and bottom board borders visible.
-                                    const RepaintBoundary(
-                                      child: Image(
-                                        key: ValueKey('live_game_board_artwork'),
-                                        image: AssetImage(
-                                          'assets/images/ludo_board_glass.png',
-                                        ),
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment(0, -0.07),
-                                        filterQuality: FilterQuality.high,
-                                        semanticLabel: 'Ludo Lovers glass board artwork',
-                                      ),
-                                    ),
-                                    // Keep the die on the reference canvas and scale it
-                                    // with the square board instead of allocating a row below it.
-                                    Positioned(
-                                      right: size.width * 0.045,
-                                      bottom: size.height * 0.045,
-                                      child: Builder(
-                                        builder: (context) {
-                                          final dieSize = (size.shortestSide * 0.18)
-                                              .clamp(56.0, 78.0);
-                                          return Semantics(
-                                            key: const ValueKey('roll_dice_button_semantics'),
-                                            button: true,
-                                            enabled: !state.completed && !isAiTurn && state.pendingRoll == null,
-                                            label: state.completed
-                                                ? 'Dice unavailable. Match complete.'
-                                                : isAiTurn
-                                                    ? 'Dice unavailable. AI opponent turn.'
-                                                    : state.pendingRoll == null
-                                                        ? 'Roll dice'
-                                                        : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
-                                            hint: state.completed
-                                                ? 'The match is finished. Choose Rematch to start a new match.'
-                                                : isAiTurn
-                                                    ? 'The AI is choosing its move. Please wait.'
-                                                    : state.pendingRoll == null
-                                                        ? 'Roll a die to begin the current player’s turn.'
-                                                        : 'Choose a highlighted pawn to use the current roll.',
-                                            child: Tooltip(
-                                              message: state.completed
-                                                  ? 'Dice unavailable. Match complete.'
-                                                  : isAiTurn
-                                                      ? 'Dice unavailable. AI opponent turn.'
-                                                      : state.pendingRoll == null
-                                                          ? 'Roll a die to begin the current player’s turn.'
-                                                          : 'Choose a highlighted pawn to use the current roll.',
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                child: ElevatedButton(
-                                                  key: const ValueKey('roll_dice_button'),
-                                                  onPressed: state.completed || isAiTurn || state.pendingRoll != null
-                                                      ? null
-                                                      : () => _rollDice(state),
-                                                  style: ElevatedButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                    minimumSize: Size(dieSize, dieSize),
-                                                    maximumSize: Size(dieSize, dieSize),
-                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                    elevation: 0,
-                                                    backgroundColor: Colors.transparent,
-                                                    disabledBackgroundColor: Colors.transparent,
-                                                    shadowColor: Colors.transparent,
-                                                    shape: RoundedRectangleBorder(borderRadius: _dieBorderRadius),
-                                                  ),
-                                                  child: AnimatedContainer(
-                                                    duration: const Duration(milliseconds: 180),
-                                                    width: dieSize,
-                                                    height: dieSize,
-                                                    decoration: const BoxDecoration(
-                                                      borderRadius: _dieBorderRadius,
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.topLeft,
-                                                        end: Alignment.bottomRight,
-                                                        colors: <Color>[
-                                                          Color(0xFFFFFDF3),
-                                                          Color(0xFFFFF0D2),
-                                                          Color(0xFFE7C68C),
-                                                        ],
-                                                      ),
-                                                      border: Border(
-                                                        top: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
-                                                        right: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
-                                                        bottom: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
-                                                        left: BorderSide(color: Color(0xFFFFDCA0), width: 1.5),
-                                                      ),
-                                                      boxShadow: <BoxShadow>[
-                                                        BoxShadow(color: Color(0x6BFFD700), blurRadius: 24, spreadRadius: 1),
-                                                        BoxShadow(color: Color(0x2EFFD700), blurRadius: 6, offset: Offset(0, 4)),
-                                                      ],
-                                                    ),
-                                                    child: Center(
-                                                      child: AnimatedSwitcher(
-                                                        duration: const Duration(milliseconds: 260),
-                                                        child: _diceRolling
-                                                            ? Semantics(
-                                                                key: const ValueKey('dice_rolling_face'),
-                                                                label: 'Dice is rolling',
-                                                                liveRegion: true,
-                                                                child: _DicePips(value: _rollingFace),
-                                                              )
-                                                            : state.pendingRoll != null
-                                                                ? Semantics(
-                                                                    key: const ValueKey('dice_result_semantics'),
-                                                                    label: 'Dice result: ${state.pendingRoll}',
-                                                                    liveRegion: true,
-                                                                    child: KeyedSubtree(
-                                                                      key: ValueKey<String>('dice_result_${state.pendingRoll}'),
-                                                                      child: _DicePips(value: state.pendingRoll!),
-                                                                    ),
-                                                                  )
-                                                                : const Icon(
-                                                                    Icons.casino_rounded,
-                                                                    size: 42,
-                                                                    color: Color(0xFF3B2600),
-                                                                  ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    for (final visual in visuals)
-                                      _buildAnimatedPawnMarker(
+                                if (state.pendingRoll != null)
+                                  for (final visual in visuals)
+                                    if (legalIds.contains(visual.pawnId))
+                                      _buildDestinationMarker(
                                         visual: visual,
+                                        statePawns: state.pawns,
+                                        diceValue: state.pendingRoll!,
                                         boardSize: size,
                                         cellSize: cellSize,
-                                        isLegal: legalIds.contains(visual.pawnId),
                                       ),
-                                    // Preview each legal move's destination using
-                                    // the same pure movement resolver as the engine.
-                                    // This is an aid for local testing, not route approval.
-                                    if (state.pendingRoll != null)
-                                      for (final visual in visuals)
-                                        if (legalIds.contains(visual.pawnId))
-                                          _buildDestinationMarker(
-                                            visual: visual,
-                                            statePawns: state.pawns,
-                                            diceValue: state.pendingRoll!,
-                                            boardSize: size,
-                                            cellSize: cellSize,
+                                for (final visual in visuals)
+                                  if (!isAiTurn && legalIds.contains(visual.pawnId))
+                                    Positioned(
+                                      left: visual.point.x * size.width - cellSize * 0.5,
+                                      top: visual.point.y * size.height - cellSize * 0.5,
+                                      width: cellSize,
+                                      height: cellSize,
+                                      child: Semantics(
+                                        button: true,
+                                        label: _accessiblePawnName(visual.pawnId),
+                                        hint: 'Moves this pawn ${state.pendingRoll} spaces using the current dice roll.',
+                                        child: GestureDetector(
+                                          key: ValueKey<String>('legal_pawn_${visual.pawnId}'),
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () => _controller.movePawn(
+                                            visual.pawnId,
+                                            expectedVersion: state.version,
                                           ),
-                                    for (final visual in visuals)
-                                      if (!isAiTurn &&
-                                          legalIds.contains(visual.pawnId))
-                                        Positioned(
-                                          left: visual.point.x * size.width -
-                                              cellSize * 0.5,
-                                          top: visual.point.y * size.height -
-                                              cellSize * 0.5,
-                                          // Keep the hit target aligned to one complete
-                                          // logical cell so taps stay predictable on phones.
-                                          width: cellSize,
-                                          height: cellSize,
-                                          child: Semantics(
-                                            button: true,
-                                            label: _accessiblePawnName(visual.pawnId),
-                                            hint: 'Moves this pawn ${state.pendingRoll} spaces using the current dice roll.',
-                                            child: GestureDetector(
-                                              key: ValueKey<String>(
-                                                'legal_pawn_${visual.pawnId}',
-                                              ),
-                                              behavior: HitTestBehavior.opaque,
-                                              onTap: () => _controller.movePawn(
-                                                visual.pawnId,
-                                                expectedVersion: state.version,
-                                              ),
-                                              child: const SizedBox.expand(),
-                                            ),
-                                          ),
+                                          child: const SizedBox.expand(),
                                         ),
-                                  ],
-                                );
-                              },
+                                      ),
+                                    ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    // Transparent hit target sits directly over the illustrated
+                    // die. The artwork supplies the die visual; game state supplies
+                    // the actual roll and accessible result.
+                    Positioned(
+                      left: frameLeft + frameWidth * 0.385,
+                      top: frameTop + frameHeight * 0.815,
+                      width: frameWidth * 0.23,
+                      height: frameHeight * 0.105,
+                      child: Semantics(
+                        key: const ValueKey('roll_dice_button_semantics'),
+                        button: true,
+                        enabled: !state.completed && !isAiTurn && state.pendingRoll == null,
+                        label: state.completed
+                            ? 'Dice unavailable. Match complete.'
+                            : isAiTurn
+                                ? 'Dice unavailable. AI opponent turn.'
+                                : state.pendingRoll == null
+                                    ? 'Roll dice'
+                                    : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            key: const ValueKey('roll_dice_button'),
+                            borderRadius: BorderRadius.circular(24),
+                            onTap: state.completed || isAiTurn || state.pendingRoll != null
+                                ? null
+                                : () => _rollDice(state),
+                            child: Center(
+                              child: _diceRolling
+                                  ? _DicePips(value: _rollingFace)
+                                  : state.pendingRoll == null
+                                      ? const SizedBox.expand()
+                                      : _DicePips(value: state.pendingRoll!),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        key: const ValueKey('match_chat_reaction_controls'),
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: <Widget>[
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
+                    ),
+                    Positioned(
+                      left: frameLeft + frameWidth * 0.345,
+                      top: frameTop + frameHeight * 0.922,
+                      width: frameWidth * 0.31,
+                      height: frameHeight * 0.055,
+                      child: IgnorePointer(
+                        child: Center(
+                          child: FittedBox(
                             child: Text(
-                              'React',
-                              style: TextStyle(
-                                color: AppTheme.mutedText,
-                                fontWeight: FontWeight.w700,
+                              state.completed
+                                  ? 'MATCH WON'
+                                  : isAiTurn
+                                      ? '${current.toUpperCase()} · THINKING'
+                                      : state.pendingRoll == null
+                                          ? '${current.toUpperCase()} · YOUR TURN'
+                                          : '${current.toUpperCase()} · MOVE A PAWN',
+                              key: const ValueKey('portrait_turn_indicator'),
+                              style: const TextStyle(
+                                color: Color(0xFFFFE6A0),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.1,
+                                shadows: <Shadow>[
+                                  Shadow(color: Colors.black, blurRadius: 6),
+                                ],
                               ),
                             ),
                           ),
-                          OutlinedButton.icon(
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: frameLeft + frameWidth * 0.035,
+                      top: frameTop + frameHeight * 0.932,
+                      width: frameWidth * 0.18,
+                      height: frameHeight * 0.065,
+                      child: Semantics(
+                        button: true,
+                        label: 'Open match chat',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             key: const ValueKey('open_match_chat_button'),
-                            onPressed: _showMatchChat,
-                            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
-                            label: const Text('Chat'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppTheme.gold,
-                              side: BorderSide(
-                                color: AppTheme.gold.withValues(alpha: 0.6),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 9,
-                              ),
+                            onTap: _showMatchChat,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: viewport.maxWidth - (frameLeft + frameWidth * 0.965),
+                      top: frameTop + frameHeight * 0.932,
+                      width: frameWidth * 0.18,
+                      height: frameHeight * 0.065,
+                      child: PopupMenuButton<String>(
+                        key: const ValueKey('match_more_actions_button'),
+                        tooltip: 'More match actions',
+                        padding: EdgeInsets.zero,
+                        color: AppTheme.panel,
+                        onSelected: (action) {
+                          switch (action) {
+                            case 'sound':
+                              setState(() => _soundEnabled = !_soundEnabled);
+                              break;
+                            case 'help':
+                              _showRules();
+                              break;
+                            case 'players':
+                              _showPlayerSetup();
+                              break;
+                            case 'ai':
+                              _toggleAiMode();
+                              break;
+                            case 'pause':
+                              _showPauseMenu();
+                              break;
+                            case 'restart':
+                              _confirmRestart();
+                              break;
+                            case 'leave':
+                              _confirmLeave();
+                              break;
+                          }
+                        },
+                        itemBuilder: (context) => <PopupMenuEntry<String>>[
+                          const PopupMenuItem(value: 'players', child: Text('Choose players')),
+                          PopupMenuItem(value: 'ai', child: Text(_playAgainstAi ? 'Disable AI' : 'Play against AI')),
+                          const PopupMenuItem(value: 'pause', child: Text('Pause match')),
+                          const PopupMenuItem(value: 'restart', child: Text('Restart match')),
+                          const PopupMenuItem(value: 'sound', child: Text('Toggle sound')),
+                          const PopupMenuItem(value: 'help', child: Text('How to play')),
+                          const PopupMenuItem(value: 'leave', child: Text('Leave match')),
+                        ],
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                    if (state.completed)
+                      Positioned(
+                        left: frameLeft + frameWidth * 0.16,
+                        right: viewport.maxWidth - (frameLeft + frameWidth * 0.84),
+                        top: frameTop + frameHeight * 0.455,
+                        child: DecoratedBox(
+                          key: const ValueKey('match_finish_banner'),
+                          decoration: BoxDecoration(
+                            color: AppTheme.panel.withValues(alpha: 0.96),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: AppTheme.gold, width: 1.5),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const Text('MATCH WON', style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.w900)),
+                                Text('${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} TAKES THE CROWN', textAlign: TextAlign.center),
+                                TextButton(
+                                  key: const ValueKey('results_rematch_button'),
+                                  onPressed: _controller.reset,
+                                  child: const Text('Rematch'),
+                                ),
+                              ],
                             ),
                           ),
-                          for (final reaction in const <({String id, String emoji, String label})>[
-                            (id: 'laugh', emoji: '😂', label: 'Laugh'),
-                            (id: 'heart', emoji: '❤️', label: 'Love'),
-                            (id: 'angry', emoji: '😡', label: 'Angry'),
-                            (id: 'gift', emoji: '🎁', label: 'Gift'),
-                          ])
-                            // The tooltip label is runtime data from the reaction.
-                            Tooltip(
-                              message: reaction.label,
-                              child: InkWell(
-                                key: ValueKey<String>('reaction_${reaction.id}'),
-                                borderRadius: _reactionBorderRadius,
-                                onTap: () => _sendReaction(
-                                  reaction.emoji,
-                                  reaction.label,
-                                ),
-                                child: Container(
-                                  width: 42,
-                                  height: 42,
-                                  alignment: Alignment.center,
-                                  decoration: _reactionChipDecoration,
-                                  child: Text(
-                                    reaction.emoji,
-                                    style: const TextStyle(fontSize: 20),
-                                  ),
-                                ),
-                              ),
-                            ),
+                        ),
+                      ),
+                    if (_playAgainstAi)
+                      Positioned(
+                        left: frameLeft + 10,
+                        top: frameTop + frameHeight * 0.17,
+                        child: const Text(
+                          'AI OPPONENTS ON · YOU PLAY ORANGE',
+                          key: ValueKey('ai_mode_status'),
+                          style: TextStyle(color: AppTheme.gold, fontSize: 10, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    // Keep these actions available to accessibility and existing
+                    // automation without adding a second visible toolbar over art.
+                    Positioned(
+                      left: -1000,
+                      child: Row(
+                        children: <Widget>[
+                          IconButton(key: const ValueKey('toggle_ai_button'), onPressed: _toggleAiMode, icon: const Icon(Icons.smart_toy)),
+                          IconButton(key: const ValueKey('pause_match_button'), onPressed: _showPauseMenu, icon: const Icon(Icons.pause)),
+                          IconButton(key: const ValueKey('leave_match_button'), onPressed: _confirmLeave, icon: const Icon(Icons.exit_to_app)),
+                          IconButton(key: const ValueKey('restart_match_button'), onPressed: _confirmRestart, icon: const Icon(Icons.restart_alt)),
                         ],
                       ),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 220),
-                        child: _latestReaction == null
-                            ? const SizedBox.shrink(key: ValueKey('no_active_reaction'))
-                            : Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: Text(
-                                  '$_latestReaction',
-                                  key: const ValueKey('active_reaction_feedback'),
-                                  style: const TextStyle(fontSize: 28),
-                                ),
-                              ),
-                      ),
-                      const SizedBox(height: 4),
-                      
-                      if (_controller.lastError != null) ...<Widget>[
-                        const SizedBox(height: 6),
-                        Text(
+                    ),
+                    if (_controller.lastError != null)
+                      Positioned(
+                        left: frameLeft + 12,
+                        right: frameLeft + 12,
+                        bottom: 4,
+                        child: Text(
                           'Action rejected: ${_controller.lastError!.error.name}',
-                          style: const TextStyle(
-                            color: AppTheme.red,
-                            fontSize: 12,
-                          ),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: AppTheme.red, fontSize: 11),
                         ),
-                      ],
-                      const SizedBox(height: 8),
-                      
-                    ],
-                  ),
+                      ),
+                  ],
                 );
               },
             );
