@@ -1054,17 +1054,24 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, viewport) {
-            // The source artwork is a complete 9:16 portrait screen. Fit that
-            // entire composition first; all interactive layers are positioned
-            // in the same normalized artwork coordinate space.
-            const artworkAspectRatio = 9 / 16;
-            final frameWidth = math.min(
-              viewport.maxWidth,
-              viewport.maxHeight * artworkAspectRatio,
+            // All gameplay overlays use the supplied 576 x 1024 artwork
+            // coordinate system. The complete 9:16 artwork is uniformly scaled;
+            // board and controls are never positioned from guessed percentages.
+            const designWidth = 576.0;
+            const designHeight = 1024.0;
+            const artworkAspectRatio = designWidth / designHeight;
+            final scale = math.min(
+              viewport.maxWidth / designWidth,
+              viewport.maxHeight / designHeight,
             );
-            final frameHeight = frameWidth / artworkAspectRatio;
+            final frameWidth = designWidth * scale;
+            final frameHeight = designHeight * scale;
             final frameLeft = (viewport.maxWidth - frameWidth) / 2;
             final frameTop = (viewport.maxHeight - frameHeight) / 2;
+
+            double dx(double x) => frameLeft + x * scale;
+            double dy(double y) => frameTop + y * scale;
+            double ds(double value) => value * scale;
 
             return AnimatedBuilder(
               animation: _controller,
@@ -1075,10 +1082,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 final isAiTurn = _playAgainstAi && current != _humanPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
                 final visuals = _visuals(state.pawns);
-                final boardLeft = frameWidth * 0.018;
-                final boardTop = frameHeight * 0.202;
-                final boardWidth = frameWidth * 0.964;
-                final boardHeight = frameHeight * 0.550;
+                // Exact owner-provided playable board bounds: (17,205)-(559,747).
+                const boardLeft = 17.0;
+                const boardTop = 205.0;
+                const boardSize = 542.0;
 
                 return Stack(
                   children: <Widget>[
@@ -1095,14 +1102,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         semanticLabel: 'Complete Ludo Lovers portrait game layout',
                       ),
                     ),
-                    // The logical 15x15 board is mapped only to the square
-                    // board region in the portrait artwork, never to the full
-                    // portrait image. The source image remains completely visible.
+                    // 15 x 15 logical grid is registered to the exact 542 px
+                    // playable square, inside the 556 px gold outer frame.
                     Positioned(
-                      left: frameLeft + boardLeft,
-                      top: frameTop + boardTop,
-                      width: boardWidth,
-                      height: boardHeight,
+                      left: dx(boardLeft),
+                      top: dy(boardTop),
+                      width: ds(boardSize),
+                      height: ds(boardSize),
                       child: ClipRect(
                         child: LayoutBuilder(
                           builder: (context, boardConstraints) {
@@ -1110,10 +1116,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               boardConstraints.maxWidth,
                               boardConstraints.maxHeight,
                             );
-                            final cellSize = math.min(
-                              size.width,
-                              size.height,
-                            ) / ClassicLudoBoardDefinition.gridSize;
+                            final cellSize = size.width /
+                                ClassicLudoBoardDefinition.gridSize;
                             return Stack(
                               clipBehavior: Clip.hardEdge,
                               children: <Widget>[
@@ -1162,14 +1166,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
-                    // Transparent hit target sits directly over the illustrated
-                    // die. The artwork supplies the die visual; game state supplies
-                    // the actual roll and accessible result.
+                    // Exact dice cube interaction bounds: (232,780)-(344,900).
                     Positioned(
-                      left: frameLeft + frameWidth * 0.385,
-                      top: frameTop + frameHeight * 0.815,
-                      width: frameWidth * 0.23,
-                      height: frameHeight * 0.105,
+                      left: dx(232),
+                      top: dy(780),
+                      width: ds(112),
+                      height: ds(120),
                       child: Semantics(
                         key: const ValueKey('roll_dice_button_semantics'),
                         button: true,
@@ -1185,7 +1187,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             key: const ValueKey('roll_dice_button'),
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(ds(24)),
                             onTap: state.completed || isAiTurn || state.pendingRoll != null
                                 ? null
                                 : () => _rollDice(state),
@@ -1200,11 +1202,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
+                    // Exact turn banner bounds: (200,924)-(376,956).
                     Positioned(
-                      left: frameLeft + frameWidth * 0.345,
-                      top: frameTop + frameHeight * 0.922,
-                      width: frameWidth * 0.31,
-                      height: frameHeight * 0.055,
+                      left: dx(200),
+                      top: dy(924),
+                      width: ds(176),
+                      height: ds(32),
                       child: IgnorePointer(
                         child: Center(
                           child: FittedBox(
@@ -1230,11 +1233,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
+                    // Exact Chat button: center (98,940), diameter 56.
                     Positioned(
-                      left: frameLeft + frameWidth * 0.035,
-                      top: frameTop + frameHeight * 0.932,
-                      width: frameWidth * 0.18,
-                      height: frameHeight * 0.065,
+                      left: dx(70),
+                      top: dy(912),
+                      width: ds(56),
+                      height: ds(56),
                       child: Semantics(
                         button: true,
                         label: 'Open match chat',
@@ -1243,16 +1247,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           child: InkWell(
                             key: const ValueKey('open_match_chat_button'),
                             onTap: _showMatchChat,
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(ds(28)),
                           ),
                         ),
                       ),
                     ),
+                    // Owner-supplied More center is x=902 on a 576 px canvas.
+                    // Keep that exact coordinate; it intentionally lies beyond
+                    // the right edge and is clipped by the viewport.
                     Positioned(
-                      right: viewport.maxWidth - (frameLeft + frameWidth * 0.965),
-                      top: frameTop + frameHeight * 0.932,
-                      width: frameWidth * 0.18,
-                      height: frameHeight * 0.065,
+                      left: dx(902 - 28),
+                      top: dy(940 - 28),
+                      width: ds(56),
+                      height: ds(56),
                       child: PopupMenuButton<String>(
                         key: const ValueKey('match_more_actions_button'),
                         tooltip: 'More match actions',
@@ -1297,9 +1304,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     ),
                     if (state.completed)
                       Positioned(
-                        left: frameLeft + frameWidth * 0.16,
-                        right: viewport.maxWidth - (frameLeft + frameWidth * 0.84),
-                        top: frameTop + frameHeight * 0.455,
+                        left: dx(92),
+                        right: viewport.maxWidth - dx(484),
+                        top: dy(466),
                         child: DecoratedBox(
                           key: const ValueKey('match_finish_banner'),
                           decoration: BoxDecoration(
@@ -1326,16 +1333,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       ),
                     if (_playAgainstAi)
                       Positioned(
-                        left: frameLeft + 10,
-                        top: frameTop + frameHeight * 0.17,
+                        left: dx(10),
+                        top: dy(174),
                         child: const Text(
                           'AI OPPONENTS ON · YOU PLAY ORANGE',
                           key: ValueKey('ai_mode_status'),
                           style: TextStyle(color: AppTheme.gold, fontSize: 10, fontWeight: FontWeight.w800),
                         ),
                       ),
-                    // Keep these actions available to accessibility and existing
-                    // automation without adding a second visible toolbar over art.
                     Positioned(
                       left: -1000,
                       child: Row(
@@ -1349,8 +1354,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     ),
                     if (_controller.lastError != null)
                       Positioned(
-                        left: frameLeft + 12,
-                        right: frameLeft + 12,
+                        left: dx(12),
+                        right: viewport.maxWidth - dx(564),
                         bottom: 4,
                         child: Text(
                           'Action rejected: ${_controller.lastError!.error.name}',
