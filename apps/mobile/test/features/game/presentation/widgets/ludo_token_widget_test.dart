@@ -6,12 +6,12 @@ void main() {
   testWidgets('positions a token relative to the supplied board rectangle',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: SizedBox(
           width: 300,
           height: 300,
           child: Stack(
-            children: const <Widget>[
+            children: <Widget>[
               LudoTokenWidget(
                 key: ValueKey<String>('orange-token'),
                 gridPosition: GridPos(0, 0),
@@ -37,12 +37,12 @@ void main() {
   testWidgets('scales token diameter down to fit compact board cells',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: SizedBox(
           width: 120,
           height: 120,
           child: Stack(
-            children: const <Widget>[
+            children: <Widget>[
               LudoTokenWidget(
                 gridPosition: GridPos(14, 14),
                 tokenColor: Color(0xFF289EFF),
