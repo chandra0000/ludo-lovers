@@ -78,27 +78,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   int _rollingFace = 1;
   int _diceRollTicks = 0;
   Timer? _diceRollTimer;
-  Timer? _reactionTimer;
-  String? _latestReaction;
   final List<String> _chatMessages = <String>[];
   late final TextEditingController _chatInputController =
       TextEditingController();
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
-  static const BorderRadius _dieBorderRadius =
-      BorderRadius.all(Radius.circular(22));
-  static const BorderRadius _reactionBorderRadius =
-      BorderRadius.all(Radius.circular(18));
-  static const BoxDecoration _reactionChipDecoration = BoxDecoration(
-    color: AppTheme.panelRaised,
-    borderRadius: _reactionBorderRadius,
-    border: Border(
-      top: BorderSide(color: Color(0x52FFD700)),
-      right: BorderSide(color: Color(0x52FFD700)),
-      bottom: BorderSide(color: Color(0x52FFD700)),
-      left: BorderSide(color: Color(0x52FFD700)),
-    ),
-  );
 
   static const Map<String, Color> _colors = <String, Color>{
     'orange': AppTheme.orange,
@@ -125,7 +109,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _aiTimer?.cancel();
     _pawnStepTimer?.cancel();
     _diceRollTimer?.cancel();
-    _reactionTimer?.cancel();
     _chatInputController.dispose();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
@@ -717,16 +700,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           ),
         ),
       );
-  }
-
-  void _sendReaction(String reaction, String label) {
-    _reactionTimer?.cancel();
-    setState(() => _latestReaction = reaction);
-    _playFeedbackSound();
-    _showLocalActionNotice('$reaction  $label');
-    _reactionTimer = Timer(const Duration(milliseconds: 1800), () {
-      if (mounted) setState(() => _latestReaction = null);
-    });
   }
 
   Future<void> _showPlayerSetup() async {
