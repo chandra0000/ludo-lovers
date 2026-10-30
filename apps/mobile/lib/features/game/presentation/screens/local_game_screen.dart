@@ -1545,17 +1545,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                     // Keep the static board artwork on its own
                                     // layer while pawns and destination markers animate.
                                     // Use the approved board artwork as the live match surface.
-                                    // Show the complete original glass-board artwork without cropping.
-                                    // Contain preserves the source image's full bounds and aspect ratio.
-                                    // The square gameplay canvas remains unchanged for the current pawn overlay.
+                                    // The source is a portrait game-screen reference. Its
+                                    // playable board occupies the central square region; cover
+                                    // crops away the profile/header/footer chrome so the board
+                                    // itself fills this square gameplay canvas. The slight upward
+                                    // alignment keeps the top and bottom board borders visible.
                                     const RepaintBoundary(
                                       child: Image(
                                         key: ValueKey('live_game_board_artwork'),
                                         image: AssetImage(
                                           'assets/images/ludo_board_glass.png',
                                         ),
-                                        fit: BoxFit.contain,
-                                        alignment: Alignment.center,
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment(0, -0.07),
                                         filterQuality: FilterQuality.high,
                                         semanticLabel: 'Ludo Lovers glass board artwork',
                                       ),
