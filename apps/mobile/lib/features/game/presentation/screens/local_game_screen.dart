@@ -1059,7 +1059,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // board and controls are never positioned from guessed percentages.
             const designWidth = 576.0;
             const designHeight = 1024.0;
-            const artworkAspectRatio = designWidth / designHeight;
             final scale = math.min(
               viewport.maxWidth / designWidth,
               viewport.maxHeight / designHeight,
