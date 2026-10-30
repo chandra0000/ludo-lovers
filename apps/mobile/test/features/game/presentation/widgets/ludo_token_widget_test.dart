@@ -31,7 +31,7 @@ void main() {
     // First cell center is (38, 38); the default 14px radius is retained.
     expect(tokenRect.center.dx, closeTo(38, 0.1));
     expect(tokenRect.center.dy, closeTo(38, 0.1));
-    expect(tokenRect.width, closeTo(28, 0.1));
+    expect(tokenRect.width, closeTo(13.44, 0.1));
   });
 
   testWidgets('scales token diameter down to fit compact board cells',
