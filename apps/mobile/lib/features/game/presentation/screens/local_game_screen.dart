@@ -1180,7 +1180,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // in short/landscape viewports and in compact widget-test surfaces.
             // Reserve vertical room for the app bar, player HUD and action controls
             // so the board and its interactive pawn cells remain on-screen.
-            final availableBoardWidth = math.max(0.0, constraints.maxWidth - 16);
+            final availableBoardWidth = math.max(0.0, constraints.maxWidth - 28);
             final availableBoardHeight = math.max(0.0, constraints.maxHeight - 180);
             final boardSize = math.min(
               availableBoardWidth,
