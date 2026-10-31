@@ -21,6 +21,7 @@ final class LudoRuleProfile {
     this.thirdSixEndsTurnWithoutMove = true,
     this.finishEndsMatchImmediately = true,
     this.captureOnlySingleOpponentPawn = true,
+    this.isTeamUp = false,
   }) : safeCellIndexes = Set<int>.unmodifiable(
           safeCellIndexes ??
               ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
@@ -61,4 +62,5 @@ final class LudoRuleProfile {
   final bool thirdSixEndsTurnWithoutMove;
   final bool finishEndsMatchImmediately;
   final bool captureOnlySingleOpponentPawn;
+  final bool isTeamUp;
 }
