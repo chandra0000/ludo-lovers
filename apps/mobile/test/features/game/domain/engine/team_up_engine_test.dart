@@ -236,6 +236,24 @@ void main() {
       expect(transition.events.map((event) => event.type), contains('GameCompleted'));
     });
 
+    test('Classic turn advancement follows current player, not Team Up schedule', () {
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 1,
+        scheduledPlayerIndex: 0,
+      );
+
+      final transition = setup.engine.roll(
+        state,
+        playerId: 'green',
+        expectedVersion: state.version,
+        value: 2,
+      );
+
+      expect(transition.state.currentPlayerId, 'magenta');
+      expect(transition.state.scheduledPlayerIndex, 2);
+    });
+
     test('Classic factory remains in Classic mode with its original rules flag', () {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       expect(setup.mode, LocalGameMode.classic);
