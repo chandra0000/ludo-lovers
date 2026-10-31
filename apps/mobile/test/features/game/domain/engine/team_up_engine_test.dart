@@ -462,6 +462,26 @@ void main() {
       expect(transition.state.winnerPlayerId, 'blue');
     });
 
+    test('keeps the fixed alternating Orange, Green, Magenta, Blue schedule', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      var state = setup.initialState;
+      for (final expectedNext in <String>['green', 'magenta', 'blue', 'orange']) {
+        final actor = state.currentPlayerId;
+        final transition = setup.engine.roll(
+          state,
+          playerId: actor,
+          expectedVersion: state.version,
+          value: 2,
+        );
+        expect(transition.state.currentPlayerId, expectedNext);
+        expect(transition.state.scheduledPlayerId, expectedNext);
+        state = transition.state;
+      }
+    });
+
     test('Classic turn advancement follows current player, not Team Up schedule', () {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       final state = setup.initialState.copyWith(
