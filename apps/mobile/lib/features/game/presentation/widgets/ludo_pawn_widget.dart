@@ -94,8 +94,8 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                             ],
                           ),
                           border: Border.all(color: AppTheme.gold, width: 1.5),
-                          boxShadow: const [
-                            BoxShadow(color: AppTheme.black.withValues(alpha: 0.45), blurRadius: 4, offset: Offset(0, 3)),
+                          boxShadow: [
+                            BoxShadow(color: AppTheme.black.withValues(alpha: 0.45), blurRadius: 4, offset: const Offset(0, 3)),
                           ],
                         ),
                         child: Center(
