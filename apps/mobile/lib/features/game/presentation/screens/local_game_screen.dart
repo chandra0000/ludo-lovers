@@ -1113,6 +1113,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       width: ds(boardSize),
                       height: ds(boardSize),
                       child: ClipRect(
+                        key: const ValueKey('local_game_board'),
                         child: LayoutBuilder(
                           builder: (context, boardConstraints) {
                             final size = Size(
@@ -1216,7 +1217,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           child: FittedBox(
                             child: Text(
                               state.completed
-                                  ? 'MATCH WON'
+                                  ? '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} · WINNER'
                                   : isAiTurn
                                       ? '${current.toUpperCase()} · THINKING'
                                       : state.pendingRoll == null
