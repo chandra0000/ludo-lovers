@@ -73,7 +73,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   int _pawnAnimationGeneration = 0;
   bool _playAgainstAi = false;
   bool _aiThinking = false;
-  bool _soundEnabled = true;
+  final bool _soundEnabled = true;
   bool _diceRolling = false;
   int _rollingFace = 1;
   int _diceRollTicks = 0;
@@ -702,6 +702,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       );
   }
 
+  // Retained for the next setup-menu iteration; currently not exposed in the UI.
+  // ignore: unused_element
   Future<void> _showPlayerSetup() async {
     final currentPlayers = _controller.state.players;
     final selectedPlayers = <String>[
@@ -911,6 +913,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
   }
 
+  // Retained for the next help-menu iteration; currently not exposed in the UI.
+  // ignore: unused_element
   void _showRules() {
     showModalBottomSheet<void>(
       context: context,
