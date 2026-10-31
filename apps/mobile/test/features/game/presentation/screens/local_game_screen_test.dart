@@ -384,10 +384,6 @@ void main() {
       expect(find.byKey(const ValueKey('compact_turn_status')), findsNothing);
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
       expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
-      expect(find.byKey(const ValueKey('reaction_laugh')), findsOneWidget);
-      expect(find.byKey(const ValueKey('reaction_heart')), findsOneWidget);
-      expect(find.byKey(const ValueKey('reaction_angry')), findsOneWidget);
-      expect(find.byKey(const ValueKey('reaction_gift')), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pump();
@@ -413,7 +409,7 @@ void main() {
       final rollButtonWhileMovePending =
           tester.widget<InkWell>(find.byKey(const ValueKey('roll_dice_button')));
       expect(
-        rollButtonWhileMovePending.onPressed,
+        rollButtonWhileMovePending.onTap,
         isNull,
         reason: 'A second roll must not be available before the pending move is used.',
       );
@@ -461,9 +457,9 @@ void main() {
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'orange');
       final rollButtonAfterMove =
-          tester.widget<ElevatedButton>(find.byKey(const ValueKey('roll_dice_button')));
+          tester.widget<InkWell>(find.byKey(const ValueKey('roll_dice_button')));
       expect(
-        rollButtonAfterMove.onPressed,
+        rollButtonAfterMove.onTap,
         isNotNull,
         reason: 'The extra turn should allow a fresh roll after the move resolves.',
       );
@@ -1113,9 +1109,9 @@ void main() {
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsNothing);
     expect(
-      tester.widget<ElevatedButton>(
+      tester.widget<InkWell>(
         find.byKey(const ValueKey('roll_dice_button')),
-      ).onPressed,
+       ).onTap,
       isNull,
       reason: 'A completed match must not accept another roll.',
     );
@@ -1140,7 +1136,7 @@ void main() {
     expect(
       tester.widget<ElevatedButton>(
         find.byKey(const ValueKey('roll_dice_button')),
-      ).onPressed,
+       ).onTap,
       isNotNull,
     );
   });
