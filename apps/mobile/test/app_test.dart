@@ -5,6 +5,20 @@ import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart'
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+Future<void> tapWhenHitTestable(WidgetTester tester, Finder finder) async {
+  final target = finder.hitTestable();
+  for (var attempt = 0; attempt < 40; attempt++) {
+    if (target.evaluate().isNotEmpty) {
+      await tester.tap(target);
+      await tester.pump();
+      return;
+    }
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  expect(target, findsOneWidget,
+      reason: 'The control did not become hit-testable after waiting for route transitions.');
+}
+
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
   // Advance in bounded frames: a single long pump can skip intermediate
   // animation frames and leave route/board overlays in an input-blocking state.
@@ -172,7 +186,7 @@ void main() {
 
 
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await tapWhenHitTestable(tester, find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
 
     expect(controller.state.pendingRoll, 6);
@@ -187,9 +201,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(
-      find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
-    );
+    await tapWhenHitTestable(tester, find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
     await tester.pump();
 
     final movedPawn = controller.state.pawns
@@ -259,7 +271,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
     expect(controller.legalPawnIds, contains('orange_pawn_1'));
-    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
+    await tapWhenHitTestable(tester, find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
     await tester.pump();
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pawns
