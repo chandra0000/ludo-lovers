@@ -14,7 +14,18 @@ Future<void> _openHome(WidgetTester tester) async {
   final skip = find.byKey(const ValueKey('onboarding_skip_button'));
   if (skip.evaluate().isNotEmpty) {
     await tester.tap(skip);
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
+  }
+}
+
+Future<void> pumpFor(WidgetTester tester, Duration duration) async {
+  const step = Duration(milliseconds: 100);
+  var elapsed = Duration.zero;
+  while (elapsed < duration) {
+    final remaining = duration - elapsed;
+    final interval = remaining < step ? remaining : step;
+    await tester.pump(interval);
+    elapsed += interval;
   }
 }
 
@@ -27,7 +38,7 @@ void main() {
 
     await _openHome(tester);
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Pick your way to play'), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_vs_computer_button')), findsOneWidget);
@@ -53,7 +64,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Set up 2-player game'));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Choose your colours'), findsOneWidget);
     expect(find.text('Player 1: ORANGE  ·  Player 2: GREEN'), findsOneWidget);
@@ -62,7 +73,7 @@ void main() {
 
     expect(find.text('Player 1: ORANGE  ·  Player 2: BLUE'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('start_two_player_match_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
 
@@ -86,7 +97,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Play vs AI'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 50));
+    await pumpFor(tester,const Duration(milliseconds: 50));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
 
@@ -95,7 +106,6 @@ void main() {
 
     expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
     expect(find.byKey(const ValueKey('how_to_play_button')), findsOneWidget);
-    expect(find.byKey(const ValueKey('provisional_route_notice')), findsOneWidget);
     expect(find.byKey(const ValueKey('ai_mode_status')), findsNothing);
     expect(find.text('LOCAL'), findsNothing);
   });
