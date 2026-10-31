@@ -663,6 +663,43 @@ class PathBasedLocalGameEngine {
         throw const LocalGameException(LocalActionError.invalidState);
       }
     }
+
+    if (!isTeamUp) {
+      if (state.teamUpCapturePriorityByCell.isNotEmpty) {
+        throw const LocalGameException(LocalActionError.invalidState);
+      }
+      return;
+    }
+
+    final teamsByCell = <int, Set<TeamUpTeam>>{};
+    for (final pawn in state.pawns) {
+      if (pawn.position.section != PawnRouteSection.mainTrack) continue;
+      final cell = paths
+          .forPlayer(pawn.playerId)
+          .cellAtProgress(pawn.position.progress!);
+      teamsByCell
+          .putIfAbsent(cell, () => <TeamUpTeam>{})
+          .add(TeamUpRules.teamFor(pawn.playerId));
+    }
+    final mixedUnsafeCells = teamsByCell.entries
+        .where(
+          (entry) =>
+              entry.value.length > 1 && !safeCellIndexes.contains(entry.key),
+        )
+        .map((entry) => entry.key)
+        .toSet();
+    if (mixedUnsafeCells.length !=
+            state.teamUpCapturePriorityByCell.length ||
+        !mixedUnsafeCells.every(
+          state.teamUpCapturePriorityByCell.containsKey,
+        )) {
+      throw const LocalGameException(LocalActionError.invalidState);
+    }
+    for (final entry in state.teamUpCapturePriorityByCell.entries) {
+      if (!teamsByCell[entry.key]!.contains(entry.value)) {
+        throw const LocalGameException(LocalActionError.invalidState);
+      }
+    }
   }
 
   void _resolveTeamUpStackDeparture({
