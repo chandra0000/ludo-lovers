@@ -1292,16 +1292,44 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                         ),
                       ),
-                    if (_playAgainstAi)
-                      Positioned(
-                        left: dx(10),
-                        top: dy(174),
-                        child: const Text(
-                          'AI OPPONENTS ON · YOU PLAY ORANGE',
-                          key: ValueKey('ai_mode_status'),
-                          style: TextStyle(color: AppTheme.gold, fontSize: 10, fontWeight: FontWeight.w800),
-                        ),
+                    // Keep tertiary product guidance to one quiet line.
+                    // Detailed provisional geometry remains available only in How to play.
+                    Positioned(
+                      left: dx(12),
+                      top: dy(172),
+                      width: ds(552),
+                      height: ds(26),
+                      child: Row(
+                        children: <Widget>[
+                          TextButton(
+                            key: const ValueKey('how_to_play_button'),
+                            onPressed: _showRules,
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.gold,
+                              padding: EdgeInsets.symmetric(horizontal: ds(6)),
+                              minimumSize: Size(0, ds(24)),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            child: Text(
+                              'How to play',
+                              style: TextStyle(fontSize: ds(10), fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'BOARD ROUTE · PROVISIONAL',
+                            key: const ValueKey('provisional_route_notice'),
+                            style: TextStyle(
+                              color: AppTheme.cream.withValues(alpha: 0.72),
+                              fontSize: ds(8),
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
                     Positioned(
                       left: -1000,
                       child: Row(
@@ -1313,17 +1341,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ],
                       ),
                     ),
-                    if (_controller.lastError != null)
-                      Positioned(
-                        left: dx(12),
-                        right: viewport.maxWidth - dx(564),
-                        bottom: 4,
-                        child: Text(
-                          'Action rejected: ${_controller.lastError!.error.name}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppTheme.red, fontSize: 11),
-                        ),
-                      ),
                   ],
                 );
               },
