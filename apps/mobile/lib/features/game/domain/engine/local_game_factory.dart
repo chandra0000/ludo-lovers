@@ -1,4 +1,4 @@
-/// Creates a fresh local game state for the four-seat Classic Ludo mode.
+/// Creates a fresh local game state for Classic or 2-vs-2 Team Up mode.
 ///
 /// This factory initializes domain state only. It does not make the provisional
 /// board route production-ready; use it for deterministic engine integration
@@ -9,19 +9,24 @@ import '../board/classic_ludo_board_definition.dart';
 import '../board/classic_ludo_board_fixture.dart';
 import '../board/ludo_board_paths.dart';
 import 'ludo_path_movement.dart';
+import 'team_up_rules.dart';
 import 'ludo_rule_profile.dart';
 import 'path_based_local_game_engine.dart';
+
+enum LocalGameMode { classic, teamUp }
 
 class LocalGameSetup {
   const LocalGameSetup({
     required this.paths,
     required this.engine,
     required this.initialState,
+    required this.mode,
   });
 
   final LudoBoardPaths paths;
   final PathBasedLocalGameEngine engine;
   final LocalGameState initialState;
+  final LocalGameMode mode;
 }
 
 class LocalGameFactory {
@@ -38,6 +43,7 @@ class LocalGameFactory {
     Set<int>? safeCellIndexes,
     bool allowProvisionalRoutes = false,
     List<String>? selectedPlayerIds,
+    LocalGameMode mode = LocalGameMode.classic,
   }) {
     final players = List<String>.unmodifiable(selectedPlayerIds ?? playerIds);
     if (players.length < 2 || players.length > playerIds.length) {
@@ -55,6 +61,14 @@ class LocalGameFactory {
         'Player colours must be unique supported colours.',
       );
     }
+    if (mode == LocalGameMode.teamUp &&
+        (players.length != 4 || players.join(',') != TeamUpRules.turnOrder.join(','))) {
+      throw ArgumentError.value(
+        players,
+        'selectedPlayerIds',
+        'Team Up requires Orange, Green, Magenta and Blue in scheduled order.',
+      );
+    }
     if (!allowProvisionalRoutes) {
       throw StateError(
         'Classic board routes are provisional. Explicitly opt in only for '
@@ -68,6 +82,7 @@ class LocalGameFactory {
       profile: LudoRuleProfile(
         safeCellIndexes: safeCellIndexes ??
             ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
+        isTeamUp: mode == LocalGameMode.teamUp,
       ),
     );
     final pawns = <LocalPawn>[
@@ -87,7 +102,9 @@ class LocalGameFactory {
         players: players,
         pawns: pawns,
         currentPlayerIndex: 0,
+        scheduledPlayerIndex: 0,
       ),
+      mode: mode,
     );
   }
 }
