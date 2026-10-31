@@ -6,8 +6,8 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  // A single frame applies the rematch state without advancing game timers.
-  await tester.pump();
+  // Advance the requested duration for result and rematch transitions.
+  await tester.pump(duration);
 }
 
 void main() {
