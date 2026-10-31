@@ -126,6 +126,61 @@ void main() {
         isEmpty,
       );
     });
+    test('safe cells protect opposing Team Up pawns from capture', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final orangePath = setup.paths.forPlayer('orange');
+      final greenPath = setup.paths.forPlayer('green');
+      final safeCell = setup.engine.safeCellIndexes.firstWhere(
+        (cell) =>
+            orangePath.mainTrackCells.indexOf(cell) > 0 &&
+            greenPath.mainTrackCells.indexOf(cell) >= 0,
+      );
+      final orangeTargetProgress = orangePath.mainTrackCells.indexOf(safeCell);
+      final greenTargetProgress = greenPath.mainTrackCells.indexOf(safeCell);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 0,
+        scheduledPlayerIndex: 0,
+        pendingRoll: 1,
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id == 'orange_pawn_1') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: orangeTargetProgress - 1,
+            ));
+          }
+          if (pawn.id == 'green_pawn_1') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: greenTargetProgress,
+            ));
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'orange',
+        expectedVersion: state.version,
+        pawnId: 'orange_pawn_1',
+      );
+
+      expect(
+        transition.state.pawns
+            .firstWhere((pawn) => pawn.id == 'green_pawn_1')
+            .position
+            .section,
+        PawnRouteSection.mainTrack,
+      );
+      expect(
+        transition.events.where((event) => event.type == 'PawnCaptured'),
+        isEmpty,
+      );
+    });
+
     test('captures only the last-arrived pawn from an opposing stack', () {
       final setup = LocalGameFactory.create(
         allowProvisionalRoutes: true,
