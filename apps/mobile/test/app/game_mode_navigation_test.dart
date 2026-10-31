@@ -19,14 +19,9 @@ Future<void> _openHome(WidgetTester tester) async {
 }
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  const step = Duration(milliseconds: 100);
-  var elapsed = Duration.zero;
-  while (elapsed < duration) {
-    final remaining = duration - elapsed;
-    final interval = remaining < step ? remaining : step;
-    await tester.pump(interval);
-    elapsed += interval;
-  }
+  // Navigation builds synchronously; do not advance the AI turn timer while
+  // a test is only waiting for the destination widget to mount.
+  await tester.pump();
 }
 
 void main() {
