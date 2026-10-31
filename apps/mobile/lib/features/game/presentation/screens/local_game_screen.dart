@@ -1038,6 +1038,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         semanticLabel: 'Complete Ludo Lovers portrait game layout',
                       ),
                     ),
+                    // Keep decorative/social controls behind gameplay hit targets.
+                    // The board and dice are painted later so their gestures always win.
+                    Positioned(
+                      left: frameLeft,
+                      top: frameTop,
+                      width: frameWidth,
+                      height: frameHeight,
+                      child: LudoBoardOverlay(
+                        onHelp: _showRules,
+                        onChat: _showMatchChat,
+                        playerName: current,
+                      ),
+                    ),
                     // 15 x 15 logical grid is registered to the exact 542 px
                     // playable square, inside the 556 px gold outer frame.
                     Positioned(
@@ -1172,17 +1185,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      left: frameLeft,
-                      top: frameTop,
-                      width: frameWidth,
-                      height: frameHeight,
-                      child: LudoBoardOverlay(
-                        onHelp: _showRules,
-                        onChat: _showMatchChat,
-                        playerName: current,
                       ),
                     ),
                     if (state.completed)
