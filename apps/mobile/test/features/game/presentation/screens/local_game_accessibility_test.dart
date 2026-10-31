@@ -40,7 +40,7 @@ void main() {
       find.byKey(const ValueKey('roll_dice_button')),
     );
     expect(
-      rollButton.onPressed,
+      rollButton.onTap,
       isNull,
       reason: 'The human must not roll during an AI opponent turn.',
     );
