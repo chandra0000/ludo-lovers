@@ -77,7 +77,7 @@ void main() {
       );
       final orangePath = setup.paths.forPlayer('orange');
       final magentaPath = setup.paths.forPlayer('magenta');
-      final sharedCell = orangePath.cellAtProgress(1)!;
+      final sharedCell = orangePath.cellAtProgress(2)!;
       final magentaProgress = magentaPath.mainTrackCells.indexOf(sharedCell);
       expect(magentaProgress, greaterThanOrEqualTo(0));
 
@@ -88,7 +88,7 @@ void main() {
             return pawn.copyWith(
               position: const PawnRoutePosition(
                 section: PawnRouteSection.mainTrack,
-                progress: 0,
+                progress: 1,
               ),
             );
           }
