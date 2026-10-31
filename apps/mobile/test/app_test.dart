@@ -5,6 +5,17 @@ import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart'
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+Future<void> pumpFor(WidgetTester tester, Duration duration) async {
+  const step = Duration(milliseconds: 100);
+  var elapsed = Duration.zero;
+  while (elapsed < duration) {
+    final remaining = duration - elapsed;
+    final interval = remaining < step ? remaining : step;
+    await tester.pump(interval);
+    elapsed += interval;
+  }
+}
+
 void main() {
   testWidgets('renders the Ludo Lovers foundation screen', (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
@@ -14,7 +25,7 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
     final logo = tester.widget<Image>(
@@ -38,12 +49,12 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('preview_board_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Classic Board'), findsOneWidget);
     expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
@@ -80,16 +91,16 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('preview_board_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.ensureVisible(find.byKey(const ValueKey('board_route_audit_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('board_route_audit_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Route & safe-cell audit'), findsOneWidget);
     expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
@@ -124,14 +135,14 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     expect(find.text('Pick your way to play'), findsOneWidget);
     await tester.ensureVisible(find.text('Start 4-player game'));
     await tester.tap(find.text('Start 4-player game'));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
     expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
@@ -215,7 +226,7 @@ void main() {
 
     final versionBeforeRestart = controller.state.version;
     controller.reset();
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
