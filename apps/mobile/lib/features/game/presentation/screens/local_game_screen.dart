@@ -18,6 +18,9 @@ import '../../domain/engine/local_game_factory.dart';
 import '../../domain/engine/ludo_path_movement.dart';
 import '../../domain/engine/path_based_local_game_engine.dart';
 import '../controllers/local_game_controller.dart';
+import '../widgets/animated_dice_widget.dart';
+import '../widgets/ludo_board_overlay.dart';
+import '../widgets/ludo_pawn_widget.dart';
 
 /// Development-only board-backed local match.
 ///
@@ -554,152 +557,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 
   Future<void> _showMatchChat() async {
-    final inputController = _chatInputController;
-    void sendMessage() {
-      final message = inputController.text.trim();
-      if (message.isEmpty) return;
-      setState(() => _chatMessages.add('You: $message'));
-      inputController.clear();
-    }
-
-    await showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: AppTheme.panel,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        builder: (sheetContext) => StatefulBuilder(
-          builder: (context, setSheetState) => Padding(
-            padding: EdgeInsets.fromLTRB(
-              18,
-              18,
-              18,
-              18 + MediaQuery.viewInsetsOf(context).bottom,
-            ),
-            child: SafeArea(
-              top: false,
-              child: Column(
-                key: const ValueKey('match_chat_sheet'),
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      const Icon(Icons.chat_bubble_rounded, color: AppTheme.gold),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'MATCH CHAT',
-                          style: TextStyle(
-                            color: AppTheme.gold,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        key: const ValueKey('close_match_chat_button'),
-                        tooltip: 'Close chat',
-                        onPressed: () => Navigator.of(sheetContext).pop(),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Local preview · messages stay on this device.',
-                    style: TextStyle(color: AppTheme.mutedText, fontSize: 12),
-                  ),
-                  const SizedBox(height: 12),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 220),
-                    child: _chatMessages.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 18),
-                            child: Center(
-                              child: Text(
-                                'Say hello to the other players!',
-                                style: TextStyle(color: AppTheme.readableText),
-                              ),
-                            ),
-                          )
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: _chatMessages.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 6),
-                            itemBuilder: (context, index) => Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 9,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.panelRaised,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppTheme.gold.withValues(alpha: 0.2),
-                                  ),
-                                ),
-                                child: Text(
-                                  _chatMessages[index],
-                                  style: const TextStyle(color: AppTheme.readableText),
-                                ),
-                              ),
-                            ),
-                          ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          key: const ValueKey('match_chat_input'),
-                          controller: inputController,
-                          textInputAction: TextInputAction.send,
-                          onSubmitted: (_) {
-                            sendMessage();
-                            setSheetState(() {});
-                          },
-                          style: const TextStyle(color: AppTheme.readableText),
-                          decoration: InputDecoration(
-                            hintText: 'Write a message…',
-                            hintStyle: const TextStyle(color: AppTheme.mutedText),
-                            filled: true,
-                            fillColor: AppTheme.black,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filled(
-                        key: const ValueKey('send_match_chat_button'),
-                        tooltip: 'Send message',
-                        onPressed: () {
-                          sendMessage();
-                          setSheetState(() {});
-                        },
-                        style: IconButton.styleFrom(
-                          backgroundColor: AppTheme.gold,
-                          foregroundColor: AppTheme.black,
-                        ),
-                        icon: const Icon(Icons.send_rounded),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+    _showLocalActionNotice('Online mode is not enabled');
   }
 
   // Retained for the next setup-menu iteration; currently not exposed in the UI.
@@ -1194,22 +1052,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 : state.pendingRoll == null
                                     ? 'Roll a die to begin the current player’s turn.'
                                     : 'Choose a highlighted pawn to use the current roll.',
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            key: const ValueKey('roll_dice_button'),
-                            borderRadius: BorderRadius.circular(ds(24)),
-                            onTap: state.completed || isAiTurn || state.pendingRoll != null
-                                ? null
-                                : () => _rollDice(state),
-                            child: Center(
-                              child: _diceRolling
-                                  ? _DicePips(value: _rollingFace)
-                                  : state.pendingRoll == null
-                                      ? const SizedBox.expand()
-                                      : _DicePips(value: state.pendingRoll!),
-                            ),
-                          ),
+                        child: AnimatedDiceWidget(
+                          value: state.pendingRoll ?? _rollingFace,
+                          rolling: _diceRolling,
+                          enabled: !state.completed && !isAiTurn && state.pendingRoll == null,
+                          onRoll: () => _rollDice(state),
                         ),
                       ),
                     ),
@@ -1228,8 +1075,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                   : isAiTurn
                                       ? '${current.toUpperCase()} · THINKING'
                                       : state.pendingRoll == null
-                                          ? '${current.toUpperCase()} · YOUR TURN'
-                                          : '${current.toUpperCase()} · MOVE A PAWN',
+                                          ? 'Your Turn'
+                                          : 'Rolling...',
                               key: const ValueKey('portrait_turn_indicator'),
                               style: const TextStyle(
                                 color: Color(0xFFFFE6A0),
@@ -1244,23 +1091,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
-                    // Exact Chat button: center (98,940), diameter 56.
                     Positioned(
-                      left: dx(70),
-                      top: dy(912),
-                      width: ds(56),
-                      height: ds(56),
-                      child: Semantics(
-                        button: true,
-                        label: 'Open match chat',
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            key: const ValueKey('open_match_chat_button'),
-                            onTap: _showMatchChat,
-                            borderRadius: BorderRadius.circular(ds(28)),
-                          ),
-                        ),
+                      left: frameLeft,
+                      top: frameTop,
+                      width: frameWidth,
+                      height: frameHeight,
+                      child: LudoBoardOverlay(
+                        onHelp: _showRules,
+                        onChat: _showMatchChat,
+                        playerName: current,
                       ),
                     ),
                     if (state.completed)
@@ -1431,7 +1270,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     required double cellSize,
     required bool isLegal,
   }) {
-    final diameter = cellSize * (visual.isFinished ? 0.30 : visual.isYard ? 0.38 : visual.isStacked ? 0.38 : 0.50);
+    final diameter = cellSize * (visual.isFinished ? 0.30 : visual.isYard ? 1.05 : visual.isStacked ? 0.61 : 0.885);
     final centerX = visual.point.x * boardSize.width + visual.stackOffset.dx * cellSize;
     final centerY = visual.point.y * boardSize.height + visual.stackOffset.dy * cellSize;
     final isSelectable = isLegal || (visual.isYard &&
@@ -1483,11 +1322,17 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
-                    _GlassConePawn(
+                    LudoPawnWidget(
                       color: _colors[visual.playerId] ?? AppTheme.cream,
-                      size: diameter,
-                      isActive: isSelectable,
-                      pawnId: visual.pawnId,
+                      diameter: diameter,
+                      eligible: isSelectable,
+                      label: _accessiblePawnName(visual.pawnId),
+                      onTap: isLegal
+                          ? () => _controller.movePawn(
+                                visual.pawnId,
+                                expectedVersion: _controller.state.version,
+                              )
+                          : null,
                     ),
                   ],
                 ),
