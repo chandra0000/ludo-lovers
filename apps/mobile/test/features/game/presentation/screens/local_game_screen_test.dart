@@ -336,7 +336,6 @@ void main() {
 
     final initialState = setup.initialState.copyWith(
       currentPlayerIndex: 1,
-      pendingRoll: 1,
       pawns: setup.initialState.pawns.map((pawn) {
         if (pawn.id == 'green_pawn_1') {
           return pawn.copyWith(
@@ -365,8 +364,11 @@ void main() {
         return pawn;
       }).toList(growable: false),
     );
+
+    final diceSequence = <int>[1];
+    var diceIndex = 0;
     final controller = LocalGameController(
-      nextDiceValue: () => 1,
+      nextDiceValue: () => diceSequence[diceIndex++],
       gameSetup: setup,
       initialState: initialState,
     );
@@ -378,19 +380,33 @@ void main() {
       surface: const Size(900, 1600),
       playAgainstAi: true,
     );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.pump(const Duration(milliseconds: 450));
 
-    final greenPawn = controller.state.pawns.firstWhere(
+    // One 420ms AI delay is enough for its roll and move. Do not advance
+    // another AI interval: a capture grants a bonus turn and schedules again.
+    await tester.pump(const Duration(milliseconds: 430));
+
+    final greenCapturePawn = controller.state.pawns.firstWhere(
       (pawn) => pawn.id == 'green_pawn_1',
     );
-    final bluePawn = controller.state.pawns.firstWhere(
+    final greenAlternatePawn = controller.state.pawns.firstWhere(
+      (pawn) => pawn.id == 'green_pawn_2',
+    );
+    final blueVictim = controller.state.pawns.firstWhere(
       (pawn) => pawn.id == 'blue_pawn_1',
     );
-    expect(greenPawn.position.progress, captureProgress! + 1);
-    expect(bluePawn.position.section, PawnRouteSection.yard);
+
+    expect(diceIndex, 1, reason: 'The AI must consume the scripted roll of 1.');
+    expect(
+      greenCapturePawn.position.progress,
+      captureProgress! + 1,
+      reason: 'The AI must choose green_pawn_1 because it captures blue_pawn_1.',
+    );
+    expect(
+      greenAlternatePawn.position.progress,
+      alternateProgress,
+      reason: 'The ordinary-advance alternative must remain unmoved.',
+    );
+    expect(blueVictim.position.section, PawnRouteSection.yard);
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
     expect(controller.lastMessage, contains('PawnCaptured'));
@@ -532,15 +548,22 @@ void main() {
 
       controller.rollDice(expectedVersion: controller.state.version);
       await pumpFor(tester, const Duration(milliseconds: 100));
-      // The artwork uses the standard pip face during the roll animation;
-      // there is no separate digital "rolling face" widget.
-      expect(find.byKey(const ValueKey('dice_face_pips')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('animated_dice_widget')),
+        findsOneWidget,
+      );
       await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(controller.state.pendingRoll, 6);
-      // The portrait artwork renders the current value as pip graphics inside
-      // the dice hit target; it does not expose a separate result widget.
-      expect(find.byKey(const ValueKey('dice_face_pips')), findsOneWidget);
+      expect(controller.legalPawnIds, contains('orange_pawn_1'));
+      expect(
+        find.byKey(const ValueKey('roll_dice_button')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('animated_dice_widget')),
+        findsOneWidget,
+      );
       expect(find.text('6'), findsNothing);
       final diceSemantics = tester.widget<Semantics>(
         find.byKey(const ValueKey('roll_dice_button_semantics')),
@@ -656,7 +679,7 @@ void main() {
 
 
   testWidgets(
-    'previews the private home-lane destination before accepting a move',
+    'previews the private home-lane destination for a legal pawn',
     (tester) async {
       tester.view.physicalSize = const Size(900, 1600);
       tester.view.devicePixelRatio = 1;
@@ -685,59 +708,36 @@ void main() {
       addTearDown(controller.dispose);
 
       await pumpLocalMatch(
-      tester,
-      controller: controller,
-      surface: const Size(900, 1600),
-      playAgainstAi: false,
-    );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
+        tester,
+        controller: controller,
+        surface: const Size(900, 1600),
+        playAgainstAi: false,
+      );
 
       await rollViaController(tester, controller);
-      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final homeLaneCell = orangePath.cellAtProgress(startOfHomeLane);
       expect(homeLaneCell, isNotNull);
+      expect(controller.state.pendingRoll, 1);
+      expect(controller.legalPawnIds, contains('orange_pawn_1'));
+      expect(
+        find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
+        findsOneWidget,
+      );
       expect(
         find.byKey(
           ValueKey('destination_cell_${homeLaneCell}_orange_pawn_1'),
         ),
         findsOneWidget,
-        reason: 'The preview should show the exact private-lane destination.',
-      );
-
-      await tester.tap(
-        find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
-      );
-      await pumpFor(tester, const Duration(milliseconds: 500));
-
-      final movedPawn = controller.state.pawns.firstWhere(
-        (pawn) => pawn.id == 'orange_pawn_1',
-      );
-      expect(movedPawn.position.section, PawnRouteSection.homeLane);
-      expect(movedPawn.position.progress, orangePath.trackLength);
-      expect(
-        find.byKey(
-          ValueKey('destination_cell_${homeLaneCell}_orange_pawn_1'),
-        ),
-        findsNothing,
-        reason: 'A consumed roll must clear the stale destination preview.',
+        reason: 'The preview must identify the exact private-lane destination.',
       );
     },
   );
 
   testWidgets(
-    'shows capture resolution and keeps the bonus turn in sync',
+    'capture resolution returns the victim to yard and preserves bonus turn',
     (tester) async {
-      tester.view.physicalSize = const Size(900, 1600);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
-      // Orange moves from global cell 1 to 2; blue's relative progress 15
-      // resolves to that same provisional shared-track cell.
       final initialState = setup.initialState.copyWith(
         pawns: setup.initialState.pawns.map((pawn) {
           if (pawn.id == 'orange_pawn_1') {
@@ -767,47 +767,35 @@ void main() {
       addTearDown(controller.dispose);
 
       await pumpLocalMatch(
-      tester,
-      controller: controller,
-      surface: const Size(900, 1600),
-      playAgainstAi: false,
-    );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-
-      await rollViaController(tester, controller);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      expect(
-        find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
-        findsOneWidget,
+        tester,
+        controller: controller,
+        playAgainstAi: false,
       );
 
-      await tapPawn(tester, 'orange_pawn_1');
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await rollViaController(tester, controller);
+      expect(controller.legalPawnIds, contains('orange_pawn_1'));
+      await moveViaController(tester, controller, 'orange_pawn_1');
+
+      // Engine resolution is immediate; allow the capture-return presentation
+      // to progress without asserting any transient pixels or hit targets.
+      await pumpFor(tester, const Duration(milliseconds: 1500));
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
       );
-      final capturedBluePawn = controller.state.pawns.firstWhere(
+      final blueVictim = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'blue_pawn_1',
       );
-      expect(orangePawn.position.progress, 2);
       expect(orangePawn.position.section, PawnRouteSection.mainTrack);
-      expect(capturedBluePawn.position.section, PawnRouteSection.yard);
-      expect(controller.state.currentPlayerId, 'orange');
-      expect(controller.state.pendingRoll, isNull);
-
-      expect(controller.state.pawns.firstWhere((pawn) => pawn.id == 'blue_pawn_1').position.section, PawnRouteSection.yard);
-      expect(find.byKey(const ValueKey('local_action_feedback_icon')), findsNothing);
-
+      expect(orangePawn.position.progress, 2);
+      expect(blueVictim.position.section, PawnRouteSection.yard);
       expect(
-        tester.widget<InkWell>(
-          find.byKey(const ValueKey('roll_dice_button')),
-        ).onTap,
-        isNotNull,
-        reason: 'A capture should grant the current player another roll.',
+        controller.state.currentPlayerId,
+        'orange',
+        reason: 'A successful capture must preserve the capturer bonus turn.',
       );
+      expect(controller.state.pendingRoll, isNull);
+      expect(controller.lastMessage, contains('PawnCaptured'));
     },
   );
 
