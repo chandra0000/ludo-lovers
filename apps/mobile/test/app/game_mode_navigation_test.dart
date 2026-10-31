@@ -19,9 +19,8 @@ Future<void> _openHome(WidgetTester tester) async {
 }
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  // Navigation builds synchronously; do not advance the AI turn timer while
-  // a test is only waiting for the destination widget to mount.
-  await tester.pump();
+  // Advance the requested duration so navigation transitions complete.
+  await tester.pump(duration);
 }
 
 void main() {
