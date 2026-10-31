@@ -43,10 +43,10 @@ final class TeamUpRules {
     };
   }
 
-  /// The scheduled player still rolls. If all their pawns are finished, the
-  /// roll is assigned to their teammate; if both are finished, the turn is
-  /// skipped. The caller must preserve the scheduled seat separately from the
-  /// recipient so the displayed turn order never changes.
+  /// The scheduled seat remains in rotation. If its player has finished all
+  /// pawns, their teammate receives the active turn; if both are finished, the
+  /// scheduled turn is skipped. Preserve the scheduled seat separately from
+  /// the active recipient so the displayed turn order never changes.
   static String? recipientForScheduledRoll({
     required String scheduledPlayerId,
     required Set<String> playersWithAllPawnsFinished,
