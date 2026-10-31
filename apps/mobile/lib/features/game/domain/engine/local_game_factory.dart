@@ -80,6 +80,9 @@ class LocalGameFactory {
     final engine = PathBasedLocalGameEngine(
       paths: paths,
       profile: LudoRuleProfile(
+        id: mode == LocalGameMode.teamUp
+            ? 'team-up-v1-provisional'
+            : 'classic-v1-provisional',
         safeCellIndexes: safeCellIndexes ??
             ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
         isTeamUp: mode == LocalGameMode.teamUp,
