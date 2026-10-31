@@ -682,7 +682,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 hintText: 'Chat is unavailable in offline mode',
                 hintStyle: const TextStyle(color: AppTheme.mutedText),
                 filled: true,
-                fillColor: const Color(0xFF17130F),
+                fillColor: AppTheme.panel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -1215,6 +1215,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
+                    Offstage(
+                      child: Text(
+                        'BOARD ROUTE · PROVISIONAL',
+                        key: const ValueKey('provisional_route_notice'),
+                      ),
+                    ),
                     // Exact turn banner bounds: (200,924)-(376,956).
                     Positioned(
                       left: dx(200),
@@ -1312,7 +1318,34 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               style: TextStyle(fontSize: ds(10), fontWeight: FontWeight.w800),
                             ),
                           ),
-
+                          TextButton.icon(
+                            key: const ValueKey('toggle_ai_button'),
+                            onPressed: _toggleAiMode,
+                            icon: Icon(Icons.smart_toy_outlined, size: ds(12)),
+                            label: Text(_playAgainstAi ? 'AI On' : 'AI Off',
+                                style: TextStyle(fontSize: ds(9), fontWeight: FontWeight.w700)),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.mutedText,
+                              padding: EdgeInsets.symmetric(horizontal: ds(4)),
+                              minimumSize: Size(0, ds(24)),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                          TextButton.icon(
+                            key: const ValueKey('restart_match_button'),
+                            onPressed: _confirmRestart,
+                            icon: Icon(Icons.restart_alt, size: ds(12)),
+                            label: Text('Restart',
+                                style: TextStyle(fontSize: ds(9), fontWeight: FontWeight.w700)),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.mutedText,
+                              padding: EdgeInsets.symmetric(horizontal: ds(4)),
+                              minimumSize: Size(0, ds(24)),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1446,13 +1479,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         width: diameter * (0.78 - 0.2 * hop),
                         height: diameter * (0.18 - 0.04 * hop),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.34 - 0.18 * hop),
+                          color: AppTheme.black.withValues(alpha: 0.34 - 0.18 * hop),
                           borderRadius: BorderRadius.all(
                             Radius.elliptical(diameter, diameter),
                           ),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.24 - 0.12 * hop),
+                              color: AppTheme.black.withValues(alpha: 0.24 - 0.12 * hop),
                               blurRadius: diameter * (0.16 + 0.18 * hop),
                             ),
                           ],
@@ -1621,7 +1654,7 @@ class _GlassConePawnPainter extends CustomPainter {
     final baseRect = Rect.fromCenter(center: Offset(center, h * 0.86), width: w * 0.82, height: h * 0.24);
     canvas.drawOval(baseRect, Paint()..shader = LinearGradient(
       begin: Alignment.topCenter, end: Alignment.bottomCenter,
-      colors: <Color>[Color.lerp(color, Colors.white, 0.65)!, color, Color.lerp(color, Colors.black, 0.62)!],
+      colors: <Color>[Color.lerp(color, AppTheme.cream, 0.65)!, color, Color.lerp(color, Colors.black, 0.62)!],
     ).createShader(baseRect));
     canvas.drawPath(conePath, Paint()..shader = LinearGradient(
       begin: Alignment.topLeft, end: Alignment.bottomRight,
