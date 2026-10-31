@@ -92,7 +92,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                               Color.lerp(widget.color, AppTheme.black, 0.42)!,
                             ],
                           ),
-                          border: Border.all(color: const AppTheme.gold, width: 1.5),
+                          border: Border.all(color: AppTheme.gold, width: 1.5),
                           boxShadow: const [
                             BoxShadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 3)),
                           ],
@@ -115,7 +115,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                           top: 0,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              color: const AppTheme.panel,
+                              color: AppTheme.panel,
                               shape: BoxShape.circle,
                               border: Border.all(color: const Color(0xFFFFD978)),
                             ),
