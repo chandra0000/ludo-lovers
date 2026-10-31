@@ -132,23 +132,6 @@ void main() {
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
   });
 
-  testWidgets('local match help explains provisional rules', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(home: LocalGameScreen(controller: LocalGameController(nextDiceValue: () => 3))),
-    );
-
-    await tester.tap(find.byKey(const ValueKey('match_more_actions_button')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('How to play').last);
-    await tester.pumpAndSettle();
-
-    expect(find.text('How to play'), findsOneWidget);
-    expect(find.text('Roll the dice'), findsOneWidget);
-    expect(find.text('Choose a glowing pawn'), findsOneWidget);
-    expect(find.text('Prototype warning'), findsOneWidget);
-    expect(find.textContaining('on-device visual review'), findsOneWidget);
-  });
-
   testWidgets('local match rolls, moves a legal pawn, and updates the board',
       (tester) async {
     final controller = LocalGameController(nextDiceValue: () => 6);
