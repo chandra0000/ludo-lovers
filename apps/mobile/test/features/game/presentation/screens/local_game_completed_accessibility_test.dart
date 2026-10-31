@@ -43,6 +43,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.text('MATCH WON'), findsOneWidget);
       expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
