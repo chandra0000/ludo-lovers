@@ -72,6 +72,8 @@ void main() {
       expect(ClassicLudoBoardTopology.hasCompatibleEntryParity, isFalse);
       expect(ClassicLudoBoardTopology.isOrthogonalTopologyValid, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.isOrthogonallyContinuous, isFalse);
+      expect(ClassicLudoBoardCoordinateFactory.hasCompatibleEntryParity, isFalse);
+      expect(ClassicLudoBoardCoordinateFactory.isOrthogonalTopologyValid, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.isGameplayReady, isFalse);
       expect(ClassicLudoBoardCoordinateFactory.topologyBlockers, isNotEmpty);
     });
