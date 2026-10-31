@@ -1187,6 +1187,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 : state.pendingRoll == null
                                     ? 'Roll dice'
                                     : 'Dice result ${state.pendingRoll}. Select a highlighted pawn.',
+                        hint: state.completed
+                            ? 'The match is finished. Choose Rematch to start a new match.'
+                            : isAiTurn
+                                ? 'The AI is choosing its move. Please wait.'
+                                : state.pendingRoll == null
+                                    ? 'Roll a die to begin the current player’s turn.'
+                                    : 'Choose a highlighted pawn to use the current roll.',
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
