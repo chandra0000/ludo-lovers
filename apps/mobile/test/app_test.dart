@@ -8,6 +8,9 @@ import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen
 void main() {
   testWidgets('renders the Ludo Lovers foundation screen', (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
@@ -29,6 +32,9 @@ void main() {
 
   testWidgets('opens the board preview', (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
@@ -68,6 +74,9 @@ void main() {
   testWidgets('board preview exposes route blockers and owner-confirmed safe cells',
       (tester) async {
     await tester.pumpWidget(const LudoLoversApp());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
@@ -109,6 +118,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const LudoLoversApp());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
@@ -140,6 +152,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: LocalGameScreen(controller: controller)),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
 
 
@@ -187,6 +202,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: LocalGameScreen(controller: controller)),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
@@ -220,6 +238,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: LocalGameScreen(controller: controller)),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     // Six enters a pawn and grants the same player another roll.
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
@@ -261,6 +282,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(home: LocalGameScreen(controller: controller)),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
