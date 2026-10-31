@@ -398,21 +398,17 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.state.pendingRoll, 6);
-      expect(find.byKey(const ValueKey('dice_result_6')), findsOneWidget);
+      // The portrait artwork renders the current value as pip graphics inside
+      // the dice hit target; it does not expose a separate result widget.
       expect(find.byKey(const ValueKey('dice_face_pips')), findsOneWidget);
       expect(find.text('6'), findsNothing);
       final diceSemantics = tester.widget<Semantics>(
-        find.byKey(const ValueKey('dice_result_semantics')),
+        find.byKey(const ValueKey('roll_dice_button_semantics')),
       );
-      expect(diceSemantics.properties.label, 'Dice result: 6');
-      expect(diceSemantics.properties.liveRegion, isTrue);
-      final diceSwitcher = tester.widget<AnimatedSwitcher>(
-        find.ancestor(
-          of: find.byKey(const ValueKey('dice_result_6')),
-          matching: find.byType(AnimatedSwitcher),
-        ).first,
+      expect(
+        diceSemantics.properties.label,
+        'Dice result 6. Select a highlighted pawn.',
       );
-      expect(diceSwitcher.duration, const Duration(milliseconds: 260));
       final rollButtonWhileMovePending =
           tester.widget<InkWell>(find.byKey(const ValueKey('roll_dice_button')));
       expect(
@@ -427,7 +423,6 @@ void main() {
         pendingRollSemantics.properties.hint,
         'Choose a highlighted pawn to use the current roll.',
       );
-      expect(find.byKey(const ValueKey('dice_result_6')), findsOneWidget);
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsOneWidget,
