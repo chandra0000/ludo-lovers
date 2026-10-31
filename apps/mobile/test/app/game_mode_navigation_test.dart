@@ -84,7 +84,10 @@ void main() {
 
 
 
-    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
+    expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
+    expect(find.byKey(const ValueKey('how_to_play_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('provisional_route_notice')), findsOneWidget);
+    expect(find.byKey(const ValueKey('ai_mode_status')), findsNothing);
     expect(find.text('LOCAL'), findsNothing);
   });
 }
