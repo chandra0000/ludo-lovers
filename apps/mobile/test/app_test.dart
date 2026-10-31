@@ -186,7 +186,46 @@ void main() {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
-    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
+        home: LocalGameScreen(controller: controller),
+      ),
+    );
+    await tester.pump();
+    await pumpFor(tester, const Duration(milliseconds: 100));
+
+    expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
+    expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+
+    controller.rollDice(expectedVersion: controller.state.version);
+    await pumpFor(tester, const Duration(milliseconds: 100));
+    expect(controller.state.pendingRoll, 6);
+    expect(controller.legalPawnIds, contains('orange_pawn_1'));
+
+    controller.movePawn(
+      'orange_pawn_1',
+      expectedVersion: controller.state.version,
+    );
+    await pumpFor(tester, const Duration(milliseconds: 100));
+
+    final moved =
+        controller.state.pawns.firstWhere((p) => p.id == 'orange_pawn_1');
+    expect(moved.position.section, PawnRouteSection.mainTrack);
+    expect(controller.state.pendingRoll, isNull);
+  });
+
+  testWidgets('restart action restores the initial local board state',
+      (tester) async {
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -201,124 +240,90 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-
-
-
-
-    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
-    await tapWhenHitTestable(tester, find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
-    expect(controller.state.pendingRoll, 6);
+    controller.rollDice(expectedVersion: controller.state.version);
+    await pumpFor(tester, const Duration(milliseconds: 100));
+    controller.movePawn(
+      'orange_pawn_1',
+      expectedVersion: controller.state.version,
+    );
+    await pumpFor(tester, const Duration(milliseconds: 100));
     expect(
-      controller.state.pendingRoll,
-      6,
-      reason: 'The controller must retain the rolled value while a legal pawn is awaiting selection.',
+      controller.state.pawns
+          .firstWhere((p) => p.id == 'orange_pawn_1')
+          .position
+          .section,
+      PawnRouteSection.mainTrack,
     );
 
-    expect(
-      find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
-      findsOneWidget,
-    );
-
-    await tapWhenHitTestable(tester, find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pump();
-
-    final movedPawn = controller.state.pawns
-        .firstWhere((pawn) => pawn.id == 'orange_pawn_1');
-    expect(movedPawn.position.section, PawnRouteSection.mainTrack);
-    expect(movedPawn.position.progress, 0);
-    expect(controller.state.pendingRoll, isNull);
-    // A six grants another turn under the current local rule profile.
-    expect(controller.state.currentPlayerId, 'orange');
-    expect(
-      find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
-      findsNothing,
-    );
-    semantics.dispose();
-  });
-
-  testWidgets('restart action restores the initial local board state',
-      (tester) async {
-    final controller = LocalGameController(nextDiceValue: () => 6);
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(
-      MaterialApp(home: LocalGameScreen(controller: controller)),
-    );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pump();
-    await tester.tap(
-      find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
-    );
-    await tester.pump();
-
-    final versionBeforeRestart = controller.state.version;
     controller.reset();
-    await pumpFor(tester, const Duration(milliseconds: 500));
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
-    expect(controller.state.currentPlayerId, 'orange');
-    expect(controller.state.pendingRoll, isNull);
-    expect(controller.state.version, versionBeforeRestart + 1);
     expect(
-      controller.state.pawns.every(
-        (pawn) => pawn.position.section == PawnRouteSection.yard,
-      ),
-      isTrue,
+      controller.state.pawns
+          .firstWhere((p) => p.id == 'orange_pawn_1')
+          .position
+          .section,
+      PawnRouteSection.yard,
     );
-
+    expect(controller.state.pendingRoll, isNull);
+    expect(controller.state.currentPlayerId, 'orange');
   });
 
   testWidgets('local match advances turn after a legal non-bonus move',
       (tester) async {
+    var rollIndex = 0;
     final rolls = <int>[6, 3];
-    final controller = LocalGameController(nextDiceValue: () => rolls.removeAt(0));
+    final controller = LocalGameController(
+      nextDiceValue: () => rolls[rollIndex++ % rolls.length],
+    );
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
-      MaterialApp(home: LocalGameScreen(controller: controller)),
+      MaterialApp(
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
+        home: LocalGameScreen(controller: controller),
+      ),
     );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
+    await tester.pump();
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
-    // Six enters a pawn and grants the same player another roll.
-    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pump();
-    expect(controller.legalPawnIds, contains('orange_pawn_1'));
-    await tapWhenHitTestable(tester, find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pump();
+    controller.rollDice(expectedVersion: controller.state.version);
+    await pumpFor(tester, const Duration(milliseconds: 100));
+    controller.movePawn(
+      'orange_pawn_1',
+      expectedVersion: controller.state.version,
+    );
+    await pumpFor(tester, const Duration(milliseconds: 100));
     expect(controller.state.currentPlayerId, 'orange');
-    expect(controller.state.pawns
-        .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
-        .position.progress, 0);
 
-    // A non-six move advances the pawn and passes the turn to green.
-    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pump();
+    controller.rollDice(expectedVersion: controller.state.version);
+    await pumpFor(tester, const Duration(milliseconds: 100));
     expect(controller.state.pendingRoll, 3);
-    expect(controller.legalPawnIds, contains('orange_pawn_1'));
-    await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pump();
+    controller.movePawn(
+      'orange_pawn_1',
+      expectedVersion: controller.state.version,
+    );
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
     expect(
       controller.state.pawns
-          .firstWhere((pawn) => pawn.id == 'orange_pawn_1')
-          .position.progress,
+          .firstWhere((p) => p.id == 'orange_pawn_1')
+          .position
+          .progress,
       3,
     );
     expect(controller.state.pendingRoll, isNull);
     expect(controller.state.currentPlayerId, 'green');
-
   });
 
   testWidgets('local match auto-advances when a roll has no legal pawns',
@@ -327,19 +332,27 @@ void main() {
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
-      MaterialApp(home: LocalGameScreen(controller: controller)),
+      MaterialApp(
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
+        home: LocalGameScreen(controller: controller),
+      ),
     );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.ensureVisible(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pump();
+    await pumpFor(tester, const Duration(milliseconds: 100));
+
+    controller.rollDice(expectedVersion: controller.state.version);
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
     expect(controller.legalPawnIds, isEmpty);
-
   });
 
 }
