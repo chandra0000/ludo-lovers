@@ -81,10 +81,10 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
         button: true,
         enabled: widget.enabled && !_locked,
         label: widget.rolling ? 'Rolling dice' : 'Dice face $_displayFace. Roll dice',
-        child: GestureDetector(
+        child: InkWell(
           key: const ValueKey('roll_dice_button'),
-          behavior: HitTestBehavior.opaque,
           onTap: widget.enabled && !_locked ? widget.onRoll : null,
+          borderRadius: BorderRadius.circular(16),
           child: Center(
             key: const ValueKey('animated_dice_widget'),
             child: AnimatedBuilder(
@@ -140,7 +140,7 @@ class _DiceFace extends StatelessWidget {
                 child: Container(
                   width: 7,
                   height: 7,
-                  decoration: const BoxDecoration(color: Color(0xFF3A2818), shape: BoxShape.circle),
+                  decoration: const BoxDecoration(color: AppTheme.panel, shape: BoxShape.circle),
                 ),
               ),
             ),
