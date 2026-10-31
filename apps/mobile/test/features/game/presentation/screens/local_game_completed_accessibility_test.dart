@@ -5,6 +5,17 @@ import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart'
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+Future<void> pumpFor(WidgetTester tester, Duration duration) async {
+  const step = Duration(milliseconds: 100);
+  var elapsed = Duration.zero;
+  while (elapsed < duration) {
+    final remaining = duration - elapsed;
+    final interval = remaining < step ? remaining : step;
+    await tester.pump(interval);
+    elapsed += interval;
+  }
+}
+
 void main() {
   testWidgets(
     'completed match announces restart guidance and Rematch resets it',
@@ -73,7 +84,7 @@ void main() {
         find.byKey(const ValueKey('results_rematch_button')),
       );
       await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(find.text('MATCH WON'), findsNothing);
       expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
