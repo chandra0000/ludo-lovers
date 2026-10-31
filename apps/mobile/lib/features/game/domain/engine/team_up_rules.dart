@@ -80,23 +80,8 @@ final class TeamUpRules {
     return members.every(playersWithAllPawnsFinished.contains);
   }
 
-  /// Selects the most recently moved pawn from an opposing stack.
-  /// The engine supplies each pawn's last-move state version, so the choice is
-  /// deterministic and does not depend on list/render order.
-  static String? selectLastArrivalPawnId(
-    Map<String, int> lastMovedAtVersionByPawnId,
-  ) {
-    if (lastMovedAtVersionByPawnId.isEmpty) return null;
-    final entries = lastMovedAtVersionByPawnId.entries.toList()
-      ..sort((a, b) {
-        final byArrival = b.value.compareTo(a.value);
-        return byArrival != 0 ? byArrival : a.key.compareTo(b.key);
-      });
-    return entries.first.key;
-  }
-
   /// Safe cells protect everyone. Else, teammates share a friendly stack;
-  /// opposing teams are subject to the Team Up stack-capture policy.
+  /// opposing teams use the configured local opponent-stack capture policy.
   static TeamUpCellOutcome classifyCell({
     required String arrivingPlayerId,
     required String occupyingPlayerId,
