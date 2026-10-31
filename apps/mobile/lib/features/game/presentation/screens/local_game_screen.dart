@@ -1253,6 +1253,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       color: _colors[visual.playerId] ?? AppTheme.cream,
                       diameter: diameter,
                       eligible: isSelectable,
+                      stackedCount: visual.occupantCount,
                       label: _accessiblePawnName(visual.pawnId),
                       onTap: isLegal
                           ? () => _controller.movePawn(
@@ -1327,6 +1328,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         isYard: visual.isYard,
         isFinished: visual.isFinished,
         isStacked: isStacked,
+        occupantCount: occupants.length,
         stackOffset: isStacked && !visual.isFinished
             ? _stackOffsets[stackIndex % _stackOffsets.length]
             : Offset.zero,
@@ -1505,6 +1507,7 @@ class _PawnVisual {
     required this.playerId,
     required this.point,
     this.isStacked = false,
+    this.occupantCount = 1,
     this.isYard = false,
     this.isFinished = false,
     this.stackOffset = Offset.zero,
@@ -1514,6 +1517,7 @@ class _PawnVisual {
   final String playerId;
   final BoardPoint point;
   final bool isStacked;
+  final int occupantCount;
   final bool isYard;
   final bool isFinished;
   final Offset stackOffset;
