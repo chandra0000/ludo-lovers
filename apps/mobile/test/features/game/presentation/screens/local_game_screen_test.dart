@@ -284,7 +284,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
+        home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
     await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
@@ -1579,12 +1579,10 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
+        home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
 
-    await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
-    await tester.pump();
     expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
@@ -1693,12 +1691,10 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
+        home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
 
-    await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
-    await tester.pump();
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
