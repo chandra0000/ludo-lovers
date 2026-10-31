@@ -16,6 +16,7 @@ void main() {
       expect(setup.initialState.pawns, hasLength(16));
       expect(setup.initialState.scheduledPlayerIndex, 0);
       expect(setup.engine.isTeamUp, isTrue);
+      expect(setup.engine.profile.id, 'team-up-v1-provisional');
     });
 
     test('rejects Team Up when seats are missing or out of scheduled order', () {
@@ -295,7 +296,6 @@ void main() {
         allowProvisionalRoutes: true,
         mode: LocalGameMode.teamUp,
       );
-      final magentaProgress = setup.paths.forPlayer('magenta');
       final state = setup.initialState.copyWith(
         currentPlayerIndex: 2,
         scheduledPlayerIndex: 0,
@@ -465,6 +465,7 @@ void main() {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       expect(setup.mode, LocalGameMode.classic);
       expect(setup.engine.isTeamUp, isFalse);
+      expect(setup.engine.profile.id, 'classic-v1-provisional');
       expect(setup.initialState.players, LocalGameFactory.playerIds);
       expect(setup.initialState.pawns, hasLength(16));
     });
