@@ -932,7 +932,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         cacheHeight: 2048,
                         filterQuality: FilterQuality.high,
                         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                          if (wasSynchronouslyLoaded || frame != null) return child;
+                          if (wasSynchronouslyLoaded || frame != null) {
+                            return child;
+                          }
                           return const DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
