@@ -909,12 +909,44 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       top: frameTop,
                       width: frameWidth,
                       height: frameHeight,
-                      child: const Image(
-                        key: ValueKey('live_game_board_artwork'),
-                        image: AssetImage('assets/images/ludo_board_glass.png'),
+                      child: Image.asset(
+                        'assets/images/ludo_board_glass.png',
+                        key: const ValueKey('live_game_board_artwork'),
                         fit: BoxFit.fill,
+                        alignment: Alignment.center,
+                        // The source artwork is larger than a phone needs.
+                        // Decode close to the maximum 2x portrait canvas size
+                        // to avoid allocating a huge full-resolution bitmap on
+                        // memory-constrained Android devices.
+                        cacheWidth: 1152,
+                        cacheHeight: 2048,
                         filterQuality: FilterQuality.high,
                         semanticLabel: 'Complete Ludo Lovers portrait game layout',
+                        errorBuilder: (context, error, stackTrace) => DecoratedBox(
+                          key: const ValueKey('live_game_board_artwork_fallback'),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: <Color>[
+                                AppTheme.black,
+                                AppTheme.panel,
+                                AppTheme.black,
+                              ],
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'LUDO LOVERS',
+                              style: TextStyle(
+                                color: AppTheme.gold,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 3,
+                                fontSize: 24,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     // Keep decorative/social controls behind gameplay hit targets.
