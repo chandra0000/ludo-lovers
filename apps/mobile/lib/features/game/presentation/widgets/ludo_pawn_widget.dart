@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/theme/app_theme.dart';
 
 /// Layered 2.5D token. Game rules and legal-move selection stay outside this widget.
 class LudoPawnWidget extends StatefulWidget {
@@ -94,7 +95,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                           ),
                           border: Border.all(color: AppTheme.gold, width: 1.5),
                           boxShadow: const [
-                            BoxShadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 3)),
+                            BoxShadow(color: AppTheme.black.withValues(alpha: 0.45), blurRadius: 4, offset: Offset(0, 3)),
                           ],
                         ),
                         child: Center(
@@ -103,7 +104,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                             height: visual * 0.27,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.88),
+                              color: AppTheme.cream.withValues(alpha: 0.88),
                               border: Border.all(color: Colors.white, width: 0.7),
                             ),
                           ),
@@ -117,7 +118,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                             decoration: BoxDecoration(
                               color: AppTheme.panel,
                               shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFFFFD978)),
+                              border: Border.all(color: AppTheme.gold),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(2),
