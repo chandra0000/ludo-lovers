@@ -121,7 +121,9 @@ Future<void> rollAndMove(
 }
 
 void main() {
-  testWidgets('chat opens its offline information sheet', (tester) async {
+  testWidgets('chat shows a brief offline toast without interrupting play', (
+    tester,
+  ) async {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
@@ -134,30 +136,15 @@ void main() {
 
     final chatButton = find.byKey(const ValueKey('open_match_chat_button'));
     expect(chatButton, findsOneWidget);
-    final chatTap = find.descendant(
-      of: chatButton,
-      matching: find.byType(InkWell),
-    );
-    expect(chatTap, findsOneWidget);
-    final chatInkWell = tester.widget<InkWell>(chatTap);
-    expect(chatInkWell.onTap, isNotNull);
-    chatInkWell.onTap!();
-    await pumpFor(tester, const Duration(milliseconds: 500));
+    await tester.tap(chatButton);
+    await pumpFor(tester, const Duration(milliseconds: 250));
 
-    expect(find.text('Match Chat'), findsOneWidget);
-    expect(find.text('OFFLINE'), findsOneWidget);
-    expect(
-      find.text(
-        'Online chat is coming soon. You can keep playing your local match while we prepare multiplayer chat.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.textContaining('You are playing offline.'), findsOneWidget);
+    expect(find.text('Online mode is not enabled'), findsOneWidget);
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
 
-    final input = tester.widget<TextField>(
-      find.byKey(const ValueKey('offline_chat_message_input')),
-    );
-    expect(input.enabled, isFalse);
+    await pumpFor(tester, const Duration(seconds: 2));
+    expect(find.text('Online mode is not enabled'), findsNothing);
   });
 
   testWidgets('starts a local two-player match with user-selected colours', (
