@@ -754,7 +754,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 title: 'Choose a glowing pawn',
                 detail: 'After a roll, only pawns marked with a gold ring can be moved.',
               ),
-              const _RuleRow(
+              _RuleRow(
                 number: '3',
                 title: 'Safe stars & captures',
                 detail: _controller.setup.engine.isTeamUp
