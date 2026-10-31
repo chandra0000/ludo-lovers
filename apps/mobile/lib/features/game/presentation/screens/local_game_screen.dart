@@ -873,6 +873,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             // All gameplay overlays use the supplied 576 x 1024 artwork
             // coordinate system. The complete 9:16 artwork is uniformly scaled;
             // board and controls are never positioned from guessed percentages.
+            if (!viewport.maxWidth.isFinite ||
+                !viewport.maxHeight.isFinite ||
+                viewport.maxWidth <= 0 ||
+                viewport.maxHeight <= 0) {
+              return _GameplayRenderFallback(
+                message: 'The Android viewport has invalid dimensions.',
+                onBack: () => Navigator.of(context).maybePop(),
+              );
+            }
             const designWidth = 576.0;
             const designHeight = 1024.0;
             final scale = math.min(
@@ -922,6 +931,32 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         cacheWidth: 1152,
                         cacheHeight: 2048,
                         filterQuality: FilterQuality.high,
+                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded || frame != null) return child;
+                          return const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: <Color>[
+                                  AppTheme.black,
+                                  AppTheme.panel,
+                                  AppTheme.black,
+                                ],
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'LOADING LUDO BOARD…',
+                                style: TextStyle(
+                                  color: AppTheme.gold,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                         semanticLabel: 'Complete Ludo Lovers portrait game layout',
                         errorBuilder: (context, error, stackTrace) => DecoratedBox(
                           key: const ValueKey('live_game_board_artwork_fallback'),
@@ -938,7 +973,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           ),
                           child: const Center(
                             child: Text(
-                              'LUDO LOVERS',
+                              'BOARD ARTWORK UNAVAILABLE',
                               style: TextStyle(
                                 color: AppTheme.gold,
                                 fontWeight: FontWeight.w900,
