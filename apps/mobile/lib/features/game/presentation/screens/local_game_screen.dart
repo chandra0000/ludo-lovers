@@ -939,62 +939,55 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     if (_controller.setup.engine.isTeamUp)
                       Positioned(
                         left: dx(62),
-                        top: dy(132),
+                        top: dy(122),
                         width: ds(452),
-                        height: ds(34),
+                        height: ds(46),
                         child: DecoratedBox(
                           key: const ValueKey('team_up_identity_banner'),
                           decoration: BoxDecoration(
-                            color: AppTheme.panel.withValues(alpha: 0.94),
+                            color: AppTheme.panel.withValues(alpha: 0.96),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: AppTheme.gold.withValues(alpha: 0.8)),
                           ),
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: ds(8)),
-                            child: Row(
+                            padding: EdgeInsets.symmetric(horizontal: ds(8), vertical: ds(3)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Expanded(
-                                  child: _TeamIdentityLabel(
-                                    label: 'TEAM A',
-                                    members: 'ORANGE + MAGENTA',
-                                    color: AppTheme.orange,
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: _TeamIdentityLabel(
+                                          label: 'TEAM A',
+                                          members: 'ORANGE + MAGENTA',
+                                          color: AppTheme.orange,
+                                        ),
+                                      ),
+                                      Container(width: 1, height: ds(24), color: AppTheme.gold.withValues(alpha: 0.45)),
+                                      Expanded(
+                                        child: _TeamIdentityLabel(
+                                          label: 'TEAM B',
+                                          members: 'GREEN + BLUE',
+                                          color: AppTheme.green,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Container(width: 1, height: ds(22), color: AppTheme.gold.withValues(alpha: 0.45)),
-                                Expanded(
-                                  child: _TeamIdentityLabel(
-                                    label: 'TEAM B',
-                                    members: 'GREEN + BLUE',
-                                    color: AppTheme.green,
+                                if (state.scheduledPlayerIndex != state.currentPlayerIndex)
+                                  Text(
+                                    'TURN TRANSFERRED · ${state.scheduledPlayerId.toUpperCase()} → ${current.toUpperCase()}',
+                                    key: const ValueKey('team_up_turn_transfer_banner'),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppTheme.gold,
+                                      fontSize: ds(9),
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
-                                ),
                               ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (_controller.setup.engine.isTeamUp &&
-                        state.scheduledPlayerIndex != state.currentPlayerIndex)
-                      Positioned(
-                        left: dx(76),
-                        top: dy(170),
-                        width: ds(424),
-                        child: Container(
-                          key: const ValueKey('team_up_turn_transfer_banner'),
-                          padding: EdgeInsets.symmetric(horizontal: ds(8), vertical: ds(4)),
-                          decoration: BoxDecoration(
-                            color: AppTheme.black.withValues(alpha: 0.88),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppTheme.gold.withValues(alpha: 0.65)),
-                          ),
-                          child: Text(
-                            'TURN TRANSFERRED · ${state.scheduledPlayerId.toUpperCase()} → ${current.toUpperCase()}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppTheme.gold,
-                              fontSize: ds(9),
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
@@ -1629,8 +1622,8 @@ class _TeamIdentityLabel extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(label, style: TextStyle(color: color, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1)),
-        Text(members, textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.readableText, fontSize: 8, fontWeight: FontWeight.w800)),
+        Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+        Text(members, textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.readableText, fontSize: 11, fontWeight: FontWeight.w800)),
       ],
     );
   }
