@@ -1090,6 +1090,25 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             ),
                           ),
                           TextButton.icon(
+                            key: const ValueKey('player_setup_button'),
+                            onPressed: _showPlayerSetup,
+                            icon: Icon(Icons.groups_outlined, size: ds(12)),
+                            label: Text(
+                              'Players',
+                              style: TextStyle(
+                                fontSize: ds(9),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.mutedText,
+                              padding: EdgeInsets.symmetric(horizontal: ds(4)),
+                              minimumSize: Size(0, ds(24)),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                          TextButton.icon(
                             key: const ValueKey('restart_match_button'),
                             onPressed: _confirmRestart,
                             icon: Icon(Icons.restart_alt, size: ds(12)),
