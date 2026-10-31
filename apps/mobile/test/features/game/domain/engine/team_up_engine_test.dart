@@ -151,6 +151,12 @@ void main() {
               progress: orangeTargetProgress - 1,
             ));
           }
+          if (pawn.id == 'magenta_pawn_1') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: magentaProgress,
+            ));
+          }
           if (pawn.id == 'green_pawn_1') {
             return pawn.copyWith(position: PawnRoutePosition(
               section: PawnRouteSection.mainTrack,
@@ -190,9 +196,12 @@ void main() {
       final targetCell = orangePath.cellAtProgress(2)!;
       final greenProgress =
           setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final magentaProgress =
+          setup.paths.forPlayer('magenta').mainTrackCells.indexOf(targetCell);
       final blueProgress =
           setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
       expect(greenProgress, greaterThanOrEqualTo(0));
+      expect(magentaProgress, greaterThanOrEqualTo(0));
       expect(blueProgress, greaterThanOrEqualTo(0));
 
       final state = setup.initialState.copyWith(
@@ -240,9 +249,13 @@ void main() {
       final blue = transition.state.pawns.firstWhere(
         (pawn) => pawn.id == 'blue_pawn_1',
       );
+      final magenta = transition.state.pawns.firstWhere(
+        (pawn) => pawn.id == 'magenta_pawn_1',
+      );
 
       expect(green.position.section, PawnRouteSection.mainTrack);
       expect(blue.position.section, PawnRouteSection.yard);
+      expect(magenta.position.section, PawnRouteSection.mainTrack);
       expect(
         transition.events.where((event) => event.type == 'PawnCaptured')
             .map((event) => event.pawnId),
