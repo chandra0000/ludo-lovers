@@ -620,7 +620,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const AppTheme.panelRaised,
+                color: AppTheme.panelRaised,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppTheme.gold.withValues(alpha: 0.3)),
               ),
@@ -648,7 +648,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const AppTheme.panel,
+                color: AppTheme.panel,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Column(
@@ -1405,7 +1405,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             shape: BoxShape.circle,
             color: AppTheme.gold.withValues(alpha: 0.20),
             border: Border.all(
-              color: const AppTheme.cream,
+              color: AppTheme.cream,
               width: math.max(1.5, cellSize * 0.075),
             ),
             boxShadow: <BoxShadow>[
@@ -1426,7 +1426,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               width: cellSize * 0.15,
               height: cellSize * 0.15,
               decoration: BoxDecoration(
-                color: const AppTheme.cream,
+                color: AppTheme.cream,
                 shape: BoxShape.circle,
                 boxShadow: <BoxShadow>[
                   BoxShadow(
