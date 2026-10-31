@@ -332,6 +332,11 @@ void main() {
             .map((event) => event.capturedPawnId),
         <String>['blue_pawn_1'],
       );
+      expect(transition.state.currentPlayerId, 'green');
+      expect(
+        transition.events.map((event) => event.type),
+        contains('ExtraRollGranted'),
+      );
     });
 
     test('keeps the earlier stack when the last-arriving side leaves first', () {
