@@ -758,7 +758,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 number: '3',
                 title: 'Safe stars & captures',
                 detail: _controller.setup.engine.isTeamUp
-                    ? 'Safe stars protect everyone. Teammates can share cells and never capture each other. On an unsafe opposing stack, only its most recently moved pawn is captured.'
+                    ? 'Safe stars protect everyone. Teammates can share cells and never capture each other. On unsafe mixed stacks, the last arrival has priority: the stacks remain until one side leaves; if the protected side leaves while the priority side remains, its remaining pawns are captured. Equal-sized stacks are resolved in favour of the last arrival.'
                     : 'Star tiles are safe squares. Landing on an opponent on an unprotected square sends that pawn back to its yard and earns a capture reward roll.',
               ),
               const _RuleRow(
