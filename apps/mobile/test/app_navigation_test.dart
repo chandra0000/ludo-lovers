@@ -38,7 +38,7 @@ void main() {
     expect(find.byKey(const ValueKey('mode_two_players_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_four_players_button')), findsOneWidget);
 
-    await tester.pageBack();
+    Navigator.of(tester.element(find.text('Pick your way to play'))).pop();
     await tester.pumpAndSettle();
     expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
   });
@@ -98,7 +98,7 @@ void main() {
 
 
 
-    await tester.pageBack();
+    Navigator.of(tester.element(find.byKey(const ValueKey('roll_dice_button')))).pop();
     await tester.pumpAndSettle();
     final fourPlayerAction = find.text('Start 4-player game');
     await tester.ensureVisible(fourPlayerAction);
