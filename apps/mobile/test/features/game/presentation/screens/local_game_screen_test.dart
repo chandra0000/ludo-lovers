@@ -7,6 +7,20 @@ import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_en
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+Future<void> tapWhenHitTestable(WidgetTester tester, Finder finder) async {
+  final target = finder.hitTestable();
+  for (var attempt = 0; attempt < 40; attempt++) {
+    if (target.evaluate().isNotEmpty) {
+      await tester.tap(target);
+      await tester.pump();
+      return;
+    }
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  expect(target, findsOneWidget,
+      reason: 'The control did not become hit-testable after waiting for route transitions.');
+}
+
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
   // Advance in bounded frames: a single long pump can skip intermediate
   // animation frames and leave route/board overlays in an input-blocking state.
@@ -23,7 +37,7 @@ Future<void> tapDice(WidgetTester tester) async {
   final dice = find.byKey(const ValueKey('roll_dice_button'));
   await tester.ensureVisible(dice);
   await pumpFor(tester, const Duration(milliseconds: 50));
-  await tester.tap(dice);
+  await tapWhenHitTestable(tester, dice);
   await tester.pump();
 }
 
@@ -32,7 +46,7 @@ Future<void> tapPawn(WidgetTester tester, String pawnId) async {
   await tester.ensureVisible(pawn);
   await pumpFor(tester, const Duration(milliseconds: 50));
   expect(pawn, findsOneWidget);
-  await tester.tap(pawn);
+  await tapWhenHitTestable(tester, pawn);
   await tester.pump();
 }
 
@@ -58,7 +72,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-    await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
+    await tapWhenHitTestable(tester, find.byKey(const ValueKey('open_match_chat_button')));
     await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Match Chat'), findsOneWidget);
