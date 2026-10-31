@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
-import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_engine.dart';
 import 'package:ludo_lovers/features/game/domain/engine/team_up_rules.dart';
 
 void main() {
@@ -136,7 +135,7 @@ void main() {
       final safeCell = setup.engine.safeCellIndexes.firstWhere(
         (cell) =>
             orangePath.mainTrackCells.indexOf(cell) > 0 &&
-            greenPath.mainTrackCells.indexOf(cell) >= 0,
+            greenPath.mainTrackCells.contains(cell),
       );
       final orangeTargetProgress = orangePath.mainTrackCells.indexOf(safeCell);
       final greenTargetProgress = greenPath.mainTrackCells.indexOf(safeCell);
