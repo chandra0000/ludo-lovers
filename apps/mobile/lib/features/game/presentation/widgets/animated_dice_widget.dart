@@ -77,10 +77,15 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
   }
 
   @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        enabled: widget.enabled && !_locked,
-        label: widget.rolling ? 'Rolling dice' : 'Dice face $_displayFace. Roll dice',
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      enabled: widget.enabled && !_locked,
+      label: widget.rolling
+          ? 'Rolling dice'
+          : 'Dice face $_displayFace. Roll dice',
+      child: Material(
+        type: MaterialType.transparency,
         child: InkWell(
           key: const ValueKey('roll_dice_button'),
           onTap: widget.enabled && !_locked ? widget.onRoll : null,
@@ -97,14 +102,18 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
                   angle: widget.rolling ? _rotation : 0,
                   child: Transform.scale(
                     scale: pulse,
-                    child: _DiceFace(value: widget.rolling ? _displayFace : widget.value),
+                    child: _DiceFace(
+                      value: widget.rolling ? _displayFace : widget.value,
+                    ),
                   ),
                 );
               },
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _DiceFace extends StatelessWidget {
