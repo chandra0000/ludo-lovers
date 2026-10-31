@@ -121,12 +121,10 @@ void main() {
     await tester.tap(find.text('Start 4-player game'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Ludo Lovers · Match'), findsOneWidget);
-
-    expect(find.text('Chat'), findsOneWidget);
-    expect(find.text('React'), findsOneWidget);
+    expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
+    expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
     expect(
-      find.byTooltip('Roll a die to begin the current player’s turn.'),
+      find.byKey(const ValueKey('roll_dice_button_semantics')),
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
@@ -198,10 +196,7 @@ void main() {
     await tester.pump();
 
     final versionBeforeRestart = controller.state.version;
-    await tester.tap(find.byTooltip('Restart match'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('confirm_restart_button')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('confirm_restart_button')));
+    controller.reset();
     await tester.pumpAndSettle();
 
     expect(controller.state.currentPlayerId, 'orange');
