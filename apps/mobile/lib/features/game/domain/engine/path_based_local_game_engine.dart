@@ -7,6 +7,7 @@ library;
 import '../board/ludo_board_paths.dart';
 import 'ludo_path_movement.dart';
 import 'ludo_rule_profile.dart';
+import 'team_up_rules.dart';
 
 class LocalPawn {
   const LocalPawn({
@@ -31,13 +32,16 @@ class LocalGameState {
     required List<String> players,
     required List<LocalPawn> pawns,
     required this.currentPlayerIndex,
+    int? scheduledPlayerIndex,
     this.pendingRoll,
     this.consecutiveSixes = 0,
     this.completed = false,
     this.winnerPlayerId,
+    this.winnerTeamId,
     this.version = 0,
   }) : pawns = List<LocalPawn>.unmodifiable(pawns),
-       players = List<String>.unmodifiable(players) {
+       players = List<String>.unmodifiable(players),
+       scheduledPlayerIndex = scheduledPlayerIndex ?? currentPlayerIndex {
     if (this.players.length < 2 || this.players.length > 4) {
       throw ArgumentError('A local game requires 2 to 4 players.');
     }
@@ -47,6 +51,9 @@ class LocalGameState {
     }
     if (currentPlayerIndex < 0 || currentPlayerIndex >= this.players.length) {
       throw ArgumentError.value(currentPlayerIndex, 'currentPlayerIndex');
+    }
+    if (this.scheduledPlayerIndex < 0 || this.scheduledPlayerIndex >= this.players.length) {
+      throw ArgumentError.value(this.scheduledPlayerIndex, 'scheduledPlayerIndex');
     }
     if (this.pawns.any((pawn) => !this.players.contains(pawn.playerId))) {
       throw ArgumentError('Every pawn must belong to a player in this game.');
@@ -76,10 +83,13 @@ class LocalGameState {
   final List<String> players;
   final List<LocalPawn> pawns;
   final int currentPlayerIndex;
+  /// Seat whose turn is scheduled, distinct from a teammate receiving a transferred roll.
+  final int scheduledPlayerIndex;
   final int? pendingRoll;
   final int consecutiveSixes;
   final bool completed;
   final String? winnerPlayerId;
+  final String? winnerTeamId;
   final int version;
 
   String get currentPlayerId => players[currentPlayerIndex];
@@ -87,20 +97,24 @@ class LocalGameState {
   LocalGameState copyWith({
     List<LocalPawn>? pawns,
     int? currentPlayerIndex,
+    int? scheduledPlayerIndex,
     int? pendingRoll,
     bool clearPendingRoll = false,
     int? consecutiveSixes,
     bool? completed,
     String? winnerPlayerId,
+    String? winnerTeamId,
     int? version,
   }) => LocalGameState(
         players: players,
         pawns: pawns ?? this.pawns,
         currentPlayerIndex: currentPlayerIndex ?? this.currentPlayerIndex,
+        scheduledPlayerIndex: scheduledPlayerIndex ?? this.scheduledPlayerIndex,
         pendingRoll: clearPendingRoll ? null : (pendingRoll ?? this.pendingRoll),
         consecutiveSixes: consecutiveSixes ?? this.consecutiveSixes,
         completed: completed ?? this.completed,
         winnerPlayerId: winnerPlayerId ?? this.winnerPlayerId,
+        winnerTeamId: winnerTeamId ?? this.winnerTeamId,
         version: version ?? this.version,
       );
 }
@@ -363,6 +377,7 @@ class PathBasedLocalGameEngine {
   bool get thirdSixEndsTurnWithoutMove => profile.thirdSixEndsTurnWithoutMove;
   bool get finishEndsMatchImmediately => profile.finishEndsMatchImmediately;
   bool get captureOnlySingleOpponentPawn => profile.captureOnlySingleOpponentPawn;
+  bool get isTeamUp => profile.isTeamUp;
 
   LocalGameTransition roll(
     LocalGameState state, {
@@ -482,6 +497,7 @@ class PathBasedLocalGameEngine {
         if (i == index) continue;
         final other = pawns[i];
         if (other.playerId == playerId ||
+            (isTeamUp && TeamUpRules.teamFor(other.playerId) == TeamUpRules.teamFor(playerId)) ||
             other.position.section != PawnRouteSection.mainTrack) {
           continue;
         }
@@ -521,18 +537,27 @@ class PathBasedLocalGameEngine {
       events.add(PawnFinished(playerId: playerId, pawnId: pawnId));
     }
 
-    final allFinished = pawns
-        .where((item) => item.playerId == playerId)
-        .every((item) => item.position.section == PawnRouteSection.finished);
+    final finishedPlayers = <String>{
+      for (final id in state.players)
+        if (pawns.where((item) => item.playerId == id).every(
+          (item) => item.position.section == PawnRouteSection.finished,
+        )) id,
+    };
+    final allFinished = finishedPlayers.contains(playerId);
+    final teamWon = isTeamUp && TeamUpRules.hasTeamWon(
+      team: TeamUpRules.teamFor(playerId),
+      playersWithAllPawnsFinished: finishedPlayers,
+    );
     var next = state.copyWith(
       pawns: pawns,
       clearPendingRoll: true,
       version: state.version + 1,
     );
-    if (allFinished && finishEndsMatchImmediately) {
+    if ((isTeamUp ? teamWon : allFinished) && finishEndsMatchImmediately) {
       next = next.copyWith(
         completed: true,
         winnerPlayerId: playerId,
+        winnerTeamId: isTeamUp ? TeamUpRules.teamFor(playerId).name : null,
         version: next.version,
       );
       events.add(GameCompleted(playerId: playerId));
@@ -594,30 +619,47 @@ class PathBasedLocalGameEngine {
   }
 
   LocalGameState _advance(LocalGameState state) {
-    // Search each other player at most once. Never silently leave the turn on
-    // a player whose pawns are all finished if no eligible player exists.
+    // Classic mode advances directly from the active seat. Team Up keeps the
+    // scheduled seat separate because a finished seat can transfer its roll.
     for (var offset = 1; offset <= state.players.length; offset++) {
-      final candidateIndex =
-          (state.currentPlayerIndex + offset) % state.players.length;
+      final candidateIndex = (state.scheduledPlayerIndex + offset) % state.players.length;
       final candidateId = state.players[candidateIndex];
-      final candidatePawns =
-          state.pawns.where((pawn) => pawn.playerId == candidateId).toList();
+      final candidatePawns = state.pawns.where((pawn) => pawn.playerId == candidateId);
       final hasUnfinishedPawn = candidatePawns.any(
         (pawn) => pawn.position.section != PawnRouteSection.finished,
       );
-      if (candidatePawns.isNotEmpty && hasUnfinishedPawn) {
+      if (isTeamUp) {
+        final finishedPlayers = <String>{
+          for (final id in state.players)
+            if (state.pawns.where((pawn) => pawn.playerId == id).every(
+              (pawn) => pawn.position.section == PawnRouteSection.finished,
+            )) id,
+        };
+        final recipient = TeamUpRules.recipientForScheduledRoll(
+          scheduledPlayerId: candidateId,
+          playersWithAllPawnsFinished: finishedPlayers,
+        );
+        if (recipient != null) {
+          return state.copyWith(
+            currentPlayerIndex: state.players.indexOf(recipient),
+            scheduledPlayerIndex: candidateIndex,
+            clearPendingRoll: true,
+            consecutiveSixes: 0,
+            version: state.version,
+          );
+        }
+      } else if (candidatePawns.isNotEmpty && hasUnfinishedPawn) {
         return state.copyWith(
           currentPlayerIndex: candidateIndex,
+          scheduledPlayerIndex: candidateIndex,
           clearPendingRoll: true,
           consecutiveSixes: 0,
           version: state.version,
         );
       }
     }
-
     throw StateError(
-      'Cannot advance turn: no player has an unfinished pawn. '
-      'The game state should have been completed before turn advancement.',
+      'Cannot advance turn: no eligible player remains. The match should have completed first.',
     );
   }
 }
