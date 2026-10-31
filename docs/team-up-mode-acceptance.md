@@ -18,8 +18,8 @@ Status: local-mode implementation and acceptance tests. This is not an online or
 - A player cannot capture their own pawns.
 - Teammates may share an unsafe cell; a teammate's pawn is never a capture target.
 - Safe cells protect every pawn, including pawns from opposing teams.
-- On an unsafe cell occupied by multiple opposing pawns, Team Up captures only the pawn with the greatest `lastMovedAtVersion` (the most recent arrival).
-- If imported/test state gives multiple opposing pawns the same arrival version, pawn ID ascending is the deterministic tie-break.
+- Teammate pawns are excluded from capture candidates before the opponent-stack policy is applied.
+- Team Up uses the existing configured local opponent-stack policy; it does not invent a new priority rule. With the default `captureOnlySingleOpponentPawn: true`, a single opposing pawn on an unsafe cell is captured, while a stack of multiple opposing pawns is protected. If a profile explicitly sets this flag to false, the existing profile behavior captures every opposing pawn in that stack.
 - Captured pawns return to their own yard. Capture bonus behavior continues to use the configured local rule profile.
 
 ## Victory
@@ -43,7 +43,7 @@ The automated suite covers:
 - rejection of incomplete or incorrectly ordered Team Up seats;
 - finished-seat transfer to the correct teammate;
 - bonus-six retention by the active teammate and return to the next scheduled seat after the bonus ends;
-- teammate protection, opposing safe-cell protection, and last-arrival capture priority (including deterministic tie-break);
+- teammate protection and capture priority, opposing safe-cell protection, single-opponent capture, and protection of a multi-pawn opposing stack under the existing default policy;
 - Team A and Team B victory, plus no premature victory while one teammate has an unfinished pawn;
 - explicit Team Up navigation, team identity banner, and transferred-turn indicator;
 - Classic factory profile and independent Classic turn advancement.
