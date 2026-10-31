@@ -47,7 +47,7 @@ void main() {
     expect(find.text('MATCH WON'), findsOneWidget);
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
 
-    final rollButton = tester.widget<ElevatedButton>(
+    final rollButton = tester.widget<InkWell>(
       find.byKey(const ValueKey('roll_dice_button')),
     );
     expect(rollButton.onPressed, isNull);
