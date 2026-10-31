@@ -496,41 +496,63 @@ class PathBasedLocalGameEngine {
     }
 
     final pawns = List<LocalPawn>.of(state.pawns);
-    pawns[index] = pawn.copyWith(position: result.resolution!.position);
     final capturedPawnIds = <String>[];
+    final capturePriorityByCell =
+        Map<int, TeamUpTeam>.of(state.teamUpCapturePriorityByCell);
+    final originCell = pawn.position.section == PawnRouteSection.mainTrack
+        ? paths.forPlayer(playerId).cellAtProgress(pawn.position.progress!)
+        : null;
+    pawns[index] = pawn.copyWith(position: result.resolution!.position);
+
+    if (isTeamUp && originCell != null) {
+      _resolveTeamUpStackDeparture(
+        pawns: pawns,
+        movingPlayerId: playerId,
+        cellId: originCell,
+        priorityByCell: capturePriorityByCell,
+        capturedPawnIds: capturedPawnIds,
+      );
+    }
+
     final destination = result.resolution!.destinationCell;
     if (destination != null && !safeCellIndexes.contains(destination)) {
-      final opponentIndexes = <int>[];
-      for (var i = 0; i < pawns.length; i++) {
-        if (i == index) continue;
-        final other = pawns[i];
-        if (other.playerId == playerId ||
-            (isTeamUp && TeamUpRules.teamFor(other.playerId) == TeamUpRules.teamFor(playerId)) ||
-            other.position.section != PawnRouteSection.mainTrack) {
-          continue;
+      if (isTeamUp) {
+        _resolveTeamUpStackArrival(
+          pawns: pawns,
+          arrivingPlayerId: playerId,
+          cellId: destination,
+          priorityByCell: capturePriorityByCell,
+          capturedPawnIds: capturedPawnIds,
+        );
+      } else {
+        final opponentIndexes = <int>[];
+        for (var i = 0; i < pawns.length; i++) {
+          if (i == index) continue;
+          final other = pawns[i];
+          if (other.playerId == playerId ||
+              other.position.section != PawnRouteSection.mainTrack) {
+            continue;
+          }
+          final otherProgress = other.position.progress;
+          if (otherProgress == null) {
+            throw StateError(
+              'Invalid game state: main-track pawn ${other.id} has no progress.',
+            );
+          }
+          final otherCell =
+              paths.forPlayer(other.playerId).cellAtProgress(otherProgress);
+          if (otherCell == destination) opponentIndexes.add(i);
         }
-        final otherProgress = other.position.progress;
-        if (otherProgress == null) {
-          throw StateError(
-            'Invalid game state: main-track pawn ${other.id} has no progress.',
-          );
-        }
-        final otherCell = paths.forPlayer(other.playerId)
-            .cellAtProgress(otherProgress);
-        if (otherCell == destination) opponentIndexes.add(i);
-      }
 
-      // Team Up excludes friendly teammates before applying the same
-      // configured opponent-stack policy as Classic. By default a stack of
-      // multiple opponents is protected; a single opponent can be captured.
-      if (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1) {
-        for (final opponentIndex in opponentIndexes) {
-          pawns[opponentIndex] = pawns[opponentIndex].copyWith(
-            position: const PawnRoutePosition(
-              section: PawnRouteSection.yard,
-            ),
-          );
-          capturedPawnIds.add(pawns[opponentIndex].id);
+        if (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1) {
+          for (final opponentIndex in opponentIndexes) {
+            pawns[opponentIndex] = pawns[opponentIndex].copyWith(
+              position: const PawnRoutePosition(
+                section: PawnRouteSection.yard,
+              ),
+            );
+            capturedPawnIds.add(pawns[opponentIndex].id);
+          }
         }
       }
     }
@@ -561,6 +583,7 @@ class PathBasedLocalGameEngine {
     );
     var next = state.copyWith(
       pawns: pawns,
+      teamUpCapturePriorityByCell: capturePriorityByCell,
       clearPendingRoll: true,
       version: state.version + 1,
     );
@@ -639,6 +662,112 @@ class PathBasedLocalGameEngine {
       if (!valid) {
         throw const LocalGameException(LocalActionError.invalidState);
       }
+    }
+  }
+
+  void _resolveTeamUpStackDeparture({
+    required List<LocalPawn> pawns,
+    required String movingPlayerId,
+    required int cellId,
+    required Map<int, TeamUpTeam> priorityByCell,
+    required List<String> capturedPawnIds,
+  }) {
+    if (safeCellIndexes.contains(cellId)) return;
+    final priorityTeam = priorityByCell[cellId];
+    if (priorityTeam == null) return;
+
+    final protectedTeam =
+        priorityTeam == TeamUpTeam.a ? TeamUpTeam.b : TeamUpTeam.a;
+    final priorityIndexes = <int>[];
+    final protectedIndexes = <int>[];
+    for (var i = 0; i < pawns.length; i++) {
+      final occupant = pawns[i];
+      if (occupant.position.section != PawnRouteSection.mainTrack) continue;
+      final progress = occupant.position.progress!;
+      if (paths.forPlayer(occupant.playerId).cellAtProgress(progress) !=
+          cellId) {
+        continue;
+      }
+      if (TeamUpRules.teamFor(occupant.playerId) == priorityTeam) {
+        priorityIndexes.add(i);
+      } else if (TeamUpRules.teamFor(occupant.playerId) == protectedTeam) {
+        protectedIndexes.add(i);
+      }
+    }
+
+    if (priorityIndexes.isEmpty || protectedIndexes.isEmpty) {
+      // The last-arriving side left first, or no opposing stack remains.
+      priorityByCell.remove(cellId);
+      return;
+    }
+
+    if (TeamUpRules.teamFor(movingPlayerId) != priorityTeam) {
+      // A protected pawn tried to leave while the priority stack remained.
+      // The moving pawn has already left; its remaining friendly stack is
+      // returned to the yard immediately.
+      for (final protectedIndex in protectedIndexes) {
+        final capturedPawn = pawns[protectedIndex];
+        pawns[protectedIndex] = capturedPawn.copyWith(
+          position: const PawnRoutePosition(
+            section: PawnRouteSection.yard,
+          ),
+        );
+        capturedPawnIds.add(capturedPawn.id);
+      }
+      priorityByCell.remove(cellId);
+    }
+  }
+
+  void _resolveTeamUpStackArrival({
+    required List<LocalPawn> pawns,
+    required String arrivingPlayerId,
+    required int cellId,
+    required Map<int, TeamUpTeam> priorityByCell,
+    required List<String> capturedPawnIds,
+  }) {
+    final arrivingTeam = TeamUpRules.teamFor(arrivingPlayerId);
+    final teamAIndexes = <int>[];
+    final teamBIndexes = <int>[];
+    for (var i = 0; i < pawns.length; i++) {
+      final occupant = pawns[i];
+      if (occupant.position.section != PawnRouteSection.mainTrack) continue;
+      final progress = occupant.position.progress!;
+      if (paths.forPlayer(occupant.playerId).cellAtProgress(progress) !=
+          cellId) {
+        continue;
+      }
+      if (TeamUpRules.teamFor(occupant.playerId) == TeamUpTeam.a) {
+        teamAIndexes.add(i);
+      } else {
+        teamBIndexes.add(i);
+      }
+    }
+
+    if (teamAIndexes.isEmpty || teamBIndexes.isEmpty) {
+      priorityByCell.remove(cellId);
+      return;
+    }
+
+    // The most recent arrival owns priority for this mixed opposing stack.
+    priorityByCell[cellId] = arrivingTeam;
+    final arrivingIndexes =
+        arrivingTeam == TeamUpTeam.a ? teamAIndexes : teamBIndexes;
+    final opposingIndexes =
+        arrivingTeam == TeamUpTeam.a ? teamBIndexes : teamAIndexes;
+
+    if (arrivingIndexes.length == opposingIndexes.length) {
+      // Equal-sized opposing stacks are resolved immediately in favour of
+      // the last-arriving side.
+      for (final opposingIndex in opposingIndexes) {
+        final capturedPawn = pawns[opposingIndex];
+        pawns[opposingIndex] = capturedPawn.copyWith(
+          position: const PawnRoutePosition(
+            section: PawnRouteSection.yard,
+          ),
+        );
+        capturedPawnIds.add(capturedPawn.id);
+      }
+      priorityByCell.remove(cellId);
     }
   }
 
