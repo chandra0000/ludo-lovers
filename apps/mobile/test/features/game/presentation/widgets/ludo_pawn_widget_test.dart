@@ -24,13 +24,17 @@ void main() {
   }
 
   testWidgets('renders accessible pawn and stack-count badge', (tester) async {
-    final semantics = tester.ensureSemantics();
     await tester.pumpWidget(host(stackedCount: 3));
 
     expect(find.byType(LudoPawnWidget), findsOneWidget);
     expect(find.text('×3'), findsOneWidget);
-    expect(find.bySemanticsLabel('Orange pawn'), findsOneWidget);
-    semantics.dispose();
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is Semantics &&
+            widget.properties.label == 'Orange pawn',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('eligible state animates and can be turned off safely', (tester) async {
