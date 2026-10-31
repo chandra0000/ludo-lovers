@@ -72,52 +72,91 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
               child: AnimatedBuilder(
                 animation: _breath,
                 builder: (context, child) => Transform.scale(
-                  scale: widget.eligible ? 1 + 0.15 * _breath.value : 1,
+                  scale: widget.eligible ? 1 + 0.12 * _breath.value : 1,
                   child: child,
                 ),
                 child: SizedBox(
                   width: visual,
                   height: visual,
                   child: Stack(
+                    clipBehavior: Clip.none,
                     alignment: Alignment.center,
                     children: [
+                      // Soft ground shadow gives the pawn a lifted, grounded feel.
+                      Positioned(
+                        bottom: 0,
+                        child: Container(
+                          width: visual * 0.72,
+                          height: visual * 0.18,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.black.withValues(alpha: 0.55),
+                                blurRadius: visual * 0.25,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Eligible pawns receive a restrained colour-matched glow.
+                      if (widget.eligible)
+                        Container(
+                          width: visual * 1.15,
+                          height: visual * 1.15,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: widget.color.withValues(alpha: 0.55),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      // Glossy radial body with a clear rim and directional highlight.
                       DecoratedBox(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
-                            center: const Alignment(-0.35, -0.45),
-                            radius: 0.9,
+                            center: const Alignment(-0.4, -0.5),
+                            radius: 0.95,
                             colors: [
-                              Color.lerp(widget.color, AppTheme.cream, 0.55)!,
+                              Color.lerp(widget.color, AppTheme.cream, 0.5)!,
                               widget.color,
-                              Color.lerp(widget.color, AppTheme.black, 0.42)!,
+                              Color.lerp(widget.color, AppTheme.black, 0.45)!,
                             ],
                           ),
-                          border: Border.all(color: AppTheme.gold, width: 1.5),
+                          border: Border.all(
+                            color: widget.eligible
+                                ? AppTheme.gold
+                                : AppTheme.cream.withValues(alpha: 0.85),
+                            width: widget.eligible ? 2.2 : 1.4,
+                          ),
                           boxShadow: [
-                            BoxShadow(color: AppTheme.black.withValues(alpha: 0.45), blurRadius: 4, offset: const Offset(0, 3)),
+                            BoxShadow(
+                              color: AppTheme.black.withValues(alpha: 0.5),
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
                           ],
                         ),
-                        child: Container(
-                          margin: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.72),
-                              width: 0.75,
-                            ),
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: visual * 0.27,
-                              height: visual * 0.27,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppTheme.cream.withValues(alpha: 0.92),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 0.7,
-                                ),
+                        child: Center(
+                          child: Container(
+                            width: visual * 0.28,
+                            height: visual * 0.22,
+                            margin: EdgeInsets.only(bottom: visual * 0.2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(visual),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppTheme.cream.withValues(alpha: 0.95),
+                                  AppTheme.cream.withValues(alpha: 0.25),
+                                ],
                               ),
                             ),
                           ),
@@ -135,8 +174,14 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(2),
-                              child: Text('×${widget.stackedCount}',
-                                  style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                              child: Text(
+                                '×${widget.stackedCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),
