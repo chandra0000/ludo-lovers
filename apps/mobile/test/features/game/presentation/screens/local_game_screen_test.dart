@@ -25,6 +25,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
     await tester.pumpAndSettle();
@@ -62,6 +65,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     controller.configurePlayers(<String>['blue', 'magenta']);
     await tester.pumpAndSettle();
@@ -93,6 +99,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.byKey(const ValueKey('player_identity_strip')), findsNothing);
       expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
@@ -118,6 +127,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     final boardArtwork = tester.widget<Image>(
       find.byKey(const ValueKey('live_game_board_artwork')),
@@ -254,6 +266,9 @@ void main() {
         home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(milliseconds: 450));
 
     final greenPawn = controller.state.pawns.firstWhere(
@@ -286,6 +301,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     final boardFinder = find.byKey(const ValueKey('local_game_board'));
     expect(boardFinder, findsOneWidget);
@@ -327,6 +345,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       final boardFinder = find.byKey(const ValueKey('local_game_board'));
       expect(boardFinder, findsOneWidget, reason: 'Viewport: $viewport');
@@ -345,6 +366,9 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'Viewport: $viewport');
 
       await tester.pumpWidget(const SizedBox.shrink());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
       await tester.pump();
       controller.dispose();
     }
@@ -367,6 +391,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
       final initialRollSemantics = tester.widget<Semantics>(
@@ -487,6 +514,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -548,6 +578,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -627,6 +660,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -709,6 +745,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -786,6 +825,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -864,6 +906,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -924,6 +969,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -979,6 +1027,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -1013,6 +1064,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
@@ -1038,6 +1092,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
@@ -1096,6 +1153,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
@@ -1164,6 +1224,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pumpAndSettle();
@@ -1209,6 +1272,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     final marker = find.byKey(
       const ValueKey('pawn_marker_orange_pawn_1'),
@@ -1269,6 +1335,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     final marker = find.byKey(
       const ValueKey('pawn_marker_orange_pawn_1'),
@@ -1380,6 +1449,9 @@ void main() {
           home: LocalGameScreen(controller: controller),
         ),
       );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
       final board = find.byKey(const ValueKey('local_game_board'));
       final boardTopLeft = tester.getTopLeft(board);
@@ -1472,6 +1544,9 @@ void main() {
         home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
 
@@ -1541,6 +1616,9 @@ void main() {
         home: LocalGameScreen(controller: controller),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
@@ -1584,6 +1662,9 @@ void main() {
         home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
@@ -1630,6 +1711,9 @@ void main() {
       theme: ThemeData.dark(),
       home: LocalGameScreen(controller: controller),
     ));
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.byKey(const ValueKey('animal_avatar_picker')), findsNothing);
     expect(find.byKey(const ValueKey('choose_animal_avatar_orange')), findsNothing);
   });
