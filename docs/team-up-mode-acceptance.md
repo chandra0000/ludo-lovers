@@ -10,8 +10,9 @@ Status: local-mode implementation and acceptance tests. This is not an online or
 - The scheduled seat remains distinct from the active player when a turn is transferred.
 - If a scheduled player has finished all four pawns, that scheduled turn is received by their teammate, provided the teammate still has unfinished pawns.
 - If both teammates have finished all four pawns, that team's scheduled turn is skipped.
-- A six, capture bonus, or finish bonus remains with the active roll recipient. The scheduled seat does not advance until that recipient's turn ends.
-- When a player finishes their fourth pawn but their teammate is not finished, any earned bonus roll transfers to the teammate.
+- When a finished scheduled player transfers their turn, the teammate receives the active turn; any six or capture bonus remains with that receiving teammate.
+- If the active player finishes their own fourth pawn and earns a finish bonus (or another bonus on that move), the bonus transfers to their still-unfinished teammate.
+- The scheduled seat does not advance until the active recipient's turn ends.
 
 ## Shared-cell and capture rules
 
