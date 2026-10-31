@@ -61,7 +61,7 @@ Future<void> pumpLocalMatch(
     ),
   );
   await tester.pump();
-  await pumpFor(tester, const Duration(milliseconds: 100));
+  await pumpFor(tester, const Duration(milliseconds: 500));
 }
 
 Future<void> tapDice(WidgetTester tester) async {
