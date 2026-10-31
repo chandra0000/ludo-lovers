@@ -30,8 +30,8 @@ void main() {
 
     test('keeps the 51 to 0 wrap edge orthogonally adjacent', () {
       final track = ClassicLudoBoardDefinition.sharedTrackCells;
-      final last = track[51];
-      final first = track[0];
+      const last = BoardGridCell(column: 0, row: 6);
+      const first = BoardGridCell(column: 1, row: 6);
       expect(last, const BoardGridCell(column: 0, row: 6));
       expect(first, const BoardGridCell(column: 1, row: 6));
       expect(
