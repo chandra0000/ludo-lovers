@@ -267,6 +267,9 @@ void main() {
       (boardArtwork.image as AssetImage).assetName,
       'assets/images/ludo_board_glass.png',
     );
+    expect(boardArtwork.cacheWidth, 1152);
+    expect(boardArtwork.cacheHeight, 2048);
+    expect(boardArtwork.errorBuilder, isNotNull);
     final artworkRect = tester.getRect(
       find.byKey(const ValueKey('live_game_board_artwork')),
     );
