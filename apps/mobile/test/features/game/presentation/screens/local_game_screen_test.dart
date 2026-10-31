@@ -121,6 +121,30 @@ Future<void> rollAndMove(
 }
 
 void main() {
+  testWidgets('shows the scheduled and receiving seats when Team Up transfers a turn',
+      (tester) async {
+    final setup = LocalGameFactory.create(
+      allowProvisionalRoutes: true,
+      mode: LocalGameMode.teamUp,
+    );
+    final state = setup.initialState.copyWith(
+      scheduledPlayerIndex: 0,
+      currentPlayerIndex: 2,
+    );
+    final controller = LocalGameController(
+      gameSetup: setup,
+      initialState: state,
+      nextDiceValue: () => 2,
+    );
+    addTearDown(controller.dispose);
+
+    await pumpLocalMatch(tester, controller: controller);
+
+    expect(find.byKey(const ValueKey('team_up_identity_banner')), findsOneWidget);
+    expect(find.byKey(const ValueKey('team_up_turn_transfer_banner')), findsOneWidget);
+    expect(find.text('TURN TRANSFERRED · ORANGE → MAGENTA'), findsOneWidget);
+  });
+
   testWidgets('chat shows a brief offline toast without interrupting play', (
     tester,
   ) async {
