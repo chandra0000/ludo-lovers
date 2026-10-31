@@ -19,6 +19,7 @@ import '../../domain/board/classic_ludo_board_fixture.dart';
 import '../../domain/engine/local_game_factory.dart';
 import '../../domain/engine/ludo_path_movement.dart';
 import '../../domain/engine/path_based_local_game_engine.dart';
+import '../../domain/engine/team_up_rules.dart';
 import '../controllers/local_game_controller.dart';
 import '../widgets/animated_dice_widget.dart';
 import '../widgets/ludo_board_overlay.dart';
@@ -35,6 +36,7 @@ class LocalGameScreen extends StatefulWidget {
     this.controller,
     this.selectedPlayerIds,
     this.playAgainstAi = false,
+    this.gameMode = LocalGameMode.classic,
   });
 
   /// Optional controller injection for deterministic widget tests.
@@ -45,6 +47,9 @@ class LocalGameScreen extends StatefulWidget {
 
   /// When true, Orange is the human seat and the remaining seats use local AI.
   final bool playAgainstAi;
+
+  /// Classic remains the default; Team Up is an explicit independent mode.
+  final LocalGameMode gameMode;
 
   @override
   State<LocalGameScreen> createState() => _LocalGameScreenState();
@@ -57,6 +62,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
           allowProvisionalRoutes: true,
           selectedPlayerIds:
               widget.selectedPlayerIds ?? LocalGameFactory.playerIds,
+          mode: widget.gameMode,
         ),
       );
   late final BoardPawnLayout _pawnLayout = BoardPawnLayout(
@@ -758,10 +764,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 title: 'Reach home exactly',
                 detail: 'A pawn must reach the final home position with an exact roll; an overshoot is not allowed.',
               ),
-              const _RuleRow(
+              _RuleRow(
                 number: '5',
                 title: 'Win the match',
-                detail: 'Be the first player to guide all four pawns into the home finish.',
+                detail: _controller.setup.engine.isTeamUp
+                    ? 'Team Up: both teammates must guide all four of their pawns into the home finish (eight pawns total).'
+                    : 'Be the first player to guide all four pawns into the home finish.',
               ),
               const _RuleRow(
                 number: '6',
@@ -928,6 +936,69 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         winnerName: state.winnerPlayerId?.toUpperCase(),
                       ),
                     ),
+                    if (_controller.setup.engine.isTeamUp)
+                      Positioned(
+                        left: dx(62),
+                        top: dy(132),
+                        width: ds(452),
+                        height: ds(34),
+                        child: DecoratedBox(
+                          key: const ValueKey('team_up_identity_banner'),
+                          decoration: BoxDecoration(
+                            color: AppTheme.panel.withValues(alpha: 0.94),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppTheme.gold.withValues(alpha: 0.8)),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: ds(8)),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: _TeamIdentityLabel(
+                                    label: 'TEAM A',
+                                    members: 'ORANGE + MAGENTA',
+                                    color: AppTheme.orange,
+                                  ),
+                                ),
+                                Container(width: 1, height: ds(22), color: AppTheme.gold.withValues(alpha: 0.45)),
+                                Expanded(
+                                  child: _TeamIdentityLabel(
+                                    label: 'TEAM B',
+                                    members: 'GREEN + BLUE',
+                                    color: AppTheme.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (_controller.setup.engine.isTeamUp &&
+                        state.scheduledPlayerIndex != state.currentPlayerIndex)
+                      Positioned(
+                        left: dx(76),
+                        top: dy(170),
+                        width: ds(424),
+                        child: Container(
+                          key: const ValueKey('team_up_turn_transfer_banner'),
+                          padding: EdgeInsets.symmetric(horizontal: ds(8), vertical: ds(4)),
+                          decoration: BoxDecoration(
+                            color: AppTheme.black.withValues(alpha: 0.88),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppTheme.gold.withValues(alpha: 0.65)),
+                          ),
+                          child: Text(
+                            'TURN TRANSFERRED · ${state.scheduledPlayerId.toUpperCase()} → ${current.toUpperCase()}',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppTheme.gold,
+                              fontSize: ds(9),
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
                     // 15 x 15 logical grid is registered to the exact 542 px
                     // playable square, inside the 556 px gold outer frame.
                     Positioned(
@@ -1048,8 +1119,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                const Text('MATCH WON', style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.w900)),
-                                Text('${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} TAKES THE CROWN', textAlign: TextAlign.center),
+                                Text(_controller.setup.engine.isTeamUp ? 'TEAM VICTORY' : 'MATCH WON', style: const TextStyle(color: AppTheme.gold, fontWeight: FontWeight.w900)),
+                                Text(
+                                  _controller.setup.engine.isTeamUp
+                                      ? 'TEAM ${state.winnerTeamId?.toUpperCase() ?? TeamUpRules.teamFor(state.winnerPlayerId ?? current).name.toUpperCase()} TAKES THE CROWN'
+                                      : '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} TAKES THE CROWN',
+                                  textAlign: TextAlign.center,
+                                ),
                                 TextButton(
                                   key: const ValueKey('results_rematch_button'),
                                   onPressed: _controller.reset,
@@ -1533,6 +1609,29 @@ class _DicePips extends StatelessWidget {
               : const SizedBox.shrink(),
         ),
       ),
+    );
+  }
+}
+
+class _TeamIdentityLabel extends StatelessWidget {
+  const _TeamIdentityLabel({
+    required this.label,
+    required this.members,
+    required this.color,
+  });
+
+  final String label;
+  final String members;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(label, style: TextStyle(color: color, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1)),
+        Text(members, textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.readableText, fontSize: 8, fontWeight: FontWeight.w800)),
+      ],
     );
   }
 }
