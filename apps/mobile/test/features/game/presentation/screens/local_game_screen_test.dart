@@ -7,23 +7,22 @@ import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_en
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
-Future<void> tapWhenHitTestable(WidgetTester tester, Finder finder) async {
-  final target = finder.hitTestable();
-  for (var attempt = 0; attempt < 40; attempt++) {
-    if (target.evaluate().isNotEmpty) {
-      await tester.tap(target);
-      await tester.pump();
-      return;
-    }
-    await tester.pump(const Duration(milliseconds: 50));
-  }
-  expect(target, findsOneWidget,
-      reason: 'The control did not become hit-testable after waiting for route transitions.');
+/// Skip Material route transitions so AbsorbPointer barriers do not block taps.
+class _NoTransitionsBuilder extends PageTransitionsBuilder {
+  const _NoTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) =>
+      child;
 }
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  // Advance in bounded frames: a single long pump can skip intermediate
-  // animation frames and leave route/board overlays in an input-blocking state.
   const frame = Duration(milliseconds: 50);
   var remaining = duration;
   while (remaining > Duration.zero) {
@@ -33,21 +32,71 @@ Future<void> pumpFor(WidgetTester tester, Duration duration) async {
   }
 }
 
+Future<void> pumpLocalMatch(
+  WidgetTester tester, {
+  required LocalGameController controller,
+  bool playAgainstAi = false,
+  Size surface = const Size(900, 1600),
+}) async {
+  tester.view.physicalSize = surface;
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        pageTransitionsTheme: PageTransitionsTheme(
+          builders: {
+            for (final p in TargetPlatform.values)
+              p: const _NoTransitionsBuilder(),
+          },
+        ),
+      ),
+      home: LocalGameScreen(
+        controller: controller,
+        playAgainstAi: playAgainstAi,
+      ),
+    ),
+  );
+  await tester.pump();
+  await pumpFor(tester, const Duration(milliseconds: 100));
+}
+
 Future<void> tapDice(WidgetTester tester) async {
   final dice = find.byKey(const ValueKey('roll_dice_button'));
-  await tester.ensureVisible(dice);
-  await pumpFor(tester, const Duration(milliseconds: 50));
-  await tapWhenHitTestable(tester, dice);
-  await tester.pump();
+  expect(dice, findsOneWidget);
+  await tester.tap(dice);
+  // Cover dice roll animation (~600ms) + state notify.
+  await pumpFor(tester, const Duration(milliseconds: 700));
 }
 
 Future<void> tapPawn(WidgetTester tester, String pawnId) async {
   final pawn = find.byKey(ValueKey<String>('legal_pawn_$pawnId'));
-  await tester.ensureVisible(pawn);
-  await pumpFor(tester, const Duration(milliseconds: 50));
-  expect(pawn, findsOneWidget);
-  await tapWhenHitTestable(tester, pawn);
-  await tester.pump();
+  expect(
+    pawn,
+    findsOneWidget,
+    reason:
+        'Expected legal pawn $pawnId after dice roll. '
+        'If missing, the dice tap did not apply a roll.',
+  );
+  await tester.tap(pawn);
+  await pumpFor(tester, const Duration(milliseconds: 500));
+}
+
+/// Prefer this in rule/flow tests (avoids UI hit-test flakiness).
+Future<void> rollAndMoveViaController(
+  WidgetTester tester,
+  LocalGameController controller,
+  String pawnId,
+) async {
+  final v1 = controller.state.version;
+  controller.rollDice(expectedVersion: v1);
+  await pumpFor(tester, const Duration(milliseconds: 100));
+  final v2 = controller.state.version;
+  controller.movePawn(pawnId, expectedVersion: v2);
+  await pumpFor(tester, const Duration(milliseconds: 100));
 }
 
 void main() {
@@ -62,17 +111,17 @@ void main() {
     final controller = LocalGameController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-    await tapWhenHitTestable(tester, find.byKey(const ValueKey('open_match_chat_button')));
+    await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
     await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Match Chat'), findsOneWidget);
@@ -102,11 +151,11 @@ void main() {
     final controller = LocalGameController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -136,12 +185,12 @@ void main() {
       final controller = LocalGameController();
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -164,11 +213,11 @@ void main() {
     final controller = LocalGameController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -303,11 +352,11 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller, playAgainstAi: true),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: true,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -338,11 +387,11 @@ void main() {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -382,12 +431,12 @@ void main() {
       tester.view.devicePixelRatio = 1;
       final controller = LocalGameController(nextDiceValue: () => 6);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -428,12 +477,12 @@ void main() {
       final controller = LocalGameController(nextDiceValue: () => 6);
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -551,12 +600,12 @@ void main() {
       final controller = LocalGameController(nextDiceValue: () => 6);
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -615,12 +664,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -697,12 +746,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -782,12 +831,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -862,12 +911,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -943,12 +992,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -1006,12 +1055,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -1064,12 +1113,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -1101,11 +1150,11 @@ void main() {
     final controller = LocalGameController(nextDiceValue: () => 3);
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1129,11 +1178,11 @@ void main() {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1190,11 +1239,11 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1261,12 +1310,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -1309,11 +1358,11 @@ void main() {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1372,11 +1421,11 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1486,12 +1535,12 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: LocalGameScreen(controller: controller),
-        ),
-      );
+      await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
@@ -1581,11 +1630,11 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller, playAgainstAi: true),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: true,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1653,11 +1702,11 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1699,11 +1748,11 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller, playAgainstAi: true),
-      ),
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+      playAgainstAi: true,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
@@ -1750,10 +1799,11 @@ void main() {
   testWidgets('live match omits the removed animal avatar picker', (tester) async {
     final controller = LocalGameController();
     addTearDown(controller.dispose);
-    await tester.pumpWidget(MaterialApp(
-      theme: ThemeData.dark(),
-      home: LocalGameScreen(controller: controller),
-    ));
+    await pumpLocalMatch(
+      tester,
+      controller: controller,
+      surface: tester.view.physicalSize,
+    );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
