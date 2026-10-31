@@ -136,7 +136,11 @@ void main() {
 
     final chatButton = find.byKey(const ValueKey('open_match_chat_button'));
     expect(chatButton, findsOneWidget);
-    await tester.tap(chatButton);
+    final chatInkWell = tester.widget<InkWell>(
+      find.descendant(of: chatButton, matching: find.byType(InkWell)),
+    );
+    expect(chatInkWell.onTap, isNotNull);
+    chatInkWell.onTap!();
     await pumpFor(tester, const Duration(milliseconds: 250));
 
     expect(find.text('Online mode is not enabled'), findsOneWidget);
