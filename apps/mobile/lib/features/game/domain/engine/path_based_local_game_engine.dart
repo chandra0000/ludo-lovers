@@ -14,20 +14,15 @@ class LocalPawn {
     required this.id,
     required this.playerId,
     required this.position,
-    this.lastMovedAtVersion = 0,
   });
 
   final String id;
   final String playerId;
   final PawnRoutePosition position;
-  /// Version of the accepted move that most recently placed this pawn.
-  final int lastMovedAtVersion;
-
-  LocalPawn copyWith({PawnRoutePosition? position, int? lastMovedAtVersion}) => LocalPawn(
+  LocalPawn copyWith({PawnRoutePosition? position}) => LocalPawn(
         id: id,
         playerId: playerId,
         position: position ?? this.position,
-        lastMovedAtVersion: lastMovedAtVersion ?? this.lastMovedAtVersion,
       );
 }
 
@@ -68,14 +63,6 @@ class LocalGameState {
     if (this.pawns.any((pawn) => pawn.id.trim().isEmpty) ||
         this.pawns.map((pawn) => pawn.id).toSet().length != this.pawns.length) {
       throw ArgumentError('Pawn IDs must be non-empty and unique.');
-    }
-    if (this.pawns.any(
-      (pawn) =>
-          pawn.lastMovedAtVersion < 0 || pawn.lastMovedAtVersion > version,
-    )) {
-      throw ArgumentError(
-        'Pawn arrival versions must be non-negative and no newer than the game state.',
-      );
     }
     final roll = pendingRoll;
     if (roll != null && (roll < 1 || roll > 6)) {
@@ -501,10 +488,7 @@ class PathBasedLocalGameEngine {
     }
 
     final pawns = List<LocalPawn>.of(state.pawns);
-    pawns[index] = pawn.copyWith(
-      position: result.resolution!.position,
-      lastMovedAtVersion: state.version + 1,
-    );
+    pawns[index] = pawn.copyWith(position: result.resolution!.position);
     final capturedPawnIds = <String>[];
     final destination = result.resolution!.destinationCell;
     if (destination != null && !safeCellIndexes.contains(destination)) {
@@ -528,29 +512,15 @@ class PathBasedLocalGameEngine {
         if (otherCell == destination) opponentIndexes.add(i);
       }
 
-      if (isTeamUp && opponentIndexes.isNotEmpty) {
-        // Team Up captures only the last-arrived pawn from an opposing stack.
-        // Teammate pawns were filtered above and safe cells never reach here.
-        final targetId = TeamUpRules.selectLastArrivalPawnId(
-          <String, int>{
-            for (final opponentIndex in opponentIndexes)
-              pawns[opponentIndex].id:
-                  pawns[opponentIndex].lastMovedAtVersion,
-          },
-        );
-        final targetIndex = opponentIndexes.firstWhere(
-          (opponentIndex) => pawns[opponentIndex].id == targetId,
-        );
-        pawns[targetIndex] = pawns[targetIndex].copyWith(
-          position: const PawnRoutePosition(section: PawnRouteSection.yard),
-        );
-        capturedPawnIds.add(pawns[targetIndex].id);
-      } else if (!isTeamUp &&
-          (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1)) {
-        // Preserve Classic's existing stacked-pair protection exactly.
+      // Team Up excludes friendly teammates before applying the same
+      // configured opponent-stack policy as Classic. By default a stack of
+      // multiple opponents is protected; a single opponent can be captured.
+      if (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1) {
         for (final opponentIndex in opponentIndexes) {
           pawns[opponentIndex] = pawns[opponentIndex].copyWith(
-            position: const PawnRoutePosition(section: PawnRouteSection.yard),
+            position: const PawnRoutePosition(
+              section: PawnRouteSection.yard,
+            ),
           );
           capturedPawnIds.add(pawns[opponentIndex].id);
         }
