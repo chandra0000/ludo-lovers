@@ -569,6 +569,9 @@ class PathBasedLocalGameEngine {
         (result.resolution!.finishes && extraRollOnFinish);
     if (bonus) {
       next = next.copyWith(
+        currentPlayerIndex: isTeamUp && allFinished && !teamWon
+            ? state.players.indexOf(TeamUpRules.teammateFor(playerId))
+            : next.currentPlayerIndex,
         consecutiveSixes: rollValue == 6 ? state.consecutiveSixes : 0,
         version: next.version,
       );
