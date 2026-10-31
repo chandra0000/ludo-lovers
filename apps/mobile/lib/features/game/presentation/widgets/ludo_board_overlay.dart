@@ -91,7 +91,7 @@ class _LudoBoardOverlayState extends State<LudoBoardOverlay>
               width: 260,
               height: 62,
               child: Material(
-                color: const Color(0xEE17130F),
+                color: AppTheme.panel.withValues(alpha: 0.93),
                 borderRadius: BorderRadius.circular(32),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -141,7 +141,7 @@ class _LudoBoardOverlayState extends State<LudoBoardOverlay>
         label: tooltip,
         child: Material(
           key: key,
-          color: const Color(0xAA17130F),
+          color: AppTheme.panel.withValues(alpha: 0.67),
           shape: const CircleBorder(side: BorderSide(color: AppTheme.gold, width: 1)),
           child: InkWell(
             customBorder: const CircleBorder(),
