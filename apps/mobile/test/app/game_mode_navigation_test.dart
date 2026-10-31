@@ -63,10 +63,10 @@ void main() {
       ),
     );
     await pumpFor(tester, const Duration(milliseconds: 400));
-    final teamUpCard = find.byKey(const ValueKey('mode_team_up_button'));
-    await tester.ensureVisible(teamUpCard);
+    final teamUpAction = find.text('Start Team Up match');
+    await tester.ensureVisible(teamUpAction);
     await pumpFor(tester, const Duration(milliseconds: 100));
-    await tester.tap(teamUpCard);
+    await tester.tap(teamUpAction);
     await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
