@@ -256,7 +256,7 @@ Team Up is a separate 2-vs-2 variant. These rules must not alter Classic mode.
 
 ### Dice-turn transfer for a finished player
 
-A player who has all four pawns in final home still has their scheduled dice roll. The result is transferred to their teammate for that teammate to use. The fixed scheduled seat order remains unchanged.
+A player who has all four pawns in final home keeps their place in the scheduled seat order, but their teammate receives the active turn and rolls on that seat's behalf. The fixed scheduled seat order remains unchanged.
 
 - When Orange has finished all four pawns, Orange's scheduled roll is transferred to Magenta.
 - When Magenta has finished all four pawns, Magenta's scheduled roll is transferred to Orange.
