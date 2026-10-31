@@ -141,14 +141,24 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     });
   }
 
-  void _playFeedbackSound({bool important = false}) {
-    if (!_soundEnabled) return;
-    try {
-      unawaited(SystemSound.play(
-        important ? SystemSoundType.alert : SystemSoundType.click,
-      ));
-    } on Object {
-      // Platform feedback sounds are best-effort; gameplay must not depend on audio.
+  void _playFeedbackSound({bool important = false, bool haptic = true}) {
+    if (_soundEnabled) {
+      try {
+        unawaited(
+          SystemSound.play(
+            important ? SystemSoundType.alert : SystemSoundType.click,
+          ),
+        );
+      } on Object {
+        // Platform feedback sounds are best-effort; gameplay must not depend on audio.
+      }
+    }
+    if (!haptic) return;
+    if (important) {
+      unawaited(HapticFeedback.mediumImpact());
+    } else {
+      // Light tick per cell — selectionClick is subtler than lightImpact.
+      unawaited(HapticFeedback.selectionClick());
     }
   }
 
