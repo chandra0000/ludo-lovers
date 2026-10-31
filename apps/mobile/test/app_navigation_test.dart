@@ -4,6 +4,9 @@ import 'package:ludo_lovers/app/app.dart';
 
 Future<void> _openHome(WidgetTester tester) async {
   await tester.pumpWidget(const LudoLoversApp());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
   await tester.pump(const Duration(seconds: 3));
   await tester.pump(const Duration(milliseconds: 400));
   final skip = find.byKey(const ValueKey('onboarding_skip_button'));
