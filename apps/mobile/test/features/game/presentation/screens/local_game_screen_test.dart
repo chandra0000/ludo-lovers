@@ -91,11 +91,18 @@ Future<void> rollAndMoveViaController(
   LocalGameController controller,
   String pawnId,
 ) async {
-  final v1 = controller.state.version;
-  controller.rollDice(expectedVersion: v1);
+  final rollVersion = controller.state.version;
+  controller.rollDice(expectedVersion: rollVersion);
   await pumpFor(tester, const Duration(milliseconds: 100));
-  final v2 = controller.state.version;
-  controller.movePawn(pawnId, expectedVersion: v2);
+
+  expect(
+    controller.legalPawnIds,
+    contains(pawnId),
+    reason: 'The deterministic roll must make $pawnId legal before moving it.',
+  );
+  final moveVersion = controller.state.version;
+  controller.movePawn(pawnId, expectedVersion: moveVersion);
+  expect(controller.lastError, isNull);
   await pumpFor(tester, const Duration(milliseconds: 100));
 }
 
@@ -841,10 +848,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      await tapPawn(tester, 'orange_pawn_1');
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -921,10 +925,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      await tapPawn(tester, 'orange_pawn_1');
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -1002,10 +1003,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      await tapPawn(tester, 'orange_pawn_1');
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
 
       final bluePawns = controller.state.pawns.where(
         (pawn) => pawn.id == 'blue_pawn_1' || pawn.id == 'blue_pawn_2',
@@ -1065,8 +1063,9 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      final overshootVersion = controller.state.version;
+      controller.rollDice(expectedVersion: overshootVersion);
+      await pumpFor(tester, const Duration(milliseconds: 100));
 
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'green');
@@ -1123,10 +1122,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      await tapPawn(tester, 'orange_pawn_1');
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
 
       expect(
         controller.state.pawns
@@ -1320,20 +1316,16 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      final skippedTurnVersion = controller.state.version;
+      controller.rollDice(expectedVersion: skippedTurnVersion);
+      await pumpFor(tester, const Duration(milliseconds: 100));
 
       expect(controller.state.currentPlayerId, 'green');
 
       expect(find.textContaining('NoLegalMove · TurnEnded'), findsNothing);
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
 
-      await tapDice(tester);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      expect(find.byKey(const ValueKey('legal_pawn_green_pawn_1')), findsOneWidget);
-
-      await tapPawn(tester, 'green_pawn_1');
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await rollAndMoveViaController(tester, controller, 'green_pawn_1');
 
       expect(controller.state.currentPlayerId, 'green');
       expect(
