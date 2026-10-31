@@ -210,76 +210,12 @@ void main() {
       );
     });
 
-    test('captures an opponent but never a teammate sharing the cell', () {
+    test('records last-arrival priority without prematurely removing an unequal stack', () {
       final setup = LocalGameFactory.create(
         allowProvisionalRoutes: true,
         mode: LocalGameMode.teamUp,
       );
-      final orangePath = setup.paths.forPlayer('orange');
-      final targetCell = orangePath.cellAtProgress(2)!;
-      final magentaProgress =
-          setup.paths.forPlayer('magenta').mainTrackCells.indexOf(targetCell);
-      final blueProgress =
-          setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
-      expect(magentaProgress, greaterThanOrEqualTo(0));
-      expect(blueProgress, greaterThanOrEqualTo(0));
-
-      final state = setup.initialState.copyWith(
-        currentPlayerIndex: 0,
-        scheduledPlayerIndex: 0,
-        pendingRoll: 1,
-        pawns: setup.initialState.pawns.map((pawn) {
-          if (pawn.id == 'orange_pawn_1') {
-            return pawn.copyWith(position: const PawnRoutePosition(
-              section: PawnRouteSection.mainTrack,
-              progress: 1,
-            ));
-          }
-          if (pawn.id == 'magenta_pawn_1') {
-            return pawn.copyWith(position: PawnRoutePosition(
-              section: PawnRouteSection.mainTrack,
-              progress: magentaProgress,
-            ));
-          }
-          if (pawn.id == 'blue_pawn_1') {
-            return pawn.copyWith(position: PawnRoutePosition(
-              section: PawnRouteSection.mainTrack,
-              progress: blueProgress,
-            ));
-          }
-          return pawn;
-        }).toList(growable: false),
-      );
-
-      final transition = setup.engine.move(
-        state,
-        playerId: 'orange',
-        expectedVersion: state.version,
-        pawnId: 'orange_pawn_1',
-      );
-      final blue = transition.state.pawns.firstWhere(
-        (pawn) => pawn.id == 'blue_pawn_1',
-      );
-      final magenta = transition.state.pawns.firstWhere(
-        (pawn) => pawn.id == 'magenta_pawn_1',
-      );
-
-      expect(blue.position.section, PawnRouteSection.yard);
-      expect(magenta.position.section, PawnRouteSection.mainTrack);
-      expect(
-        transition.events.where((event) => event.type == 'PawnCaptured')
-            .map((event) => event.pawnId),
-        <String?>['blue_pawn_1'],
-      );
-    });
-
-    test('protects an opposing stack under the existing default capture policy', () {
-      final setup = LocalGameFactory.create(
-        allowProvisionalRoutes: true,
-        mode: LocalGameMode.teamUp,
-      );
-      final orangePath = setup.paths.forPlayer('orange');
-      final targetCell = orangePath.cellAtProgress(2)!;
+      final targetCell = setup.paths.forPlayer('orange').cellAtProgress(2)!;
       final greenProgress =
           setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
       final blueProgress =
@@ -320,13 +256,296 @@ void main() {
 
       expect(
         transition.state.pawns
-            .where((pawn) => pawn.id == 'green_pawn_1' || pawn.id == 'blue_pawn_1')
+            .where((pawn) =>
+                pawn.id == 'orange_pawn_1' ||
+                pawn.id == 'green_pawn_1' ||
+                pawn.id == 'blue_pawn_1')
             .every((pawn) => pawn.position.section == PawnRouteSection.mainTrack),
         isTrue,
       );
       expect(
+        transition.state.teamUpCapturePriorityByCell[targetCell],
+        TeamUpTeam.a,
+      );
+      expect(
         transition.events.where((event) => event.type == 'PawnCaptured'),
         isEmpty,
+      );
+    });
+
+    test('captures the remaining protected stack when it tries to leave first', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final targetCell = setup.paths.forPlayer('orange').cellAtProgress(2)!;
+      final orangeProgress =
+          setup.paths.forPlayer('orange').mainTrackCells.indexOf(targetCell);
+      final greenProgress =
+          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final blueProgress =
+          setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 1,
+        scheduledPlayerIndex: 1,
+        pendingRoll: 1,
+        teamUpCapturePriorityByCell: <int, TeamUpTeam>{
+          targetCell: TeamUpTeam.a,
+        },
+        pawns: setup.initialState.pawns.map((pawn) {
+          final progress = switch (pawn.id) {
+            'orange_pawn_1' => orangeProgress,
+            'green_pawn_1' => greenProgress,
+            'blue_pawn_1' => blueProgress,
+            _ => null,
+          };
+          if (progress == null) return pawn;
+          return pawn.copyWith(position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ));
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'green',
+        expectedVersion: state.version,
+        pawnId: 'green_pawn_1',
+      );
+
+      expect(
+        transition.state.pawns
+            .firstWhere((pawn) => pawn.id == 'green_pawn_1')
+            .position.section,
+        PawnRouteSection.mainTrack,
+      );
+      expect(
+        transition.state.pawns
+            .firstWhere((pawn) => pawn.id == 'blue_pawn_1')
+            .position.section,
+        PawnRouteSection.yard,
+      );
+      expect(transition.state.teamUpCapturePriorityByCell, isEmpty);
+      expect(
+        transition.events.whereType<PawnCaptured>()
+            .map((event) => event.capturedPawnId),
+        <String>['blue_pawn_1'],
+      );
+    });
+
+    test('keeps the earlier stack when the last-arriving side leaves first', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final targetCell = setup.paths.forPlayer('orange').cellAtProgress(2)!;
+      final orangeProgress =
+          setup.paths.forPlayer('orange').mainTrackCells.indexOf(targetCell);
+      final greenProgress =
+          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final blueProgress =
+          setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 0,
+        scheduledPlayerIndex: 0,
+        pendingRoll: 1,
+        teamUpCapturePriorityByCell: <int, TeamUpTeam>{
+          targetCell: TeamUpTeam.a,
+        },
+        pawns: setup.initialState.pawns.map((pawn) {
+          final progress = switch (pawn.id) {
+            'orange_pawn_1' => orangeProgress,
+            'green_pawn_1' => greenProgress,
+            'blue_pawn_1' => blueProgress,
+            _ => null,
+          };
+          if (progress == null) return pawn;
+          return pawn.copyWith(position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ));
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'orange',
+        expectedVersion: state.version,
+        pawnId: 'orange_pawn_1',
+      );
+
+      expect(
+        transition.state.pawns
+            .where((pawn) => pawn.id == 'green_pawn_1' || pawn.id == 'blue_pawn_1')
+            .every((pawn) => pawn.position.section == PawnRouteSection.mainTrack),
+        isTrue,
+      );
+      expect(transition.state.teamUpCapturePriorityByCell, isEmpty);
+      expect(
+        transition.events.where((event) => event.type == 'PawnCaptured'),
+        isEmpty,
+      );
+    });
+
+    test('equal-sized opposing stacks are won by the last-arriving stack', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final targetCell = setup.paths.forPlayer('orange').cellAtProgress(2)!;
+      final orangeProgress =
+          setup.paths.forPlayer('orange').mainTrackCells.indexOf(targetCell);
+      final magentaProgress =
+          setup.paths.forPlayer('magenta').mainTrackCells.indexOf(targetCell);
+      final greenProgress =
+          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final blueProgress =
+          setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 2,
+        scheduledPlayerIndex: 2,
+        pendingRoll: 1,
+        teamUpCapturePriorityByCell: <int, TeamUpTeam>{
+          targetCell: TeamUpTeam.b,
+        },
+        pawns: setup.initialState.pawns.map((pawn) {
+          final progress = switch (pawn.id) {
+            'orange_pawn_1' => orangeProgress,
+            'magenta_pawn_1' => magentaProgress - 1,
+            'green_pawn_1' => greenProgress,
+            'blue_pawn_1' => blueProgress,
+            _ => null,
+          };
+          if (progress == null) return pawn;
+          return pawn.copyWith(position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ));
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'magenta',
+        expectedVersion: state.version,
+        pawnId: 'magenta_pawn_1',
+      );
+
+      expect(
+        transition.state.pawns
+            .where((pawn) => pawn.id == 'orange_pawn_1' || pawn.id == 'magenta_pawn_1')
+            .every((pawn) => pawn.position.section == PawnRouteSection.mainTrack),
+        isTrue,
+      );
+      expect(
+        transition.state.pawns
+            .where((pawn) => pawn.id == 'green_pawn_1' || pawn.id == 'blue_pawn_1')
+            .every((pawn) => pawn.position.section == PawnRouteSection.yard),
+        isTrue,
+      );
+      expect(transition.state.teamUpCapturePriorityByCell, isEmpty);
+      expect(
+        transition.events.whereType<PawnCaptured>()
+            .map((event) => event.capturedPawnId).toSet(),
+        <String>{'green_pawn_1', 'blue_pawn_1'},
+      );
+    });
+
+    test('resolves stacks with more than two protected occupants', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final targetCell = setup.paths.forPlayer('orange').cellAtProgress(2)!;
+      final orangeProgress =
+          setup.paths.forPlayer('orange').mainTrackCells.indexOf(targetCell);
+      final greenProgress =
+          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final blueProgress =
+          setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 1,
+        scheduledPlayerIndex: 1,
+        pendingRoll: 1,
+        teamUpCapturePriorityByCell: <int, TeamUpTeam>{
+          targetCell: TeamUpTeam.a,
+        },
+        pawns: setup.initialState.pawns.map((pawn) {
+          final progress = switch (pawn.id) {
+            'orange_pawn_1' => orangeProgress,
+            'green_pawn_1' || 'green_pawn_2' => greenProgress,
+            'blue_pawn_1' => blueProgress,
+            _ => null,
+          };
+          if (progress == null) return pawn;
+          return pawn.copyWith(position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ));
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'green',
+        expectedVersion: state.version,
+        pawnId: 'green_pawn_1',
+      );
+
+      expect(
+        transition.state.pawns
+            .where((pawn) => pawn.id == 'green_pawn_2' || pawn.id == 'blue_pawn_1')
+            .every((pawn) => pawn.position.section == PawnRouteSection.yard),
+        isTrue,
+      );
+      expect(
+        transition.events.whereType<PawnCaptured>()
+            .map((event) => event.capturedPawnId).toSet(),
+        <String>{'green_pawn_2', 'blue_pawn_1'},
+      );
+      expect(transition.state.teamUpCapturePriorityByCell, isEmpty);
+    });
+
+    test('rejects mixed unsafe stacks without explicit capture-priority state', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final targetCell = setup.paths.forPlayer('orange').cellAtProgress(2)!;
+      final orangeProgress =
+          setup.paths.forPlayer('orange').mainTrackCells.indexOf(targetCell);
+      final greenProgress =
+          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final malformed = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns.map((pawn) {
+          final progress = switch (pawn.id) {
+            'orange_pawn_1' => orangeProgress,
+            'green_pawn_1' => greenProgress,
+            _ => null,
+          };
+          if (progress == null) return pawn;
+          return pawn.copyWith(position: PawnRoutePosition(
+            section: PawnRouteSection.mainTrack,
+            progress: progress,
+          ));
+        }).toList(growable: false),
+      );
+
+      expect(
+        () => setup.engine.roll(
+          malformed,
+          playerId: 'orange',
+          expectedVersion: malformed.version,
+          value: 1,
+        ),
+        throwsA(
+          isA<LocalGameException>().having(
+            (error) => error.error,
+            'error',
+            LocalActionError.invalidState,
+          ),
+        ),
       );
     });
 
