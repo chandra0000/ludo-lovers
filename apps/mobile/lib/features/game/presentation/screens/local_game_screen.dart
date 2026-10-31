@@ -279,6 +279,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
 
     if (points.isEmpty) return;
+    final humanMove = newPawn.playerId == _humanPlayerId;
     setState(() => _animatedPawnPoints[newPawn.id] = oldVisual.point);
     var step = 0;
     void advanceStep() {
@@ -289,6 +290,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       }
       step++;
       if (step >= points.length) {
+        if (humanMove) {
+          unawaited(HapticFeedback.lightImpact());
+        }
         setState(() {
           _animatedPawnPoints.remove(newPawn.id);
           _pawnStepTimer = null;
@@ -313,11 +317,14 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         return;
       }
       setState(() => _animatedPawnPoints[newPawn.id] = points[step]);
-      _playFeedbackSound();
+      _playFeedbackSound(haptic: humanMove);
       _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
     }
 
-    _playFeedbackSound(important: oldPawn.position.section == PawnRouteSection.yard);
+    _playFeedbackSound(
+      important: oldPawn.position.section == PawnRouteSection.yard,
+      haptic: humanMove,
+    );
     setState(() => _animatedPawnPoints[newPawn.id] = points.first);
     _pawnStepTimer = Timer(const Duration(milliseconds: 320), advanceStep);
   }
