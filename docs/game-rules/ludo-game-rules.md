@@ -297,6 +297,6 @@ The local Team Up mode is now integrated into the game-mode selection screen and
 
 ## 15. Scope and next step
 
-This document remains the rules specification. A provisional profile and part of the local engine are implemented, but the full acceptance matrix is not yet executable and board topology is not approved. Next, expand classic 52-cell route tests and convert compatibility string events to typed event payloads before connecting the visual board.
+This document remains the source of truth for the provisional Classic rules and confirmed Team Up variant. Team Up's local engine, stateful stack-priority lifecycle, game-mode selection, gameplay indicators, and engine-level acceptance matrix are implemented. The shared board route and safe-cell geometry are still provisional, so this does not approve release gameplay. Next, complete the independent visual/topology review and continue expanding Classic route acceptance and domain-event contracts.
 
 **Brand consistency:** The board renderer and HUD must use the approved Ludo Lovers palette exactly: orange `#FF8928`, green `#33FF28`, blue `#289EFF`, magenta `#F428FF`, gold `#FFD700`, red `#FF3830`, black `#080B0B`, and cream `#FFF8E1`. The existing official logo remains unchanged.
