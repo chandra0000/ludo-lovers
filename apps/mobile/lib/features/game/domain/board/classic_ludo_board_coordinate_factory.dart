@@ -70,9 +70,16 @@ class ClassicLudoBoardCoordinateFactory {
   /// This includes documented connectors; it is not the same as an unknown jump.
   static List<int> get invalidTransitionIndexes => nonOrthogonalTransitionIndexes;
 
-  /// True only when the full loop and its seat-entry parity satisfy the
-  /// orthogonal-grid contract. The current reference candidate does not.
+  /// True only when every shared-track edge, including 51 -> 0, is orthogonal.
   static bool get isOrthogonallyContinuous =>
+      ClassicLudoBoardTopology.isOrthogonalCycle;
+
+  /// Whether the current 13-step entry intervals satisfy grid parity.
+  static bool get hasCompatibleEntryParity =>
+      ClassicLudoBoardTopology.hasCompatibleEntryParity;
+
+  /// Combined strict topology gate: orthogonal loop plus compatible entries.
+  static bool get isOrthogonalTopologyValid =>
       ClassicLudoBoardTopology.isOrthogonalTopologyValid;
 
   /// Detailed blockers for the requested orthogonal route contract.
@@ -89,7 +96,7 @@ class ClassicLudoBoardCoordinateFactory {
         sharedTrack.toSet().length != sharedTrack.length ||
         !sharedTrack.every((cell) => cell.isInsideBoard) ||
         unmappedTransitionIndexes.isNotEmpty ||
-        !ClassicLudoBoardTopology.isOrthogonalTopologyValid ||
+        !isOrthogonalTopologyValid ||
         !ClassicLudoBoardDefinition.isVisualTopologyApproved) {
       return false;
     }
