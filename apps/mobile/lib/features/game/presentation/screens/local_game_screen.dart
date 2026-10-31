@@ -83,7 +83,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   int _rollingFace = 1;
   int _diceRollTicks = 0;
   Timer? _diceRollTimer;
-  bool _isPaused = false;
+  final bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
   static const Map<String, Color> _colors = <String, Color>{
