@@ -1303,19 +1303,27 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       height: ds(26),
                       child: Row(
                         children: <Widget>[
-                          TextButton(
-                            key: const ValueKey('how_to_play_button'),
-                            onPressed: _showRules,
-                            style: TextButton.styleFrom(
-                              foregroundColor: AppTheme.gold,
-                              padding: EdgeInsets.symmetric(horizontal: ds(6)),
-                              minimumSize: Size(0, ds(24)),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          Tooltip(
+                            message: 'Help and game menu',
+                            child: IconButton(
+                              key: const ValueKey('how_to_play_button'),
+                              onPressed: _showRules,
+                              tooltip: 'Help',
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints.tightFor(
+                                width: ds(26),
+                                height: ds(26),
+                              ),
                               visualDensity: VisualDensity.compact,
-                            ),
-                            child: Text(
-                              'How to play',
-                              style: TextStyle(fontSize: ds(10), fontWeight: FontWeight.w800),
+                              style: IconButton.styleFrom(
+                                foregroundColor: AppTheme.gold,
+                                backgroundColor: AppTheme.panel,
+                                side: BorderSide(
+                                  color: AppTheme.gold.withValues(alpha: 0.55),
+                                ),
+                                shape: const CircleBorder(),
+                              ),
+                              icon: Icon(Icons.question_mark_rounded, size: ds(15)),
                             ),
                           ),
                           TextButton.icon(
