@@ -6,6 +6,9 @@ import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen
 
 Future<void> _openHome(WidgetTester tester) async {
   await tester.pumpWidget(const LudoLoversApp());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
   await tester.pump(const Duration(seconds: 3));
   await tester.pump(const Duration(milliseconds: 400));
   final skip = find.byKey(const ValueKey('onboarding_skip_button'));
@@ -46,6 +49,9 @@ void main() {
         home: const GameModeSelectionScreen(),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Set up 2-player game'));
     await tester.pumpAndSettle();
 
@@ -76,6 +82,9 @@ void main() {
         home: const GameModeSelectionScreen(),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Play vs AI'));
     await tester.pumpAndSettle(const Duration(milliseconds: 50));
 
