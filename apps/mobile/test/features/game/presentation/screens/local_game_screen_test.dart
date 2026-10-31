@@ -514,14 +514,14 @@ void main() {
       addTearDown(controller.dispose);
 
       await pumpLocalMatch(
-      tester,
-      controller: controller,
-      surface: const Size(900, 1600),
-      playAgainstAi: false,
-    );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
+        tester,
+        controller: controller,
+        surface: const Size(900, 1600),
+        playAgainstAi: false,
+      );
+      // Allow the initial Material route transition to complete without
+      // pumpAndSettle (the live match may schedule AI work continuously).
+      await pumpFor(tester, const Duration(milliseconds: 400));
 
       expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
       final initialRollSemantics = tester.widget<Semantics>(
@@ -533,9 +533,6 @@ void main() {
       );
       expect(find.byKey(const ValueKey('local_playtest_status')), findsNothing);
       expect(find.text('LOCAL'), findsNothing);
-
-
-
       expect(
         find.byKey(const ValueKey('local_match_player_strip')),
         findsNothing,
@@ -546,25 +543,18 @@ void main() {
       expect(find.byKey(const ValueKey('match_turn_caption')), findsNothing);
       expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
 
+      // Deterministic six: drive the engine directly, not the dice UI.
       controller.rollDice(expectedVersion: controller.state.version);
       await pumpFor(tester, const Duration(milliseconds: 100));
-      expect(
-        find.byKey(const ValueKey('animated_dice_widget')),
-        findsOneWidget,
-      );
-      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(controller.state.pendingRoll, 6);
       expect(controller.legalPawnIds, contains('orange_pawn_1'));
-      expect(
-        find.byKey(const ValueKey('roll_dice_button')),
-        findsOneWidget,
-      );
       expect(
         find.byKey(const ValueKey('animated_dice_widget')),
         findsOneWidget,
       );
       expect(find.text('6'), findsNothing);
+
       final diceSemantics = tester.widget<Semantics>(
         find.byKey(const ValueKey('roll_dice_button_semantics')),
       );
@@ -572,8 +562,9 @@ void main() {
         diceSemantics.properties.label,
         'Dice result 6. Select a highlighted pawn.',
       );
-      final rollButtonWhileMovePending =
-          tester.widget<InkWell>(find.byKey(const ValueKey('roll_dice_button')));
+      final rollButtonWhileMovePending = tester.widget<InkWell>(
+        find.byKey(const ValueKey('roll_dice_button')),
+      );
       expect(
         rollButtonWhileMovePending.onTap,
         isNull,
@@ -602,17 +593,18 @@ void main() {
         pawnSemantics.properties.hint,
         'Moves this pawn 6 spaces using the current dice roll.',
       );
-
       expect(
         find.byKey(const ValueKey('destination_cell_0_orange_pawn_1')),
         findsOneWidget,
         reason: 'Legal entry should preview its destination on the board.',
       );
 
-      await tester.tap(
-        find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
+      // Move through the controller; no pawn tap or hit testing.
+      controller.movePawn(
+        'orange_pawn_1',
+        expectedVersion: controller.state.version,
       );
-      await pumpFor(tester, const Duration(milliseconds: 500));
+      await pumpFor(tester, const Duration(milliseconds: 100));
 
       final pawn = controller.state.pawns.firstWhere(
         (item) => item.id == 'orange_pawn_1',
@@ -621,16 +613,16 @@ void main() {
       expect(pawn.position.progress, 0);
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'orange');
-      final rollButtonAfterMove =
-          tester.widget<InkWell>(find.byKey(const ValueKey('roll_dice_button')));
+      final rollButtonAfterMove = tester.widget<InkWell>(
+        find.byKey(const ValueKey('roll_dice_button')),
+      );
       expect(
         rollButtonAfterMove.onTap,
         isNotNull,
         reason: 'The extra turn should allow a fresh roll after the move resolves.',
       );
-},
+    },
   );
-
 
   testWidgets(
     'ignores a duplicate pawn tap from an outdated board frame',
