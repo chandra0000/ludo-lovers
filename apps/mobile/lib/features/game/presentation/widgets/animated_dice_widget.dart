@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../../../app/theme/app_theme.dart';
 
 /// Presentation-only dice tumble. [value] is always supplied by authoritative game state.
 class AnimatedDiceWidget extends StatefulWidget {
@@ -81,10 +82,11 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
         enabled: widget.enabled && !_locked,
         label: widget.rolling ? 'Rolling dice' : 'Dice face $_displayFace. Roll dice',
         child: GestureDetector(
-          key: const ValueKey('animated_dice_widget'),
+          key: const ValueKey('roll_dice_button'),
           behavior: HitTestBehavior.opaque,
           onTap: widget.enabled && !_locked ? widget.onRoll : null,
           child: Center(
+            key: const ValueKey('animated_dice_widget'),
             child: AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
@@ -123,10 +125,10 @@ class _DiceFace extends StatelessWidget {
       width: 54,
       height: 54,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF5DB),
+        color: AppTheme.cream,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD5A94F), width: 2),
-        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 8, offset: Offset(0, 3))],
+        border: Border.all(color: AppTheme.gold, width: 2),
+        boxShadow: const [BoxShadow(color: AppTheme.black.withValues(alpha: 0.75), blurRadius: 8, offset: Offset(0, 3))],
       ),
       child: Stack(
         children: [
