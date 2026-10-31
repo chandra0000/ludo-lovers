@@ -26,10 +26,16 @@ class AnimatedDiceWidget extends StatefulWidget {
 }
 
 class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 600),
+  );
+  late final AnimationController _turnPulseController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+    lowerBound: 0,
+    upperBound: 1,
   );
   final math.Random _random = math.Random();
   Timer? _faceTimer;
@@ -54,19 +60,40 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
   void initState() {
     super.initState();
     _displayFace = widget.value.clamp(1, 6).toInt();
-    if (widget.rolling) _animateRoll();
+    if (widget.rolling) {
+      _animateRoll();
+    } else {
+      _syncTurnPulse();
+    }
   }
 
   @override
   void didUpdateWidget(covariant AnimatedDiceWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.rolling && !oldWidget.rolling) {
+      _turnPulseController.stop();
       _animateRoll();
     } else if (!widget.rolling && oldWidget.rolling) {
       _faceTimer?.cancel();
       _displayFace = widget.value.clamp(1, 6).toInt();
+      _syncTurnPulse();
     } else if (!widget.rolling && widget.value != oldWidget.value) {
       _displayFace = widget.value.clamp(1, 6).toInt();
+    }
+    if (!widget.rolling && widget.enabled != oldWidget.enabled) {
+      _syncTurnPulse();
+    }
+  }
+
+  void _syncTurnPulse() {
+    if (!mounted) return;
+    if (widget.enabled && !widget.rolling && !_locked) {
+      if (!_turnPulseController.isAnimating) {
+        _turnPulseController.repeat(reverse: true);
+      }
+    } else {
+      _turnPulseController.stop();
+      _turnPulseController.value = 0;
     }
   }
 
@@ -74,6 +101,7 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
     if (!widget.enabled || _locked || widget.rolling) return;
     // Lock synchronously, before invoking the parent callback, so a second
     // pointer event in the same frame cannot consume another dice value.
+    _turnPulseController.stop();
     setState(() => _locked = true);
     widget.onRoll();
   }
@@ -82,6 +110,7 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
     _locked = true;
     _rotationPhase = _random.nextDouble() * math.pi * 2;
     _faceTimer?.cancel();
+    _turnPulseController.stop();
     _controller.reset();
     _faceTimer = Timer.periodic(
       const Duration(milliseconds: 58),
@@ -114,6 +143,7 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
   void dispose() {
     _faceTimer?.cancel();
     _controller.dispose();
+    _turnPulseController.dispose();
     super.dispose();
   }
 
@@ -136,7 +166,10 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
             child: Center(
               key: const ValueKey('animated_dice_widget'),
               child: AnimatedBuilder(
-                animation: _controller,
+                animation: Listenable.merge(<Listenable>[
+                  _controller,
+                  _turnPulseController,
+                ]),
                 builder: (context, _) {
                   final progress = _controller.value;
                   final rotation = widget.rolling
@@ -144,7 +177,11 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
                           0.25 *
                           (1 - progress)
                       : 0.0;
-                  final scale = widget.rolling ? _scale.transform(progress) : 1.0;
+                  final scale = widget.rolling
+                      ? _scale.transform(progress)
+                      : (widget.enabled && !_locked
+                          ? 1.0 + 0.04 * _turnPulseController.value
+                          : 1.0);
                   return Transform.rotate(
                     angle: rotation,
                     child: Transform.scale(
