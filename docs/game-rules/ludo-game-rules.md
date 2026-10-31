@@ -263,7 +263,8 @@ A player who has all four pawns in final home keeps their place in the scheduled
 - When Green has finished all four pawns, Green's scheduled roll is transferred to Blue.
 - When Blue has finished all four pawns, Blue's scheduled roll is transferred to Green.
 - A teammate receives both their own scheduled rolls and rolls transferred by their finished teammate.
-- A six's bonus roll is transferred to the same receiving teammate and follows the same bonus-roll rules. Transfer does not itself advance or reorder the scheduled seats.
+- A six or capture bonus stays with the teammate currently receiving the transferred turn. Transfer does not itself advance or reorder the scheduled seats.
+- If the active teammate finishes their own fourth pawn and earns a bonus on that move, the bonus transfers to their still-unfinished teammate.
 - If both teammates have finished all four pawns, there is no eligible recipient and that scheduled roll is skipped normally.
 - The match ends immediately when either team has all eight pawns in final home.
 
