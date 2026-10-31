@@ -770,7 +770,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 number: '5',
                 title: 'Win the match',
                 detail: _controller.setup.engine.isTeamUp
-                    ? 'Team Up: both teammates must guide all four of their pawns into the home finish (eight pawns total).'
+                    ? 'Team Up: both teammates must finish all eight pawns to win. When a scheduled player has finished all four, their turn transfers to their teammate; any bonus roll stays with the active teammate.'
                     : 'Be the first player to guide all four pawns into the home finish.',
               ),
               const _RuleRow(
