@@ -22,6 +22,30 @@ void main() {
       expect(controller.lastError, isNull);
     });
 
+    test('uses a deterministic controller dice source with a factory setup', () {
+      final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
+      var diceCalls = 0;
+      final controller = LocalGameController(
+        gameSetup: setup,
+        nextDiceValue: () {
+          diceCalls++;
+          return 6;
+        },
+      );
+      addTearDown(controller.dispose);
+
+      expect(controller.setup, same(setup));
+      expect(controller.state.currentPlayerId, 'orange');
+      expect(controller.legalPawnIds, isEmpty);
+
+      controller.rollDice(expectedVersion: controller.state.version);
+
+      expect(diceCalls, 1);
+      expect(controller.state.pendingRoll, 6);
+      expect(controller.legalPawnIds, hasLength(4));
+      expect(controller.lastError, isNull);
+    });
+
     test('moves a selected legal pawn and grants the six bonus turn', () {
       final controller = LocalGameController(nextDiceValue: () => 6);
       addTearDown(controller.dispose);
