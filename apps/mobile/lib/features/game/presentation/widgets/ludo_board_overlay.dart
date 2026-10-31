@@ -146,7 +146,9 @@ class _LudoBoardOverlayState extends State<LudoBoardOverlay>
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: onTap,
-            child: Center(child: Icon(icon, color: AppTheme.gold, size: 23)),
+            child: SizedBox.expand(
+              child: Center(child: Icon(icon, color: AppTheme.gold, size: 23)),
+            ),
           ),
         ),
       );
