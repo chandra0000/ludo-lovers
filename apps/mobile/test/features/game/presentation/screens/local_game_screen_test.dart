@@ -27,20 +27,10 @@ void main() {
     );
 
     await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('match_chat_sheet')), findsOneWidget);
-    expect(find.text('Local preview · messages stay on this device.'), findsOneWidget);
-
-    await tester.enterText(
-      find.byKey(const ValueKey('match_chat_input')),
-      'Hello players!',
-    );
-    await tester.tap(find.byKey(const ValueKey('send_match_chat_button')));
     await tester.pump();
-    expect(find.text('You: Hello players!'), findsOneWidget);
-
-    await tester.tap(find.byKey(const ValueKey('close_match_chat_button')));
-    await tester.pumpAndSettle();
+    expect(find.text('Online mode is not enabled'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('Online mode is not enabled'), findsNothing);
     expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
   });
 
