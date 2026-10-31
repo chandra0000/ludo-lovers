@@ -5,6 +5,19 @@ import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart'
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+class _NoTransitionsBuilder extends PageTransitionsBuilder {
+  const _NoTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => child;
+}
+
 Future<void> tapWhenHitTestable(WidgetTester tester, Finder finder) async {
   final target = finder.hitTestable();
   for (var attempt = 0; attempt < 40; attempt++) {
@@ -176,7 +189,17 @@ void main() {
     final semantics = tester.ensureSemantics();
 
     await tester.pumpWidget(
-      MaterialApp(home: LocalGameScreen(controller: controller)),
+      MaterialApp(
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
+        home: LocalGameScreen(controller: controller),
+      ),
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
