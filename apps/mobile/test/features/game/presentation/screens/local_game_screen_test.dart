@@ -1754,9 +1754,8 @@ void main() {
 
     // pumpAndSettle may advance scheduled timers too, so verify the final
     // outcome instead of depending on an exact intermediate frame.
-    for (var turn = 0; turn < 6; turn++) {
+    for (var turn = 0; turn < 12; turn++) {
       await tester.pump(const Duration(milliseconds: 500));
-      await tester.pump(const Duration(milliseconds: 300));
     }
 
     expect(
@@ -1770,8 +1769,8 @@ void main() {
     expect(controller.state.pendingRoll, isNull);
     expect(
       rollIndex,
-      greaterThanOrEqualTo(2),
-      reason: 'The deterministic six sequence must be consumed by the match.',
+      greaterThanOrEqualTo(3),
+      reason: 'Both orange rolls and the AI six must be consumed.',
     );
   });
 
