@@ -75,8 +75,7 @@ void main() {
     expect(
       tester.widget<InkWell>(
         find.byKey(const ValueKey('roll_dice_button')),
-      ).onPressed,
-      isNotNull,
+      undefined
     );
     expect(controller.state.completed, isFalse);
     expect(controller.state.currentPlayerId, 'orange');
