@@ -649,8 +649,11 @@ class PathBasedLocalGameEngine {
   LocalGameState _advance(LocalGameState state) {
     // Classic mode advances directly from the active seat. Team Up keeps the
     // scheduled seat separate because a finished seat can transfer its roll.
+    final basePlayerIndex = isTeamUp
+        ? state.scheduledPlayerIndex
+        : state.currentPlayerIndex;
     for (var offset = 1; offset <= state.players.length; offset++) {
-      final candidateIndex = (state.scheduledPlayerIndex + offset) % state.players.length;
+      final candidateIndex = (basePlayerIndex + offset) % state.players.length;
       final candidateId = state.players[candidateIndex];
       final candidatePawns = state.pawns.where((pawn) => pawn.playerId == candidateId);
       final hasUnfinishedPawn = candidatePawns.any(
