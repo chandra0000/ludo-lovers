@@ -554,166 +554,18 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     );
   }
 
-  Future<void> _showMatchChat() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppTheme.black.withValues(alpha: 0),
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (sheetContext) => Container(
-        padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
-        decoration: const BoxDecoration(
-          color: AppTheme.panel,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border(top: BorderSide(color: AppTheme.gold, width: 1)),
+  void _showMatchChat() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Online mode is not enabled'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppTheme.gold.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                const Icon(Icons.chat_bubble_outline_rounded,
-                    color: AppTheme.gold, size: 24),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Text(
-                    'Match Chat',
-                    style: TextStyle(
-                      color: AppTheme.cream,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppTheme.gold.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: AppTheme.gold.withValues(alpha: 0.55)),
-                  ),
-                  child: const Text(
-                    'OFFLINE',
-                    style: TextStyle(
-                      color: AppTheme.gold,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppTheme.panelRaised,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.gold.withValues(alpha: 0.3)),
-              ),
-              child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.info_outline_rounded,
-                      color: AppTheme.gold, size: 20),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Online chat is coming soon. You can keep playing your local match while we prepare multiplayer chat.',
-                      style: TextStyle(
-                        color: AppTheme.readableText,
-                        height: 1.4,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppTheme.panel,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ludo Lovers',
-                    style: TextStyle(
-                      color: AppTheme.gold,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'You are playing offline. Messages will be available when online rooms are introduced.',
-                    style: TextStyle(
-                      color: AppTheme.cream,
-                      fontSize: 13,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-            TextField(
-              key: const ValueKey('offline_chat_message_input'),
-              enabled: false,
-              decoration: InputDecoration(
-                hintText: 'Chat is unavailable in offline mode',
-                hintStyle: const TextStyle(color: AppTheme.mutedText),
-                filled: true,
-                fillColor: AppTheme.panel,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                suffixIcon: const Icon(Icons.send_rounded,
-                    color: AppTheme.mutedText),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              key: const ValueKey('close_offline_chat_button'),
-              onPressed: () => Navigator.of(sheetContext).pop(),
-              child: const Text(
-                'CLOSE',
-                style: TextStyle(
-                  color: AppTheme.gold,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+      );
   }
 
-  // Retained for the next setup-menu iteration; currently not exposed in the UI.
-  // ignore: unused_element
   Future<void> _showPlayerSetup() async {
     final currentPlayers = _controller.state.players;
     final selectedPlayers = <String>[
@@ -1048,7 +900,15 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       child: LudoBoardOverlay(
                         onHelp: _showRules,
                         onChat: _showMatchChat,
-                        playerName: current,
+                        playerName: current.toUpperCase(),
+                        isLocalTurn: !isAiTurn,
+                        isRolling: _diceRolling,
+                        isOpponentTurn: isAiTurn,
+                        colorName: state.pendingRoll == null
+                            ? null
+                            : current,
+                        isCompleted: state.completed,
+                        winnerName: state.winnerPlayerId?.toUpperCase(),
                       ),
                     ),
                     // 15 x 15 logical grid is registered to the exact 542 px
@@ -1152,39 +1012,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       child: Text(
                         'BOARD ROUTE · PROVISIONAL',
                         key: const ValueKey('provisional_route_notice'),
-                      ),
-                    ),
-                    // Exact turn banner bounds: (200,924)-(376,956).
-                    Positioned(
-                      left: dx(200),
-                      top: dy(924),
-                      width: ds(176),
-                      height: ds(32),
-                      child: IgnorePointer(
-                        child: Center(
-                          child: FittedBox(
-                            child: Text(
-                              state.completed
-                                  ? '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} · WINNER'
-                                  : _diceRolling
-                                      ? 'Rolling...'
-                                      : isAiTurn
-                                          ? "${current.toUpperCase()}'s Turn"
-                                          : state.pendingRoll == null
-                                              ? 'Your Turn'
-                                              : current.toUpperCase(),
-                              key: const ValueKey('portrait_turn_indicator'),
-                              style: const TextStyle(
-                                color: AppTheme.cream,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.1,
-                                shadows: <Shadow>[
-                                  Shadow(color: AppTheme.black, blurRadius: 6),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                     if (state.completed)
