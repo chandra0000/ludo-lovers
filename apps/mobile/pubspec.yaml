@@ -26,6 +26,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
   mocktail: ^1.0.4
 
 flutter:
@@ -35,3 +36,16 @@ flutter:
     - assets/images/ludo_board_final.png
     - assets/images/ludo_board.jpg
     - assets/images/ludo_board_glass.png
+
+# Generates Android mipmap launcher icons and the iOS AppIcon.appiconset.
+# The supplied artwork is used as the foreground; the solid luxury-black
+# adaptive background prevents launcher-mask cropping from exposing empty edges.
+flutter_launcher_icons:
+  android: launcher_icon
+  ios: true
+  image_path: assets/images/ludo_lovers_icon.png
+  adaptive_icon_background: "#080808"
+  adaptive_icon_foreground: assets/images/ludo_lovers_icon.png
+  adaptive_icon_foreground_inset: 16
+  min_sdk_android: 21
+  remove_alpha_ios: true
