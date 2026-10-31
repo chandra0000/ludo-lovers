@@ -509,6 +509,24 @@ class GameModeSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _GameModeCard(
+                key: const ValueKey('mode_team_up_button'),
+                icon: Icons.diversity_3_rounded,
+                accent: AppTheme.gold,
+                title: 'Team Up · 2 vs 2',
+                subtitle: 'Orange + Magenta vs Green + Blue',
+                detail: 'Four seats, two teams. Teammates share the victory and protect one another.',
+                actionLabel: 'Start Team Up match',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const LocalGameScreen(
+                      selectedPlayerIds: LocalGameFactory.playerIds,
+                      gameMode: LocalGameMode.teamUp,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _GameModeCard(
                 key: const ValueKey('mode_four_players_button'),
                 icon: Icons.groups_rounded,
                 accent: AppTheme.blue,
