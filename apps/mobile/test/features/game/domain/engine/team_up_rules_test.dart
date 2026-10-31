@@ -44,6 +44,18 @@ void main() {
       );
     });
 
+    test('last-arrival capture priority is deterministic', () {
+      expect(
+        TeamUpRules.selectLastArrivalPawnId(<String, int>{
+          'green_pawn_1': 3,
+          'blue_pawn_2': 8,
+          'blue_pawn_3': 5,
+        }),
+        'blue_pawn_2',
+      );
+      expect(TeamUpRules.selectLastArrivalPawnId(<String, int>{}), isNull);
+    });
+
     test('safe cells protect all teams, including opposing colours', () {
       expect(
         TeamUpRules.classifyCell(
