@@ -81,7 +81,7 @@ class ClassicLudoBoardTopology {
   /// Human-readable blockers for the current board definition.
   static List<String> inspect() {
     final issues = <String>[];
-    final track = ClassicLudoBoardDefinition.sharedTrackCells;
+    const track = ClassicLudoBoardDefinition.sharedTrackCells;
     if (track.length != ClassicLudoBoardDefinition.sharedTrackLength) {
       issues.add('Expected exactly 52 shared-track cells; found ${track.length}.');
     }
