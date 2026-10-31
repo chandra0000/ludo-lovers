@@ -93,6 +93,7 @@ class LocalGameState {
   final int version;
 
   String get currentPlayerId => players[currentPlayerIndex];
+  String get scheduledPlayerId => players[scheduledPlayerIndex];
 
   LocalGameState copyWith({
     List<LocalPawn>? pawns,
