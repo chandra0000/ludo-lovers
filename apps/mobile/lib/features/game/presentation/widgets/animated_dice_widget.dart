@@ -90,24 +90,26 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
           key: const ValueKey('roll_dice_button'),
           onTap: widget.enabled && !_locked ? widget.onRoll : null,
           borderRadius: BorderRadius.circular(16),
-          child: Center(
-            key: const ValueKey('animated_dice_widget'),
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                final pulse = widget.rolling
-                    ? 0.9 + 0.25 * math.sin(math.pi * _controller.value)
-                    : 1.0;
-                return Transform.rotate(
-                  angle: widget.rolling ? _rotation : 0,
-                  child: Transform.scale(
-                    scale: pulse,
-                    child: _DiceFace(
-                      value: widget.rolling ? _displayFace : widget.value,
+          child: SizedBox.expand(
+            child: Center(
+              key: const ValueKey('animated_dice_widget'),
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, _) {
+                  final pulse = widget.rolling
+                      ? 0.9 + 0.25 * math.sin(math.pi * _controller.value)
+                      : 1.0;
+                  return Transform.rotate(
+                    angle: widget.rolling ? _rotation : 0,
+                    child: Transform.scale(
+                      scale: pulse,
+                      child: _DiceFace(
+                        value: widget.rolling ? _displayFace : widget.value,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),
