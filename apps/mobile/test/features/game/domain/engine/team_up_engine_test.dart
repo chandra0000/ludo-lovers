@@ -77,7 +77,7 @@ void main() {
       );
       final orangePath = setup.paths.forPlayer('orange');
       final magentaPath = setup.paths.forPlayer('magenta');
-      final sharedCell = orangePath.cellAtProgress(0)!;
+      final sharedCell = orangePath.cellAtProgress(1)!;
       final magentaProgress = magentaPath.mainTrackCells.indexOf(sharedCell);
       expect(magentaProgress, greaterThanOrEqualTo(0));
 
