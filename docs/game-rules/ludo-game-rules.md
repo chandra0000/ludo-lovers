@@ -2,7 +2,7 @@
 
 **Project:** Ludo Lovers  
 **Roadmap step:** 06 — Ludo Game Rules  
-**Status:** Rules specification with a provisional `LudoRuleProfile` implementation and profile unit tests. Full rules acceptance coverage and board-topology validation remain incomplete.  
+**Status:** Confirmed rules specification. The local Team Up engine, mode-selection integration, gameplay identity/turn-transfer UI, and engine-level stack/turn/victory acceptance tests are implemented. The shared board route remains provisional, and online/server-authoritative gameplay is not implemented.  
 **Purpose:** Agree on deterministic game rules before building the local game engine in Step 07.
 
 ## 1. Rule-profile decision
@@ -293,7 +293,7 @@ A player who has all four pawns in final home still has their scheduled dice rol
 | TEAM-014 | Classic mode uses the existing profile | Team Up transfer/stack rules do not affect Classic |
 | TEAM-015 | Any colour combination from opposing teams meets | Same team-based rule is applied; no colour-specific special case |
 
-Team Up remains a specification until these behaviors are integrated into the live local engine, exercised by engine-level tests, and the complete Flutter analyze/test/Android debug APK pipeline passes. The helper-level rule tests alone do not establish gameplay readiness.
+The local Team Up mode is now integrated into the game-mode selection screen and local gameplay UI. The engine stores last-arrival priority in immutable `LocalGameState.teamUpCapturePriorityByCell`, validates mixed-stack state, resolves protected-stack departures and equal-sized stacks, and emits capture events for every pawn returned to its yard. Engine acceptance tests cover the TEAM-001–TEAM-015 behavior, including stacks with more than two occupants, both team victories, bonus-roll transfer, and Classic isolation. Team Up remains local-only; the shared board route is still provisional and must pass visual/topology approval before the mode can be considered release-ready. Online/server-authoritative play remains future work.
 
 ## 15. Scope and next step
 
