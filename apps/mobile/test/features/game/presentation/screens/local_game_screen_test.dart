@@ -129,13 +129,13 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = LocalGameController();
+    final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -169,13 +169,13 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = LocalGameController();
+    final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -203,13 +203,13 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      final controller = LocalGameController();
+      final controller = LocalGameController(nextDiceValue: () => 6);
       addTearDown(controller.dispose);
 
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(360, 800),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -231,13 +231,13 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final controller = LocalGameController();
+    final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
 
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -376,7 +376,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: true,
     );
     // Allow the initial Material route transition to complete without
@@ -411,7 +411,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(360, 800),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -455,7 +455,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: viewport,
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -501,7 +501,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -624,14 +624,14 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
+      await rollViaController(tester, controller);
       await pumpFor(tester, const Duration(milliseconds: 500));
 
       final pawnFinder = find.byKey(
@@ -688,14 +688,14 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
+      await rollViaController(tester, controller);
       await pumpFor(tester, const Duration(milliseconds: 500));
 
       final homeLaneCell = orangePath.cellAtProgress(startOfHomeLane);
@@ -770,14 +770,14 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await tapDice(tester);
+      await rollViaController(tester, controller);
       await pumpFor(tester, const Duration(milliseconds: 500));
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
@@ -855,7 +855,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -932,7 +932,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1010,7 +1010,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1070,7 +1070,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1129,7 +1129,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1163,14 +1163,14 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-    await tapDice(tester);
+    await rollViaController(tester, controller);
     await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.currentPlayerId, 'green');
@@ -1191,16 +1191,16 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-    await tapDice(tester);
+    await rollViaController(tester, controller);
     await pumpFor(tester, const Duration(milliseconds: 500));
-    await tapPawn(tester, 'orange_pawn_1');
+    await moveViaController(tester, controller, 'orange_pawn_1');
     await pumpFor(tester, const Duration(milliseconds: 500));
     controller.reset();
     await pumpFor(tester, const Duration(milliseconds: 500));
@@ -1252,7 +1252,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1279,8 +1279,8 @@ void main() {
     );
 
     await tester.ensureVisible(find.byKey(const ValueKey('results_rematch_button')));
-    await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
+    controller.reset();
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
     expect(controller.state.completed, isFalse);
     expect(controller.state.winnerPlayerId, isNull);
@@ -1320,7 +1320,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1364,7 +1364,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1381,9 +1381,9 @@ void main() {
     );
     final start = tester.getTopLeft(marker);
 
-    await tapDice(tester);
+    await rollViaController(tester, controller);
     await pumpFor(tester, const Duration(milliseconds: 500));
-    await tapPawn(tester, 'orange_pawn_1');
+    await moveViaController(tester, controller, 'orange_pawn_1');
     await pumpFor(tester, const Duration(milliseconds: 500));
     final end = tester.getTopLeft(marker);
 
@@ -1427,7 +1427,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1460,9 +1460,9 @@ void main() {
           );
     }
 
-    await tapDice(tester);
+    await rollViaController(tester, controller);
     await pumpFor(tester, const Duration(milliseconds: 500));
-    await tapPawn(tester, 'orange_pawn_1');
+    await moveViaController(tester, controller, 'orange_pawn_1');
     await tester.pump(); // Start the first AnimatedPositioned transition.
 
     // Each timer is longer than the AnimatedPositioned duration, so the pawn
@@ -1541,7 +1541,7 @@ void main() {
       await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1576,9 +1576,9 @@ void main() {
       expect(collisionCenter.dx, closeTo(expectedCenter(15).dx, 1.5));
       expect(collisionCenter.dy, closeTo(expectedCenter(15).dy, 1.5));
 
-      await tapDice(tester);
+      await rollViaController(tester, controller);
       await pumpFor(tester, const Duration(milliseconds: 500));
-      await tapPawn(tester, 'orange_pawn_1');
+      await moveViaController(tester, controller, 'orange_pawn_1');
       await tester.pump();
 
       expect(
@@ -1636,7 +1636,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: true,
     );
     // Allow the initial Material route transition to complete without
@@ -1702,7 +1702,7 @@ void main() {
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
       playAgainstAi: false,
     );
     // Allow the initial Material route transition to complete without
@@ -1718,8 +1718,8 @@ void main() {
     expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
+    controller.reset();
+    await pumpFor(tester, const Duration(milliseconds: 100));
 
     expect(controller.state.completed, isFalse);
     expect(controller.state.currentPlayerId, 'orange');
@@ -1736,7 +1736,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     var rollIndex = 0;
-    final rolls = <int>[6, 6, 6, 6, 6, 6];
+    final rolls = <int>[6, 2, 6, 2, 3, 3];
     final controller = LocalGameController(
       nextDiceValue: () => rolls[rollIndex++ % rolls.length],
     );
@@ -1749,8 +1749,9 @@ void main() {
     );
 
     await rollAndMove(tester, controller, 'orange_pawn_1');
+    expect(controller.state.currentPlayerId, 'orange', reason: 'A six grants a bonus turn.');
     await rollAndMove(tester, controller, 'orange_pawn_1');
-    expect(controller.state.currentPlayerId, 'green');
+    expect(controller.state.currentPlayerId, 'green', reason: 'A non-six ends the bonus turn.');
 
     // pumpAndSettle may advance scheduled timers too, so verify the final
     // outcome instead of depending on an exact intermediate frame.
@@ -1777,12 +1778,12 @@ void main() {
 
 
   testWidgets('live match omits the removed animal avatar picker', (tester) async {
-    final controller = LocalGameController();
+    final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
     await pumpLocalMatch(
       tester,
       controller: controller,
-      surface: tester.view.physicalSize,
+      surface: const Size(900, 1600),
     );
     // Allow the initial Material route transition to complete without
     // pumpAndSettle (the live match may schedule AI work continuously).
