@@ -63,7 +63,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
         width: 44,
         height: 44,
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.black.withValues(alpha: 0),
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: widget.onTap,
@@ -87,12 +87,12 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                             center: const Alignment(-0.35, -0.45),
                             radius: 0.9,
                             colors: [
-                              Color.lerp(widget.color, Colors.white, 0.55)!,
+                              Color.lerp(widget.color, AppTheme.cream, 0.55)!,
                               widget.color,
-                              Color.lerp(widget.color, Colors.black, 0.42)!,
+                              Color.lerp(widget.color, AppTheme.black, 0.42)!,
                             ],
                           ),
-                          border: Border.all(color: const Color(0xFFFFD978), width: 1.5),
+                          border: Border.all(color: const AppTheme.gold, width: 1.5),
                           boxShadow: const [
                             BoxShadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 3)),
                           ],
@@ -115,7 +115,7 @@ class _LudoPawnWidgetState extends State<LudoPawnWidget>
                           top: 0,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              color: const Color(0xFF17120D),
+                              color: const AppTheme.panel,
                               shape: BoxShape.circle,
                               border: Border.all(color: const Color(0xFFFFD978)),
                             ),
