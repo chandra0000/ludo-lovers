@@ -1278,7 +1278,6 @@ void main() {
       reason: 'A completed match must not accept another roll.',
     );
 
-    await tester.ensureVisible(find.byKey(const ValueKey('results_rematch_button')));
     controller.reset();
     await pumpFor(tester, const Duration(milliseconds: 100));
 
