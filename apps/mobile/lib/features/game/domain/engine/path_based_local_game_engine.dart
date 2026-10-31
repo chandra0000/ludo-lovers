@@ -14,16 +14,20 @@ class LocalPawn {
     required this.id,
     required this.playerId,
     required this.position,
+    this.lastMovedAtVersion = 0,
   });
 
   final String id;
   final String playerId;
   final PawnRoutePosition position;
+  /// Version of the accepted move that most recently placed this pawn.
+  final int lastMovedAtVersion;
 
-  LocalPawn copyWith({PawnRoutePosition? position}) => LocalPawn(
+  LocalPawn copyWith({PawnRoutePosition? position, int? lastMovedAtVersion}) => LocalPawn(
         id: id,
         playerId: playerId,
         position: position ?? this.position,
+        lastMovedAtVersion: lastMovedAtVersion ?? this.lastMovedAtVersion,
       );
 }
 
@@ -489,7 +493,10 @@ class PathBasedLocalGameEngine {
     }
 
     final pawns = List<LocalPawn>.of(state.pawns);
-    pawns[index] = pawn.copyWith(position: result.resolution!.position);
+    pawns[index] = pawn.copyWith(
+      position: result.resolution!.position,
+      lastMovedAtVersion: state.version + 1,
+    );
     final capturedPawnIds = <String>[];
     final destination = result.resolution!.destinationCell;
     if (destination != null && !safeCellIndexes.contains(destination)) {
@@ -513,9 +520,26 @@ class PathBasedLocalGameEngine {
         if (otherCell == destination) opponentIndexes.add(i);
       }
 
-      // A stacked pair is protected under the default MVP rule. Keep this
-      // explicit and configurable because Ludo variants differ on block rules.
-      if (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1) {
+      if (isTeamUp && opponentIndexes.isNotEmpty) {
+        // Team Up captures only the last-arrived pawn from an opposing stack.
+        // Teammate pawns were filtered above and safe cells never reach here.
+        final targetId = TeamUpRules.selectLastArrivalPawnId(
+          <String, int>{
+            for (final opponentIndex in opponentIndexes)
+              pawns[opponentIndex].id:
+                  pawns[opponentIndex].lastMovedAtVersion,
+          },
+        );
+        final targetIndex = opponentIndexes.firstWhere(
+          (opponentIndex) => pawns[opponentIndex].id == targetId,
+        );
+        pawns[targetIndex] = pawns[targetIndex].copyWith(
+          position: const PawnRoutePosition(section: PawnRouteSection.yard),
+        );
+        capturedPawnIds.add(pawns[targetIndex].id);
+      } else if (!isTeamUp &&
+          (!captureOnlySingleOpponentPawn || opponentIndexes.length == 1)) {
+        // Preserve Classic's existing stacked-pair protection exactly.
         for (final opponentIndex in opponentIndexes) {
           pawns[opponentIndex] = pawns[opponentIndex].copyWith(
             position: const PawnRoutePosition(section: PawnRouteSection.yard),
