@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/app/onboarding_screen.dart';
-import 'package:ludo_lovers/app/app.dart';
+
+Widget _laterDestination() => const Scaffold(
+      body: Center(child: Text('Future onboarding destination')),
+    );
 
 void main() {
-  testWidgets('onboarding shows the first introduction and skip opens home',
+  testWidgets('onboarding remains preserved but is not in the launch flow',
       (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: OnboardingScreen(
-          destinationBuilder: (_) => const AppFoundationScreen(),
+          destinationBuilder: (_) => _laterDestination(),
         ),
       ),
     );
@@ -21,15 +24,15 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
+    expect(find.text('Future onboarding destination'), findsOneWidget);
   });
 
-  testWidgets('onboarding next advances through the slides to get started',
+  testWidgets('onboarding slides remain available for later reactivation',
       (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: OnboardingScreen(
-          destinationBuilder: (_) => const AppFoundationScreen(),
+          destinationBuilder: (_) => _laterDestination(),
         ),
       ),
     );
@@ -47,6 +50,6 @@ void main() {
 
     await tester.tap(next);
     await tester.pumpAndSettle();
-    expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
+    expect(find.text('Future onboarding destination'), findsOneWidget);
   });
 }
