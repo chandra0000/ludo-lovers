@@ -555,7 +555,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   Future<void> _showMatchChat() async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.black.withValues(alpha: 0),
       isScrollControlled: true,
       useSafeArea: true,
       builder: (sheetContext) => Container(
@@ -620,7 +620,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF292117),
+                color: const AppTheme.panelRaised,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppTheme.gold.withValues(alpha: 0.3)),
               ),
@@ -648,7 +648,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF17130F),
+                color: const AppTheme.panel,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Column(
@@ -746,7 +746,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     avatar: CircleAvatar(backgroundColor: color, radius: 8),
                     selectedColor: color.withValues(alpha: 0.22),
                     side: BorderSide(
-                      color: selected ? color : Colors.white24,
+                      color: selected ? color : AppTheme.cream24,
                       width: selected ? 1.5 : 1,
                     ),
                     labelStyle: TextStyle(
@@ -1236,11 +1236,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                               : current.toUpperCase(),
                               key: const ValueKey('portrait_turn_indicator'),
                               style: const TextStyle(
-                                color: Color(0xFFFFE6A0),
+                                color: AppTheme.cream,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 1.1,
                                 shadows: <Shadow>[
-                                  Shadow(color: Colors.black, blurRadius: 6),
+                                  Shadow(color: AppTheme.black, blurRadius: 6),
                                 ],
                               ),
                             ),
@@ -1312,31 +1312,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               style: TextStyle(fontSize: ds(10), fontWeight: FontWeight.w800),
                             ),
                           ),
-                          const Spacer(),
-                          Text(
-                            'BOARD ROUTE · PROVISIONAL',
-                            key: const ValueKey('provisional_route_notice'),
-                            style: TextStyle(
-                              color: AppTheme.cream.withValues(alpha: 0.72),
-                              fontSize: ds(8),
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
+
                         ],
                       ),
                     ),
-                    Positioned(
-                      left: -1000,
-                      child: Row(
-                        children: <Widget>[
-                          IconButton(key: const ValueKey('toggle_ai_button'), onPressed: _toggleAiMode, icon: const Icon(Icons.smart_toy)),
-                          IconButton(key: const ValueKey('pause_match_button'), onPressed: _showPauseMenu, icon: const Icon(Icons.pause)),
-                          IconButton(key: const ValueKey('leave_match_button'), onPressed: _confirmLeave, icon: const Icon(Icons.exit_to_app)),
-                          IconButton(key: const ValueKey('restart_match_button'), onPressed: _confirmRestart, icon: const Icon(Icons.restart_alt)),
-                        ],
-                      ),
-                    ),
+
                   ],
                 );
               },
@@ -1384,7 +1364,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             shape: BoxShape.circle,
             color: AppTheme.gold.withValues(alpha: 0.20),
             border: Border.all(
-              color: const Color(0xFFFFF4B8),
+              color: const AppTheme.cream,
               width: math.max(1.5, cellSize * 0.075),
             ),
             boxShadow: <BoxShadow>[
@@ -1405,7 +1385,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               width: cellSize * 0.15,
               height: cellSize * 0.15,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF8D6),
+                color: const AppTheme.cream,
                 shape: BoxShape.circle,
                 boxShadow: <BoxShadow>[
                   BoxShadow(
@@ -1715,10 +1695,10 @@ class _DicePips extends StatelessWidget {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF3B2600),
+                    color: AppTheme.panel,
                     shape: BoxShape.circle,
                     boxShadow: <BoxShadow>[
-                      BoxShadow(color: Color(0x55000000), blurRadius: 1),
+                      BoxShadow(color: AppTheme.black.withValues(alpha: 0.33), blurRadius: 1),
                     ],
                   ),
                 )
