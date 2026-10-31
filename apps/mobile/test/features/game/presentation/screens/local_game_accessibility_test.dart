@@ -36,6 +36,8 @@ void main() {
     expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
     expect(find.byKey(const ValueKey('how_to_play_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('provisional_route_notice')), findsOneWidget);
+    expect(find.byKey(const ValueKey('toggle_ai_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('restart_match_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('ai_mode_status')), findsNothing);
 
     final rollButton = tester.widget<InkWell>(
