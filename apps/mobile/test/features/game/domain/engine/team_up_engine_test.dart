@@ -290,6 +290,159 @@ void main() {
       expect(transition.events.map((event) => event.type), contains('GameCompleted'));
     });
 
+    test('bonus six remains with the teammate receiving a transferred turn', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final magentaProgress = setup.paths.forPlayer('magenta');
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 2,
+        scheduledPlayerIndex: 0,
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.playerId == 'orange') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.finished,
+              progress: setup.paths.forPlayer('orange').finishProgress,
+            ));
+          }
+          if (pawn.id == 'magenta_pawn_1') {
+            return pawn.copyWith(position: const PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: 0,
+            ));
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+
+      final six = setup.engine.roll(
+        state,
+        playerId: 'magenta',
+        expectedVersion: state.version,
+        value: 6,
+      );
+      expect(six.state.currentPlayerId, 'magenta');
+      expect(six.state.scheduledPlayerIndex, 0);
+      expect(six.state.pendingRoll, 6);
+
+      final moved = setup.engine.move(
+        six.state,
+        playerId: 'magenta',
+        expectedVersion: six.state.version,
+        pawnId: 'magenta_pawn_1',
+      );
+      expect(moved.state.currentPlayerId, 'magenta');
+      expect(moved.state.scheduledPlayerIndex, 0);
+      expect(moved.events.map((event) => event.type), contains('ExtraRollGranted'));
+
+      final nextRoll = setup.engine.roll(
+        moved.state,
+        playerId: 'magenta',
+        expectedVersion: moved.state.version,
+        value: 2,
+      );
+      final nextMove = setup.engine.move(
+        nextRoll.state,
+        playerId: 'magenta',
+        expectedVersion: nextRoll.state.version,
+        pawnId: 'magenta_pawn_1',
+      );
+      expect(nextMove.state.currentPlayerId, 'green');
+      expect(nextMove.state.scheduledPlayerIndex, 1);
+    });
+
+    test('one unfinished teammate prevents premature team victory', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 2,
+        scheduledPlayerIndex: 2,
+        pendingRoll: 1,
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.playerId == 'orange' && pawn.id != 'orange_pawn_4') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.finished,
+              progress: setup.paths.forPlayer('orange').finishProgress,
+            ));
+          }
+          if (pawn.id == 'orange_pawn_4') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: setup.paths.forPlayer('orange').finishProgress - 1,
+            ));
+          }
+          if (pawn.playerId == 'magenta' && pawn.id != 'magenta_pawn_4') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.finished,
+              progress: setup.paths.forPlayer('magenta').finishProgress,
+            ));
+          }
+          if (pawn.id == 'magenta_pawn_4') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: setup.paths.forPlayer('magenta').finishProgress - 1,
+            ));
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'magenta',
+        expectedVersion: state.version,
+        pawnId: 'magenta_pawn_4',
+      );
+
+      expect(transition.state.completed, isFalse);
+      expect(transition.state.winnerTeamId, isNull);
+      expect(transition.state.currentPlayerId, 'orange');
+      expect(transition.state.scheduledPlayerIndex, 2);
+      expect(transition.events.map((event) => event.type), contains('ExtraRollGranted'));
+    });
+
+    test('Team B wins only after Green and Blue finish all eight pawns', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 3,
+        scheduledPlayerIndex: 3,
+        pendingRoll: 1,
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.playerId == 'green' ||
+              (pawn.playerId == 'blue' && pawn.id != 'blue_pawn_4')) {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.finished,
+              progress: setup.paths.forPlayer(pawn.playerId).finishProgress,
+            ));
+          }
+          if (pawn.id == 'blue_pawn_4') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.homeLane,
+              progress: setup.paths.forPlayer('blue').finishProgress - 1,
+            ));
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'blue',
+        expectedVersion: state.version,
+        pawnId: 'blue_pawn_4',
+      );
+
+      expect(transition.state.completed, isTrue);
+      expect(transition.state.winnerTeamId, 'b');
+      expect(transition.state.winnerPlayerId, 'blue');
+    });
+
     test('Classic turn advancement follows current player, not Team Up schedule', () {
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       final state = setup.initialState.copyWith(
