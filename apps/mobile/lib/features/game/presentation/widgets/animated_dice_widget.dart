@@ -34,7 +34,7 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
   @override
   void initState() {
     super.initState();
-    _displayFace = widget.value.clamp(1, 6);
+    _displayFace = widget.value.clamp(1, 6).toInt();
   }
 
   @override
@@ -42,7 +42,7 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
     super.didUpdateWidget(oldWidget);
     if (widget.rolling && !oldWidget.rolling) _animateRoll();
     if (!widget.rolling && oldWidget.rolling) {
-      _displayFace = widget.value.clamp(1, 6);
+      _displayFace = widget.value.clamp(1, 6).toInt();
       _locked = false;
     }
   }
@@ -55,7 +55,7 @@ class _AnimatedDiceWidgetState extends State<AnimatedDiceWidget>
     if (!mounted) return;
     _controller.removeListener(_tumble);
     setState(() {
-      _displayFace = widget.value.clamp(1, 6);
+      _displayFace = widget.value.clamp(1, 6).toInt();
       _rotation = 0;
       _locked = false;
     });
@@ -130,7 +130,7 @@ class _DiceFace extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          for (final alignment in positions[value.clamp(1, 6)]!)
+          for (final alignment in positions[value.clamp(1, 6).toInt()]!)
             Align(
               alignment: alignment,
               child: Padding(
