@@ -653,7 +653,7 @@ void main() {
       expect(
         tester.widget<InkWell>(
           find.byKey(const ValueKey('roll_dice_button')),
-        ).onPressed,
+        ).onTap,
         isNotNull,
         reason: 'A capture should grant the current player another roll.',
       );
@@ -1134,7 +1134,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
     expect(
-      tester.widget<ElevatedButton>(
+      tester.widget<InkWell>(
         find.byKey(const ValueKey('roll_dice_button')),
        ).onTap,
       isNotNull,
