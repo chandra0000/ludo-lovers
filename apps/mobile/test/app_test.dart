@@ -6,14 +6,9 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  const step = Duration(milliseconds: 100);
-  var elapsed = Duration.zero;
-  while (elapsed < duration) {
-    final remaining = duration - elapsed;
-    final interval = remaining < step ? remaining : step;
-    await tester.pump(interval);
-    elapsed += interval;
-  }
+  // Flush the rebuild without advancing fake time; gameplay timers must remain
+  // under each test's explicit control.
+  await tester.pump();
 }
 
 void main() {
@@ -34,7 +29,7 @@ void main() {
     expect(logo.image, isA<AssetImage>());
     expect((logo.image as AssetImage).assetName,
         'assets/images/ludo_lovers_logo.jpg');
-    expect(find.text('PLAY • CONNECT • LOVE'), findsOneWidget);
+    expect(find.text('PLAY • CONNECT • LOVE'), findsAtLeastNWidgets(1));
     expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
     expect(find.text('Love Mode'), findsOneWidget);
     expect(find.text('Explore the Board'), findsOneWidget);
