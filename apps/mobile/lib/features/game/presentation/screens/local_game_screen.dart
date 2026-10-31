@@ -811,8 +811,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               ),
               const _RuleRow(
                 number: '3',
-                title: 'Earn another roll',
-                detail: 'In this provisional rules profile, rolling a six grants another roll. Captures and finishing may also grant one.',
+                title: 'Safe stars & captures',
+                detail: 'Star tiles are safe squares. Landing on an opponent on an unprotected square sends that pawn back to its yard and earns a capture reward roll.',
               ),
               const _RuleRow(
                 number: '4',
@@ -821,6 +821,11 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               ),
               const _RuleRow(
                 number: '5',
+                title: 'Win the match',
+                detail: 'Be the first player to guide all four pawns into the home finish.',
+              ),
+              const _RuleRow(
+                number: '6',
                 title: 'Prototype warning',
                 detail: 'The owner-confirmed safe/star positions are fixed. The complete board route still requires on-device visual review. This guide describes the current local test rules, not approved online or competitive rules.',
               ),
