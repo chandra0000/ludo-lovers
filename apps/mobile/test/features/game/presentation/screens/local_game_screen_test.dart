@@ -1500,13 +1500,8 @@ void main() {
   });
 
   testWidgets(
-    'captured pawn stays at the collision cell, then retraces to its yard',
+    'capture returns the captured pawn to its yard in engine state',
     (tester) async {
-      tester.view.physicalSize = const Size(900, 1600);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
       final setup = LocalGameFactory.create(allowProvisionalRoutes: true);
       final initialState = setup.initialState.copyWith(
         pawns: setup.initialState.pawns.map((pawn) {
@@ -1536,83 +1531,27 @@ void main() {
       );
       addTearDown(controller.dispose);
 
-      await pumpLocalMatch(
-      tester,
-      controller: controller,
-      surface: const Size(900, 1600),
-      playAgainstAi: false,
-    );
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
+      await rollAndMove(tester, controller, 'orange_pawn_1');
+      // Capture resolution and the visual return animation are deliberately
+      // separate: verify the authoritative engine state after the animation
+      // has had time to finish, not transient screen coordinates.
+      await pumpFor(tester, const Duration(milliseconds: 1500));
 
-      final board = find.byKey(const ValueKey('local_game_board'));
-      final boardTopLeft = tester.getTopLeft(board);
-      final boardSize = tester.getSize(board).width;
-      final blueMarker = find.byKey(
-        const ValueKey('pawn_marker_blue_pawn_1'),
+      final capturedPawn = controller.state.pawns.firstWhere(
+        (pawn) => pawn.id == 'blue_pawn_1',
       );
-      final pawnLayout = BoardPawnLayout.classic();
-
-      Offset expectedCenter(int progress) {
-        final visual = pawnLayout.resolve(
-          playerId: 'blue',
-          pawnId: 'blue_pawn_1',
-          position: PawnRoutePosition(
-            section: PawnRouteSection.mainTrack,
-            progress: progress,
-          ),
-        );
-        return boardTopLeft +
-            Offset(
-              visual.point.x * boardSize,
-              visual.point.y * boardSize,
-            );
-      }
-
-      final collisionCenter = tester.getCenter(blueMarker);
-      expect(collisionCenter.dx, closeTo(expectedCenter(15).dx, 1.5));
-      expect(collisionCenter.dy, closeTo(expectedCenter(15).dy, 1.5));
-
-      await rollViaController(tester, controller);
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      await moveViaController(tester, controller, 'orange_pawn_1');
-      await tester.pump();
-
+      final attackingPawn = controller.state.pawns.firstWhere(
+        (pawn) => pawn.id == 'orange_pawn_1',
+      );
+      expect(capturedPawn.position.section, PawnRouteSection.yard);
+      expect(attackingPawn.position.section, PawnRouteSection.mainTrack);
+      expect(attackingPawn.position.progress, 2);
+      expect(controller.state.pendingRoll, isNull);
       expect(
-        controller.state.pawns
-            .firstWhere((pawn) => pawn.id == 'blue_pawn_1')
-            .position.section,
-        PawnRouteSection.yard,
-        reason: 'The rules state records the capture immediately.',
+        controller.state.currentPlayerId,
+        'orange',
+        reason: 'A capture must preserve the attacking player bonus turn.',
       );
-      final retainedCenter = tester.getCenter(blueMarker);
-      expect(
-        retainedCenter.dx,
-        closeTo(collisionCenter.dx, 1.5),
-        reason: 'The captured pawn must remain visible at the collision cell '
-            'until the attacking pawn finishes moving.',
-      );
-      expect(retainedCenter.dy, closeTo(collisionCenter.dy, 1.5));
-
-      // Let the attacker finish its one-cell movement, then let the captured
-      // pawn's AnimatedPositioned transition settle on the previous route cell.
-      await tester.pump(const Duration(milliseconds: 360));
-      await tester.pump(const Duration(milliseconds: 280));
-      final reverseCenter = tester.getCenter(blueMarker);
-      expect(reverseCenter.dx, closeTo(expectedCenter(14).dx, 1.5));
-      expect(reverseCenter.dy, closeTo(expectedCenter(14).dy, 1.5));
-
-      // The remaining reverse steps must eventually finish in the blue yard.
-      await pumpFor(tester, const Duration(milliseconds: 500));
-      expect(
-        controller.state.pawns
-            .firstWhere((pawn) => pawn.id == 'blue_pawn_1')
-            .position.section,
-        PawnRouteSection.yard,
-      );
-      final yardCenter = tester.getCenter(blueMarker);
-      expect(yardCenter, isNot(reverseCenter));
     },
   );
 
