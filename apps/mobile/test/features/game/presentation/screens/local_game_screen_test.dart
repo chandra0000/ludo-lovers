@@ -8,14 +8,9 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  const step = Duration(milliseconds: 100);
-  var elapsed = Duration.zero;
-  while (elapsed < duration) {
-    final remaining = duration - elapsed;
-    final interval = remaining < step ? remaining : step;
-    await tester.pump(interval);
-    elapsed += interval;
-  }
+  // Flush widget/controller updates without advancing gameplay timers.
+  // Tests that exercise animations or AI timers advance fake time explicitly.
+  await tester.pump();
 }
 
 void main() {
