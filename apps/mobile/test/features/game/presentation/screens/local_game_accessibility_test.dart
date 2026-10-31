@@ -33,8 +33,10 @@ void main() {
       ),
     );
 
-    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
-    expect(find.text('AI OPPONENTS ON · YOU PLAY ORANGE'), findsOneWidget);
+    expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
+    expect(find.byKey(const ValueKey('how_to_play_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('provisional_route_notice')), findsOneWidget);
+    expect(find.byKey(const ValueKey('ai_mode_status')), findsNothing);
 
     final rollButton = tester.widget<InkWell>(
       find.byKey(const ValueKey('roll_dice_button')),
