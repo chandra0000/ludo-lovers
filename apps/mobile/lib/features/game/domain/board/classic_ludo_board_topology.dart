@@ -15,7 +15,7 @@ class ClassicLudoBoardTopology {
   /// Indexes of shared-track edges that are not one-cell orthogonal moves.
   /// The index identifies the edge from [index] to [(index + 1) % 52].
   static List<int> get nonOrthogonalEdgeIndexes {
-    final track = ClassicLudoBoardDefinition.sharedTrackCells;
+    const track = ClassicLudoBoardDefinition.sharedTrackCells;
     final result = <int>[];
     for (var index = 0; index < track.length; index++) {
       final from = track[index];
