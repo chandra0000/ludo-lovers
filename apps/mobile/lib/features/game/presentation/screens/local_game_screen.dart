@@ -1,3 +1,5 @@
+// ignore_for_file: const_eval_method_invocation
+
 // Temporary file-level suppression for the constructor lint emitted only after CI formatting.
 // TODO: replace with a targeted const fix once the CI-formatted line is reproducible locally.
 // ignore_for_file: prefer_const_constructors
@@ -877,49 +879,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
   }
 
-  Future<void> _showPauseMenu() async {
-    if (_isPaused || !mounted) return;
-    setState(() => _isPaused = true);
-    final choice = await showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        key: const ValueKey('match_paused_dialog'),
-        backgroundColor: AppTheme.panel,
-        title: const Text('Match paused'),
-        content: const Text(
-          'Take a break. Your local match and pawn positions will be kept.',
-          style: TextStyle(color: AppTheme.readableText),
-        ),
-        actions: <Widget>[
-          TextButton(
-            key: const ValueKey('resume_match_button'),
-            onPressed: () => Navigator.of(dialogContext).pop('resume'),
-            child: const Text('Resume match'),
-          ),
-          TextButton(
-            key: const ValueKey('pause_restart_match_button'),
-            onPressed: () => Navigator.of(dialogContext).pop('restart'),
-            child: const Text('Restart match'),
-          ),
-          TextButton(
-            key: const ValueKey('pause_leave_match_button'),
-            onPressed: () => Navigator.of(dialogContext).pop('leave'),
-            child: const Text('Leave match'),
-          ),
-        ],
-      ),
-    );
-    if (!mounted) return;
-    setState(() => _isPaused = false);
-    if (choice == 'restart') {
-      await _confirmRestart();
-    } else if (choice == 'leave') {
-      await _confirmLeave();
-    } else {
-      _scheduleAiTurn(_controller.state);
-    }
-  }
 
   // Retained for the next help-menu iteration; currently not exposed in the UI.
   // ignore: unused_element
