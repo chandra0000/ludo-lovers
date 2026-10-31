@@ -18,9 +18,13 @@ Status: local-mode implementation and acceptance tests. This is not an online or
 - A player cannot capture their own pawns.
 - Teammates may share an unsafe cell; a teammate's pawn is never a capture target.
 - Safe cells protect every pawn, including pawns from opposing teams.
-- Teammate pawns are excluded from capture candidates before the opponent-stack policy is applied.
-- Team Up uses the existing configured local opponent-stack policy; it does not invent a new priority rule. With the default `captureOnlySingleOpponentPawn: true`, a single opposing pawn on an unsafe cell is captured, while a stack of multiple opposing pawns is protected. If a profile explicitly sets this flag to false, the existing profile behavior captures every opposing pawn in that stack.
-- Captured pawns return to their own yard. Capture bonus behavior continues to use the configured local rule profile.
+- Teammate pawns may share a cell and are always friendly.
+- On a non-safe cell with opposing teams, the last-arriving pawn/stack owns capture priority. The mixed occupants initially remain present and the priority team is stored in immutable game state by shared-track cell.
+- If a pawn from the protected (earlier-arriving) team leaves while the priority team still occupies the cell, all remaining pawns from the protected team at that cell are captured and returned to their yard. The pawn that left is not captured.
+- If the last-arriving priority team leaves the cell first, the earlier-arriving team remains and the priority record is removed.
+- When opposing stacks become equal-sized after an arrival, the last-arriving team immediately wins the cell and all opposing pawns there return to their yard.
+- These rules apply to stacks of more than two occupants; stack membership is calculated by team, not by colour or animation order.
+- Capture events are emitted for each pawn returned to the yard. Capture bonus behavior continues to use the configured local rule profile.
 
 ## Victory
 
@@ -43,7 +47,7 @@ The automated suite covers:
 - rejection of incomplete or incorrectly ordered Team Up seats;
 - finished-seat transfer to the correct teammate;
 - bonus-six retention by the active teammate and return to the next scheduled seat after the bonus ends;
-- teammate protection and capture priority, opposing safe-cell protection, single-opponent capture, and protection of a multi-pawn opposing stack under the existing default policy;
+- friendly teammate stacking, safe-cell protection, last-arrival priority persistence, protected-stack departure capture, priority-stack departure protection, equal-sized stack resolution, and stacks with more than two occupants;
 - Team A and Team B victory, plus no premature victory while one teammate has an unfinished pawn;
 - explicit Team Up navigation, team identity banner, and transferred-turn indicator;
 - Classic factory profile and independent Classic turn advancement.
