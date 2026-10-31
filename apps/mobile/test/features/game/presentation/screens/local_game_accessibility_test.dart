@@ -32,6 +32,9 @@ void main() {
         home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
     expect(find.byKey(const ValueKey('how_to_play_button')), findsOneWidget);
@@ -71,5 +74,8 @@ void main() {
 
     // Stop the scheduled AI timer by unmounting before its delayed action.
     await tester.pumpWidget(const SizedBox.shrink());
+    // Allow the initial Material route transition to complete without
+    // pumpAndSettle (the live match may schedule AI work continuously).
+    await tester.pump(const Duration(milliseconds: 400));
   });
 }
