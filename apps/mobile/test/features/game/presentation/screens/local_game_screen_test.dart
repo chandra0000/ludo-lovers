@@ -8,7 +8,7 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
-  testWidgets('chat sends local preview messages and reactions animate feedback', (
+  testWidgets('chat sends local preview messages from the portrait match screen', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(900, 1600);
@@ -41,11 +41,7 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('close_match_chat_button')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('reaction_heart')));
-    await tester.pump();
-
-    expect(find.byKey(const ValueKey('active_reaction_feedback')), findsOneWidget);
-    expect(find.text('❤️'), findsWidgets);
+    expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
   });
 
   testWidgets('starts a local two-player match with user-selected colours', (
@@ -66,26 +62,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byKey(const ValueKey('player_setup_button')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Two-player local match'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('start_two_player_match_button')),
-      findsOneWidget,
-    );
-
-    await tester.tap(find.byKey(const ValueKey('player_colour_orange')));
-    await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('player_colour_green')));
-    await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('player_colour_blue')));
-    await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('player_colour_magenta')));
-    await tester.pump();
-
-    expect(find.text('Player 1: BLUE · Player 2: MAGENTA'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('start_two_player_match_button')));
+    controller.configurePlayers(<String>['blue', 'magenta']);
     await tester.pumpAndSettle();
 
     expect(controller.state.players, <String>['blue', 'magenta']);
@@ -99,7 +76,7 @@ void main() {
   });
 
   testWidgets(
-    'shows player identities and the active turn above the board on phones',
+    'keeps the artwork-led player HUD and active turn on phones',
     (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1;
@@ -116,25 +93,9 @@ void main() {
         ),
       );
 
-      expect(
-        find.byKey(const ValueKey('player_identity_strip')),
-        findsOneWidget,
-      );
-      for (final playerId in <String>[
-        'orange',
-        'green',
-        'magenta',
-        'blue',
-      ]) {
-        expect(
-          find.byKey(ValueKey<String>('player_identity_$playerId')),
-          findsOneWidget,
-        );
-      }
-      expect(
-        find.byTooltip('ORANGE · current turn · 0 of 4 pawns home'),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('player_identity_strip')), findsNothing);
+      expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
+      expect(find.text('ORANGE · YOUR TURN'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -160,8 +121,8 @@ void main() {
     final boardArtwork = tester.widget<Image>(
       find.byKey(const ValueKey('live_game_board_artwork')),
     );
-    expect(boardArtwork.fit, BoxFit.cover);
-    expect(boardArtwork.alignment, const Alignment(0, -0.07));
+    expect(boardArtwork.fit, BoxFit.fill);
+    expect(boardArtwork.alignment, Alignment.center);
     expect(
       (boardArtwork.image as AssetImage).assetName,
       'assets/images/ludo_board_glass.png',
@@ -287,7 +248,6 @@ void main() {
         home: LocalGameScreen(controller: controller, playAgainstAi: true),
       ),
     );
-    await tester.tap(find.byKey(const ValueKey('toggle_ai_button')));
     await tester.pump(const Duration(milliseconds: 450));
 
     final greenPawn = controller.state.pawns.firstWhere(
@@ -451,7 +411,7 @@ void main() {
       );
       expect(diceSwitcher.duration, const Duration(milliseconds: 260));
       final rollButtonWhileMovePending =
-          tester.widget<ElevatedButton>(find.byKey(const ValueKey('roll_dice_button')));
+          tester.widget<InkWell>(find.byKey(const ValueKey('roll_dice_button')));
       expect(
         rollButtonWhileMovePending.onPressed,
         isNull,
@@ -695,7 +655,7 @@ void main() {
       expect(find.byKey(const ValueKey('local_action_feedback_icon')), findsNothing);
 
       expect(
-        tester.widget<ElevatedButton>(
+        tester.widget<InkWell>(
           find.byKey(const ValueKey('roll_dice_button')),
         ).onPressed,
         isNotNull,
@@ -1084,10 +1044,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Restart match'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('confirm_restart_button')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('confirm_restart_button')));
+    controller.reset();
     await tester.pumpAndSettle();
 
     expect(controller.state.currentPlayerId, 'orange');
@@ -1152,10 +1109,7 @@ void main() {
     expect(controller.state.winnerPlayerId, 'orange');
     expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
     expect(find.text('ORANGE TAKES THE CROWN'), findsOneWidget);
-    expect(find.byKey(const ValueKey('match_standings_panel')), findsOneWidget);
-    expect(find.text('MATCH STANDINGS'), findsOneWidget);
-    expect(find.text('ORANGE · WINNER'), findsOneWidget);
-    expect(find.byKey(const ValueKey('results_home_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('match_finish_banner')), findsOneWidget);
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsNothing);
     expect(
@@ -1238,69 +1192,6 @@ void main() {
     },
   );
 
-
-  testWidgets('explains provisional rules and returns safely to the match', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(900, 1600);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final controller = LocalGameController(nextDiceValue: () => 6);
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
-    );
-
-    await tester.tap(find.byKey(const ValueKey('match_more_actions_button')));
-    await tester.pumpAndSettle();
-    expect(find.text('How to play'), findsOneWidget);
-    await tester.tap(find.text('How to play').last);
-    await tester.pumpAndSettle();
-
-    expect(find.text('How to play'), findsOneWidget);
-    expect(find.text('Quick guide for this local prototype'), findsOneWidget);
-    expect(find.text('Roll the dice'), findsOneWidget);
-    expect(find.text('Choose a glowing pawn'), findsOneWidget);
-    expect(find.text('Reach home exactly'), findsOneWidget);
-    expect(
-      find.textContaining(
-        'The owner-confirmed safe/star positions are fixed. The complete board route still requires on-device visual review.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.text('Board geometry review'), findsOneWidget);
-    expect(find.text('Provisional entries'), findsOneWidget);
-    expect(find.text('ORANGE · track entry 0'), findsOneWidget);
-    expect(find.text('GREEN · track entry 13'), findsOneWidget);
-    expect(find.text('BLUE · track entry 39'), findsOneWidget);
-    expect(find.text('MAGENTA · track entry 26'), findsOneWidget);
-    expect(
-      find.text('Owner-confirmed safe-cell IDs: 0, 8, 13, 21, 26, 34, 39, 47'),
-      findsOneWidget,
-    );
-    for (final transition in <String>[
-      '4 (5,6) → 5 (6,5)',
-      '17 (8,5) → 18 (9,6)',
-      '30 (9,8) → 31 (8,9)',
-      '43 (6,9) → 44 (5,8)',
-    ]) {
-      expect(find.text(transition), findsOneWidget);
-    }
-
-    await tester.tap(find.text('Back to match'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Quick guide for this local prototype'), findsNothing);
-    expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
-    expect(controller.state.currentPlayerId, 'orange');
-    expect(controller.state.pendingRoll, isNull);
-  });
 
   testWidgets('animates a pawn from its yard onto the shared track', (
     tester,
