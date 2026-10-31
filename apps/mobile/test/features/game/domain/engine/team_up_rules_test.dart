@@ -53,6 +53,14 @@ void main() {
         }),
         'blue_pawn_2',
       );
+      expect(
+        TeamUpRules.selectLastArrivalPawnId(<String, int>{
+          'blue_pawn_2': 5,
+          'green_pawn_1': 5,
+        }),
+        'blue_pawn_2',
+        reason: 'Equal move versions use a stable pawn-ID tie-break.',
+      );
       expect(TeamUpRules.selectLastArrivalPawnId(<String, int>{}), isNull);
     });
 
