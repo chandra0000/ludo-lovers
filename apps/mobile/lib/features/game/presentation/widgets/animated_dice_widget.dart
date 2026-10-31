@@ -128,7 +128,7 @@ class _DiceFace extends StatelessWidget {
         color: AppTheme.cream,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.gold, width: 2),
-        boxShadow: const [BoxShadow(color: AppTheme.black.withValues(alpha: 0.75), blurRadius: 8, offset: Offset(0, 3))],
+        boxShadow: [BoxShadow(color: AppTheme.black.withValues(alpha: 0.75), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Stack(
         children: [
