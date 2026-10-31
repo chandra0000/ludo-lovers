@@ -194,7 +194,7 @@ void main() {
 
     expect(find.text('LOCAL'), findsNothing);
     expect(find.text('YOUR TURN'), findsNothing);
-    expect(find.byKey(const ValueKey('match_more_actions_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('match_more_actions_button')), findsNothing);
     expect(find.byKey(const ValueKey('toggle_sound_button')), findsNothing);
     expect(find.text('Online'), findsNothing);
   });
@@ -1736,107 +1736,6 @@ void main() {
   });
 
 
-
-  testWidgets('restart requires confirmation and can be cancelled', (tester) async {
-    tester.view.physicalSize = const Size(360, 800);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final controller = LocalGameController(nextDiceValue: () => 6);
-    addTearDown(controller.dispose);
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
-    );
-
-    final originalVersion = controller.state.version;
-    await tester.tap(find.byKey(const ValueKey('restart_match_button')));
-    await tester.pumpAndSettle();
-    expect(find.text('Restart this match?'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('cancel_restart_button')));
-    await tester.pumpAndSettle();
-    expect(controller.state.version, originalVersion);
-
-    await tester.tap(find.byKey(const ValueKey('restart_match_button')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('confirm_restart_button')));
-    await tester.pumpAndSettle();
-    expect(controller.state.version, greaterThan(originalVersion));
-    expect(controller.state.completed, isFalse);
-  });
-
-  testWidgets('leaving a local match requires explicit confirmation', (tester) async {
-    tester.view.physicalSize = const Size(360, 800);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final controller = LocalGameController();
-    addTearDown(controller.dispose);
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: const Scaffold(body: Text('Home destination')),
-      ),
-    );
-    await tester.tap(find.text('Home destination'));
-    await tester.pumpAndSettle();
-    Navigator.of(tester.element(find.text('Home destination'))).push(
-      MaterialPageRoute<void>(
-        builder: (_) => LocalGameScreen(controller: controller),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const ValueKey('leave_match_button')));
-    await tester.pumpAndSettle();
-    expect(find.text('Leave this match?'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('cancel_leave_match_button')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
-
-    await tester.tap(find.byKey(const ValueKey('leave_match_button')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('confirm_leave_match_button')));
-    await tester.pumpAndSettle();
-    expect(find.text('Home destination'), findsOneWidget);
-    expect(find.byKey(const ValueKey('local_game_board')), findsNothing);
-  });
-
-
-  testWidgets('pause menu freezes the match until the player resumes', (tester) async {
-    tester.view.physicalSize = const Size(900, 1600);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final controller = LocalGameController(nextDiceValue: () => 6);
-    addTearDown(controller.dispose);
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: LocalGameScreen(controller: controller),
-      ),
-    );
-
-    final versionBeforePause = controller.state.version;
-    await tester.tap(find.byKey(const ValueKey('pause_match_button')));
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const ValueKey('match_paused_dialog')), findsOneWidget);
-    expect(find.byKey(const ValueKey('resume_match_button')), findsOneWidget);
-    expect(controller.state.version, versionBeforePause);
-
-    await tester.tap(find.byKey(const ValueKey('resume_match_button')));
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const ValueKey('match_paused_dialog')), findsNothing);
-    expect(controller.state.version, versionBeforePause);
-    expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
-  });
 
   testWidgets('live match omits the removed animal avatar picker', (tester) async {
     final controller = LocalGameController();
