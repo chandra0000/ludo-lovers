@@ -19,8 +19,15 @@ Future<void> _openHome(WidgetTester tester) async {
 }
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  // Advance the requested duration so navigation transitions complete.
-  await tester.pump(duration);
+  // Advance in bounded frames: a single long pump can skip intermediate
+  // animation frames and leave route/board overlays in an input-blocking state.
+  const frame = Duration(milliseconds: 50);
+  var remaining = duration;
+  while (remaining > Duration.zero) {
+    final step = remaining > frame ? frame : remaining;
+    await tester.pump(step);
+    remaining -= step;
+  }
 }
 
 void main() {
