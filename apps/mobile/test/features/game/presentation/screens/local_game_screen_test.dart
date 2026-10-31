@@ -61,7 +61,7 @@ Future<void> pumpLocalMatch(
     ),
   );
   await tester.pump();
-  await pumpFor(tester, const Duration(milliseconds: 500));
+  await pumpFor(tester, const Duration(milliseconds: 100));
 }
 
 Future<void> tapDice(WidgetTester tester) async {
@@ -85,25 +85,39 @@ Future<void> tapPawn(WidgetTester tester, String pawnId) async {
   await pumpFor(tester, const Duration(milliseconds: 500));
 }
 
-/// Prefer this in rule/flow tests (avoids UI hit-test flakiness).
-Future<void> rollAndMoveViaController(
+/// Rules / flow tests — does NOT use UI hit-testing.
+Future<void> rollViaController(
+  WidgetTester tester,
+  LocalGameController controller,
+) async {
+  final before = controller.state.version;
+  controller.rollDice(expectedVersion: before);
+  await pumpFor(tester, const Duration(milliseconds: 100));
+}
+
+Future<void> moveViaController(
   WidgetTester tester,
   LocalGameController controller,
   String pawnId,
 ) async {
-  final rollVersion = controller.state.version;
-  controller.rollDice(expectedVersion: rollVersion);
-  await pumpFor(tester, const Duration(milliseconds: 100));
-
+  final legal = controller.legalPawnIds;
   expect(
-    controller.legalPawnIds,
-    contains(pawnId),
-    reason: 'The deterministic roll must make $pawnId legal before moving it.',
+    legal,
+    isNotEmpty,
+    reason: 'No legal pawns after roll (pendingRoll=${controller.state.pendingRoll}).',
   );
-  final moveVersion = controller.state.version;
-  controller.movePawn(pawnId, expectedVersion: moveVersion);
-  expect(controller.lastError, isNull);
+  expect(legal, contains(pawnId), reason: 'Pawn $pawnId not legal: $legal');
+  controller.movePawn(pawnId, expectedVersion: controller.state.version);
   await pumpFor(tester, const Duration(milliseconds: 100));
+}
+
+Future<void> rollAndMove(
+  WidgetTester tester,
+  LocalGameController controller,
+  String pawnId,
+) async {
+  await rollViaController(tester, controller);
+  await moveViaController(tester, controller, pawnId);
 }
 
 void main() {
@@ -848,7 +862,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
+      await rollAndMove(tester, controller, 'orange_pawn_1');
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -925,7 +939,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
+      await rollAndMove(tester, controller, 'orange_pawn_1');
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -1003,7 +1017,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
+      await rollAndMove(tester, controller, 'orange_pawn_1');
 
       final bluePawns = controller.state.pawns.where(
         (pawn) => pawn.id == 'blue_pawn_1' || pawn.id == 'blue_pawn_2',
@@ -1122,7 +1136,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-      await rollAndMoveViaController(tester, controller, 'orange_pawn_1');
+      await rollAndMove(tester, controller, 'orange_pawn_1');
 
       expect(
         controller.state.pawns
@@ -1325,7 +1339,7 @@ void main() {
       expect(find.textContaining('NoLegalMove · TurnEnded'), findsNothing);
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
 
-      await rollAndMoveViaController(tester, controller, 'green_pawn_1');
+      await rollAndMove(tester, controller, 'green_pawn_1');
 
       expect(controller.state.currentPlayerId, 'green');
       expect(
