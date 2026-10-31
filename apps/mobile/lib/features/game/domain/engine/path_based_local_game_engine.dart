@@ -69,6 +69,14 @@ class LocalGameState {
         this.pawns.map((pawn) => pawn.id).toSet().length != this.pawns.length) {
       throw ArgumentError('Pawn IDs must be non-empty and unique.');
     }
+    if (this.pawns.any(
+      (pawn) =>
+          pawn.lastMovedAtVersion < 0 || pawn.lastMovedAtVersion > version,
+    )) {
+      throw ArgumentError(
+        'Pawn arrival versions must be non-negative and no newer than the game state.',
+      );
+    }
     final roll = pendingRoll;
     if (roll != null && (roll < 1 || roll > 6)) {
       throw ArgumentError.value(roll, 'pendingRoll');
@@ -627,6 +635,16 @@ class PathBasedLocalGameEngine {
   /// Reject malformed route positions before they can corrupt capture or
   /// rendering logic. The renderer and engine share the same player paths.
   void _validatePawnPositions(LocalGameState state) {
+    if (isTeamUp) {
+      if (state.players.join(',') != TeamUpRules.turnOrder.join(',')) {
+        throw const LocalGameException(LocalActionError.invalidState);
+      }
+      for (final playerId in TeamUpRules.turnOrder) {
+        if (state.pawns.where((pawn) => pawn.playerId == playerId).length != 4) {
+          throw const LocalGameException(LocalActionError.invalidState);
+        }
+      }
+    }
     for (final pawn in state.pawns) {
       final path = paths.forPlayer(pawn.playerId);
       final progress = pawn.position.progress;
