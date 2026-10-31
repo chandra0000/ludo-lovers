@@ -891,6 +891,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             return AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {
+                try {
                 final state = _controller.state;
                 _scheduleAiTurn(state);
                 final current = state.currentPlayerId;
@@ -1248,6 +1249,18 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
                   ],
                 );
+                } on Object catch (error, stackTrace) {
+                  FlutterError.reportError(FlutterErrorDetails(
+                    exception: error,
+                    stack: stackTrace,
+                    library: 'Ludo Lovers gameplay',
+                    context: ErrorDescription('while building the local match screen'),
+                  ));
+                  return _GameplayRenderFallback(
+                    message: error.toString(),
+                    onBack: () => Navigator.of(context).maybePop(),
+                  );
+                }
               },
             );
           },
@@ -1750,3 +1763,71 @@ class _RuleRow extends StatelessWidget {
   }
 }
 
+
+/// Keeps a gameplay initialization/rendering failure visible and recoverable
+/// instead of leaving users on an unexplained black screen.
+class _GameplayRenderFallback extends StatelessWidget {
+  const _GameplayRenderFallback({
+    required this.message,
+    required this.onBack,
+  });
+
+  final String message;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppTheme.black,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(Icons.warning_amber_rounded,
+                    color: AppTheme.gold, size: 48),
+                const SizedBox(height: 16),
+                const Text(
+                  'GAME BOARD COULD NOT START',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppTheme.gold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'The match encountered a rendering error. Your game rules and board data have not been changed.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppTheme.readableText, height: 1.4),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  message,
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppTheme.mutedText,
+                    fontSize: 10,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                FilledButton.icon(
+                  onPressed: onBack,
+                  icon: const Icon(Icons.arrow_back_rounded),
+                  label: const Text('Back to game modes'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
