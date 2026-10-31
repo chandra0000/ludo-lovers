@@ -174,7 +174,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 1.28,
+                    childAspectRatio: 1.15,
                     children: <Widget>[
                       _ModeTile(
                         key: const ValueKey('mode_vs_computer_button'),
