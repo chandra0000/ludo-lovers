@@ -98,7 +98,7 @@ void main() {
     // pumpAndSettle (the live match may schedule AI work continuously).
     await pumpFor(tester, const Duration(milliseconds: 400));
     await tester.tap(find.text('Play vs AI'));
-    await pumpFor(tester,const Duration(milliseconds: 50));
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.byType(LocalGameScreen), findsOneWidget);
 
