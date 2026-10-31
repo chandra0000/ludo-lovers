@@ -1,5 +1,6 @@
 import 'board_coordinate_layout.dart';
 import 'classic_ludo_board_definition.dart';
+import 'classic_ludo_board_topology.dart';
 
 /// Provisional 15x15 grid route used to unify rendering and hit-testing.
 ///
@@ -69,10 +70,14 @@ class ClassicLudoBoardCoordinateFactory {
   /// This includes documented connectors; it is not the same as an unknown jump.
   static List<int> get invalidTransitionIndexes => nonOrthogonalTransitionIndexes;
 
-  /// True only when all 52 cells form an orthogonally continuous cycle.
+  /// True only when the full loop and its seat-entry parity satisfy the
+  /// orthogonal-grid contract. The current reference candidate does not.
   static bool get isOrthogonallyContinuous =>
-      sharedTrack.length == ClassicLudoBoardDefinition.sharedTrackLength &&
-      nonOrthogonalTransitionIndexes.isEmpty;
+      ClassicLudoBoardTopology.isOrthogonalTopologyValid;
+
+  /// Detailed blockers for the requested orthogonal route contract.
+  static List<String> get topologyBlockers =>
+      ClassicLudoBoardTopology.inspect();
 
   /// Conservative release gate for consuming this geometry in game rules.
   ///
@@ -84,6 +89,7 @@ class ClassicLudoBoardCoordinateFactory {
         sharedTrack.toSet().length != sharedTrack.length ||
         !sharedTrack.every((cell) => cell.isInsideBoard) ||
         unmappedTransitionIndexes.isNotEmpty ||
+        !ClassicLudoBoardTopology.isOrthogonalTopologyValid ||
         !ClassicLudoBoardDefinition.isVisualTopologyApproved) {
       return false;
     }
