@@ -1655,7 +1655,7 @@ class _DicePips extends StatelessWidget {
               ? Container(
                   width: 8,
                   height: 8,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppTheme.panel,
                     shape: BoxShape.circle,
                     boxShadow: <BoxShadow>[
