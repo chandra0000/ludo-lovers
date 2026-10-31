@@ -50,7 +50,7 @@ void main() {
     final rollButton = tester.widget<InkWell>(
       find.byKey(const ValueKey('roll_dice_button')),
     );
-    expect(rollButton.onPressed, isNull);
+    expect(rollButton.onTap, isNull);
 
     final rollSemantics = tester.widget<Semantics>(
       find.byKey(const ValueKey('roll_dice_button_semantics')),
@@ -73,7 +73,7 @@ void main() {
     expect(find.text('MATCH WON'), findsNothing);
     expect(find.byKey(const ValueKey('results_rematch_button')), findsNothing);
     expect(
-      tester.widget<ElevatedButton>(
+      tester.widget<InkWell>(
         find.byKey(const ValueKey('roll_dice_button')),
       ).onPressed,
       isNotNull,
