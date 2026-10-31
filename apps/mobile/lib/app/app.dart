@@ -397,7 +397,7 @@ class _SameColourPawnsIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: 54,
       height: 38,
       child: Stack(
