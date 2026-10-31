@@ -49,6 +49,31 @@ void main() {
     expect(find.text('Online rooms'), findsNothing);
   });
 
+  testWidgets('Team Up selection opens the 2-vs-2 match with team identities',
+      (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const GameModeSelectionScreen(),
+      ),
+    );
+    await pumpFor(tester, const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('mode_team_up_button')));
+    await pumpFor(tester, const Duration(milliseconds: 500));
+
+    expect(find.byType(LocalGameScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('team_up_identity_banner')), findsOneWidget);
+    expect(find.text('TEAM A'), findsOneWidget);
+    expect(find.text('TEAM B'), findsOneWidget);
+    expect(find.text('ORANGE + MAGENTA'), findsOneWidget);
+    expect(find.text('GREEN + BLUE'), findsOneWidget);
+  });
+
   testWidgets('two-player setup lets players choose two distinct colours',
       (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
