@@ -81,9 +81,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   int _rollingFace = 1;
   int _diceRollTicks = 0;
   Timer? _diceRollTimer;
-  final List<String> _chatMessages = <String>[];
-  late final TextEditingController _chatInputController =
-      TextEditingController();
   bool _isPaused = false;
   static const String _humanPlayerId = 'orange';
 
@@ -112,7 +109,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _aiTimer?.cancel();
     _pawnStepTimer?.cancel();
     _diceRollTimer?.cancel();
-    _chatInputController.dispose();
     if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
@@ -557,7 +553,161 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 
   Future<void> _showMatchChat() async {
-    _showLocalActionNotice('Online mode is not enabled');
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (sheetContext) => Container(
+        padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
+        decoration: const BoxDecoration(
+          color: AppTheme.panel,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border(top: BorderSide(color: AppTheme.gold, width: 1)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.gold.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Icon(Icons.chat_bubble_outline_rounded,
+                    color: AppTheme.gold, size: 24),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Match Chat',
+                    style: TextStyle(
+                      color: AppTheme.cream,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.gold.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: AppTheme.gold.withValues(alpha: 0.55)),
+                  ),
+                  child: const Text(
+                    'OFFLINE',
+                    style: TextStyle(
+                      color: AppTheme.gold,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF292117),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.gold.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline_rounded,
+                      color: AppTheme.gold, size: 20),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Online chat is coming soon. You can keep playing your local match while we prepare multiplayer chat.',
+                      style: TextStyle(
+                        color: AppTheme.readableText,
+                        height: 1.4,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF17130F),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ludo Lovers',
+                    style: TextStyle(
+                      color: AppTheme.gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'You are playing offline. Messages will be available when online rooms are introduced.',
+                    style: TextStyle(
+                      color: AppTheme.cream,
+                      fontSize: 13,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            TextField(
+              key: const ValueKey('offline_chat_message_input'),
+              enabled: false,
+              decoration: InputDecoration(
+                hintText: 'Chat is unavailable in offline mode',
+                hintStyle: const TextStyle(color: AppTheme.mutedText),
+                filled: true,
+                fillColor: const Color(0xFF17130F),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                suffixIcon: const Icon(Icons.send_rounded,
+                    color: AppTheme.mutedText),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              key: const ValueKey('close_offline_chat_button'),
+              onPressed: () => Navigator.of(sheetContext).pop(),
+              child: const Text(
+                'CLOSE',
+                style: TextStyle(
+                  color: AppTheme.gold,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   // Retained for the next setup-menu iteration; currently not exposed in the UI.
@@ -1415,6 +1565,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   }
 }
 
+// ignore: unused_element
 class _GlassConePawn extends StatelessWidget {
   const _GlassConePawn({
     required this.color,
@@ -1527,6 +1678,7 @@ class _GlassConePawnPainter extends CustomPainter {
 
 /// Standard die-face pips. The numeric roll stays in game state and semantics,
 /// never as a digital number in the visible gameplay UI.
+// ignore: unused_element
 class _DicePips extends StatelessWidget {
   const _DicePips({required this.value});
 
