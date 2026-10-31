@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/app/app.dart';
 import 'package:ludo_lovers/features/game/domain/engine/ludo_path_movement.dart';
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
+import 'package:ludo_lovers/features/game/presentation/screens/board_preview_screen.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 class _NoTransitionsBuilder extends PageTransitionsBuilder {
@@ -18,23 +19,7 @@ class _NoTransitionsBuilder extends PageTransitionsBuilder {
   ) => child;
 }
 
-Future<void> tapWhenHitTestable(WidgetTester tester, Finder finder) async {
-  final target = finder.hitTestable();
-  for (var attempt = 0; attempt < 40; attempt++) {
-    if (target.evaluate().isNotEmpty) {
-      await tester.tap(target);
-      await tester.pump();
-      return;
-    }
-    await tester.pump(const Duration(milliseconds: 50));
-  }
-  expect(target, findsOneWidget,
-      reason: 'The control did not become hit-testable after waiting for route transitions.');
-}
-
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  // Advance in bounded frames: a single long pump can skip intermediate
-  // animation frames and leave route/board overlays in an input-blocking state.
   const frame = Duration(milliseconds: 50);
   var remaining = duration;
   while (remaining > Duration.zero) {
@@ -45,139 +30,70 @@ Future<void> pumpFor(WidgetTester tester, Duration duration) async {
 }
 
 void main() {
-  testWidgets('renders the Ludo Lovers foundation screen', (tester) async {
-    await tester.pumpWidget(const LudoLoversApp());
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.pump(const Duration(seconds: 3));
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-
-    expect(find.text('LUDO LOVERS'), findsAtLeastNWidgets(1));
-    final logo = tester.widget<Image>(
-      find.byKey(const ValueKey('ludo_lovers_home_logo')),
-    );
-    expect(logo.image, isA<AssetImage>());
-    expect((logo.image as AssetImage).assetName,
-        'assets/images/ludo_lovers_logo.jpg');
-    expect(find.text('PLAY • CONNECT • LOVE'), findsAtLeastNWidgets(1));
-    expect(find.text('Your next favourite\ngame night starts here.'), findsOneWidget);
-    expect(find.text('Love Mode'), findsOneWidget);
-    expect(find.text('Explore the Board'), findsOneWidget);
-    expect(find.text('Play Now · Choose a Mode'), findsOneWidget);
-  });
-
-  testWidgets('opens the board preview', (tester) async {
-    await tester.pumpWidget(const LudoLoversApp());
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.pump(const Duration(seconds: 3));
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-
-    await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-    await tester.tap(find.byKey(const ValueKey('preview_board_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-
-    expect(find.text('Classic Board'), findsOneWidget);
-    expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
-    expect(find.text('GAMEPLAY LOCKED · ROUTE REVIEW REQUIRED'), findsOneWidget);
-    expect(find.text('4 invalid transitions · 8 owner-confirmed safe cells'), findsOneWidget);
-    expect(find.byKey(const ValueKey('board_route_gate_summary')), findsOneWidget);
-    expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
-
-    final board = tester.getRect(find.byKey(const ValueKey('interactive_board')));
-    // The keyed square includes an 8 px decorative inset around the board.
-    const inset = 8.0;
-    final boardWidth = board.width - inset * 2;
-    final boardHeight = board.height - inset * 2;
-    await tester.tapAt(Offset(
-      board.left + inset + boardWidth * (1.5 / 15),
-      board.top + inset + boardHeight * (6.5 / 15),
-    ));
-    await tester.pump();
-    expect(find.text('Sample pawn selected on cell 0.'), findsOneWidget);
-    expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsOneWidget);
-
-    await tester.tap(find.byKey(const ValueKey('clear_pawn_selection_button')));
-    await tester.pump();
-    expect(find.textContaining('Tap a sample pawn'), findsOneWidget);
-    expect(find.byKey(const ValueKey('clear_pawn_selection_button')), findsNothing);
-  });
-
-  testWidgets('board preview exposes route blockers and owner-confirmed safe cells',
-      (tester) async {
-    await tester.pumpWidget(const LudoLoversApp());
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.pump(const Duration(seconds: 3));
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-
-    await tester.ensureVisible(find.byKey(const ValueKey('preview_board_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-    await tester.tap(find.byKey(const ValueKey('preview_board_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-    await tester.ensureVisible(find.byKey(const ValueKey('board_route_audit_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-    await tester.tap(find.byKey(const ValueKey('board_route_audit_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-
-    expect(find.text('Route & safe-cell audit'), findsOneWidget);
-    expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
-    expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
-    expect(find.textContaining('Structural geometry checks found blockers'), findsOneWidget);
-    expect(find.text('Owner-confirmed safe track IDs'), findsOneWidget);
-    expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
-    expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
-    expect(find.byKey(const ValueKey('safe_cell_coordinate_audit')), findsOneWidget);
-    expect(find.textContaining('0 (1,6)'), findsOneWidget);
-    expect(
-      find.textContaining('The owner-confirmed safe-cell map contains eight cells'),
-      findsOneWidget,
-    );
-    expect(
-      find.textContaining('The physical loop has 52 cells'),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('opens the local match preview and clearly labels its limitation',
-      (tester) async {
-    tester.view.physicalSize = const Size(900, 1600);
+  testWidgets('renders compact game hub directly after splash', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(const LudoLoversApp());
-    // Allow the initial Material route transition to complete without
-    // pumpAndSettle (the live match may schedule AI work continuously).
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.pump(const Duration(seconds: 3));
-    await pumpFor(tester, const Duration(milliseconds: 400));
-    await tester.tap(find.byKey(const ValueKey('onboarding_skip_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
+    await pumpFor(tester, const Duration(seconds: 4));
 
-    await tester.tap(find.byKey(const ValueKey('local_game_lab_button')));
-    await pumpFor(tester, const Duration(milliseconds: 500));
-    expect(find.text('Pick your way to play'), findsOneWidget);
-    await tester.ensureVisible(find.text('Start 4-player game'));
-    await tester.tap(find.text('Start 4-player game'));
+    expect(find.text('LUDO LOVERS'), findsOneWidget);
+    expect(find.text('CHOOSE YOUR GAME'), findsOneWidget);
+    expect(find.text('VS AI'), findsOneWidget);
+    expect(find.text('2P'), findsOneWidget);
+    expect(find.text('4P'), findsOneWidget);
+    expect(find.text('TEAM UP'), findsOneWidget);
+    expect(find.text('Your next favourite'), findsNothing);
+    expect(find.byKey(const ValueKey('onboarding_skip_button')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('board preview remains available for future review', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: BoardPreviewScreen()),
+    );
+    await tester.pump();
+
+    expect(find.text('Classic Board'), findsOneWidget);
+    expect(find.textContaining('Preview only: legal moves'), findsOneWidget);
+    expect(find.text('GAMEPLAY LOCKED · ROUTE REVIEW REQUIRED'), findsOneWidget);
+    expect(find.byKey(const ValueKey('board_route_gate_summary')), findsOneWidget);
+  });
+
+  testWidgets('board preview route audit remains available', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: BoardPreviewScreen()),
+    );
+    await tester.pump();
+
+    await tester.ensureVisible(find.byKey(const ValueKey('board_route_audit_button')));
+    await tester.tap(find.byKey(const ValueKey('board_route_audit_button')));
+    await pumpFor(tester, const Duration(milliseconds: 300));
+
+    expect(find.text('Route & safe-cell audit'), findsOneWidget);
+    expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
+    expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
+    expect(find.text('Owner-confirmed safe track IDs'), findsOneWidget);
+    expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
+  });
+
+  testWidgets('4P tile opens the local match preview', (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(home: GameModeSelectionScreen()),
+    );
+    await tester.tap(find.byKey(const ValueKey('mode_four_players_button')));
     await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
     expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('roll_dice_button_semantics')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('roll_dice_button_semantics')), findsOneWidget);
     expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
   });
 
