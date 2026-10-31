@@ -1730,4 +1730,92 @@ void main() {
     expect(find.byKey(const ValueKey('choose_animal_avatar_orange')), findsNothing);
   });
 
+
+  testWidgets('renders board artwork, pawns and dice in every game mode',
+      (tester) async {
+    final modes = <({
+      String name,
+      List<String> players,
+      LocalGameMode mode,
+      bool againstAi,
+    })>[
+      (
+        name: 'VS AI',
+        players: LocalGameFactory.playerIds,
+        mode: LocalGameMode.classic,
+        againstAi: true,
+      ),
+      (
+        name: '2P',
+        players: <String>['orange', 'green'],
+        mode: LocalGameMode.classic,
+        againstAi: false,
+      ),
+      (
+        name: '4P',
+        players: LocalGameFactory.playerIds,
+        mode: LocalGameMode.classic,
+        againstAi: false,
+      ),
+      (
+        name: 'Team Up',
+        players: LocalGameFactory.playerIds,
+        mode: LocalGameMode.teamUp,
+        againstAi: false,
+      ),
+    ];
+
+    for (final mode in modes) {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        selectedPlayerIds: mode.players,
+        mode: mode.mode,
+      );
+      final controller = LocalGameController(
+        gameSetup: setup,
+        nextDiceValue: () => 6,
+      );
+      addTearDown(controller.dispose);
+
+      await pumpLocalMatch(
+        tester,
+        controller: controller,
+        playAgainstAi: mode.againstAi,
+        surface: const Size(900, 1600),
+      );
+      await pumpFor(tester, const Duration(milliseconds: 500));
+
+      expect(
+        find.byKey(const ValueKey('local_game_board')),
+        findsOneWidget,
+        reason: '${mode.name} must render the playable board region.',
+      );
+      expect(
+        find.byKey(const ValueKey('live_game_board_artwork')),
+        findsOneWidget,
+        reason: '${mode.name} must create the board artwork image.',
+      );
+      expect(
+        find.byKey(const ValueKey('roll_dice_button_semantics')),
+        findsOneWidget,
+        reason: '${mode.name} must render the dice control.',
+      );
+      expect(
+        find.byKey(const ValueKey('live_game_board_artwork_fallback')),
+        findsNothing,
+        reason: '${mode.name} should load the bundled board artwork.',
+      );
+      expect(
+        find.byKey(const ValueKey('pawn_marker_orange_pawn_1')),
+        findsOneWidget,
+        reason: '${mode.name} must render its starting pawns.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${mode.name} must build without a Flutter rendering exception.',
+      );
+    }
+  });
+
 }
