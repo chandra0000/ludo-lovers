@@ -37,8 +37,10 @@ class LocalGameState {
     this.completed = false,
     this.winnerPlayerId,
     this.winnerTeamId,
+    Map<int, TeamUpTeam> teamUpCapturePriorityByCell = const <int, TeamUpTeam>{},
     this.version = 0,
-  }) : pawns = List<LocalPawn>.unmodifiable(pawns),
+  }) : teamUpCapturePriorityByCell = Map<int, TeamUpTeam>.unmodifiable(teamUpCapturePriorityByCell),
+       pawns = List<LocalPawn>.unmodifiable(pawns),
        players = List<String>.unmodifiable(players),
        scheduledPlayerIndex = scheduledPlayerIndex ?? currentPlayerIndex {
     if (this.players.length < 2 || this.players.length > 4) {
@@ -89,6 +91,9 @@ class LocalGameState {
   final bool completed;
   final String? winnerPlayerId;
   final String? winnerTeamId;
+  /// Last-arriving team for each unsafe mixed-team shared-track cell.
+  /// This is authoritative domain state, not reconstructed from animation.
+  final Map<int, TeamUpTeam> teamUpCapturePriorityByCell;
   final int version;
 
   String get currentPlayerId => players[currentPlayerIndex];
@@ -104,6 +109,7 @@ class LocalGameState {
     bool? completed,
     String? winnerPlayerId,
     String? winnerTeamId,
+    Map<int, TeamUpTeam>? teamUpCapturePriorityByCell,
     int? version,
   }) => LocalGameState(
         players: players,
@@ -115,6 +121,8 @@ class LocalGameState {
         completed: completed ?? this.completed,
         winnerPlayerId: winnerPlayerId ?? this.winnerPlayerId,
         winnerTeamId: winnerTeamId ?? this.winnerTeamId,
+        teamUpCapturePriorityByCell:
+            teamUpCapturePriorityByCell ?? this.teamUpCapturePriorityByCell,
         version: version ?? this.version,
       );
 }
