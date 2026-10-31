@@ -1251,56 +1251,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         ),
                       ),
                     ),
-                    // Owner-supplied More center is x=902 on a 576 px canvas.
-                    // Keep that exact coordinate; it intentionally lies beyond
-                    // the right edge and is clipped by the viewport.
-                    Positioned(
-                      left: dx(902 - 28),
-                      top: dy(940 - 28),
-                      width: ds(56),
-                      height: ds(56),
-                      child: PopupMenuButton<String>(
-                        key: const ValueKey('match_more_actions_button'),
-                        tooltip: 'More match actions',
-                        padding: EdgeInsets.zero,
-                        color: AppTheme.panel,
-                        onSelected: (action) {
-                          switch (action) {
-                            case 'sound':
-                              setState(() => _soundEnabled = !_soundEnabled);
-                              break;
-                            case 'help':
-                              _showRules();
-                              break;
-                            case 'players':
-                              _showPlayerSetup();
-                              break;
-                            case 'ai':
-                              _toggleAiMode();
-                              break;
-                            case 'pause':
-                              _showPauseMenu();
-                              break;
-                            case 'restart':
-                              _confirmRestart();
-                              break;
-                            case 'leave':
-                              _confirmLeave();
-                              break;
-                          }
-                        },
-                        itemBuilder: (context) => <PopupMenuEntry<String>>[
-                          const PopupMenuItem(value: 'players', child: Text('Choose players')),
-                          PopupMenuItem(value: 'ai', child: Text(_playAgainstAi ? 'Disable AI' : 'Play against AI')),
-                          const PopupMenuItem(value: 'pause', child: Text('Pause match')),
-                          const PopupMenuItem(value: 'restart', child: Text('Restart match')),
-                          const PopupMenuItem(value: 'sound', child: Text('Toggle sound')),
-                          const PopupMenuItem(value: 'help', child: Text('How to play')),
-                          const PopupMenuItem(value: 'leave', child: Text('Leave match')),
-                        ],
-                        child: const SizedBox.expand(),
-                      ),
-                    ),
                     if (state.completed)
                       Positioned(
                         left: dx(92),
