@@ -31,7 +31,7 @@ Future<void> pumpFor(WidgetTester tester, Duration duration) async {
 }
 
 void main() {
-  testWidgets('home navigates to the three local game modes', (tester) async {
+  testWidgets('home navigates to the four local game modes', (tester) async {
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
