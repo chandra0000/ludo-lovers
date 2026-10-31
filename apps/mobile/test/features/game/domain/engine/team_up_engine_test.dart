@@ -210,20 +210,17 @@ void main() {
       );
     });
 
-    test('captures only the last-arrived pawn from an opposing stack', () {
+    test('captures an opponent but never a teammate sharing the cell', () {
       final setup = LocalGameFactory.create(
         allowProvisionalRoutes: true,
         mode: LocalGameMode.teamUp,
       );
       final orangePath = setup.paths.forPlayer('orange');
       final targetCell = orangePath.cellAtProgress(2)!;
-      final greenProgress =
-          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
       final magentaProgress =
           setup.paths.forPlayer('magenta').mainTrackCells.indexOf(targetCell);
       final blueProgress =
           setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
-      expect(greenProgress, greaterThanOrEqualTo(0));
       expect(magentaProgress, greaterThanOrEqualTo(0));
       expect(blueProgress, greaterThanOrEqualTo(0));
 
@@ -231,7 +228,6 @@ void main() {
         currentPlayerIndex: 0,
         scheduledPlayerIndex: 0,
         pendingRoll: 1,
-        version: 10,
         pawns: setup.initialState.pawns.map((pawn) {
           if (pawn.id == 'orange_pawn_1') {
             return pawn.copyWith(position: const PawnRoutePosition(
@@ -245,23 +241,11 @@ void main() {
               progress: magentaProgress,
             ));
           }
-          if (pawn.id == 'green_pawn_1') {
-            return pawn.copyWith(
-              position: PawnRoutePosition(
-                section: PawnRouteSection.mainTrack,
-                progress: greenProgress,
-              ),
-              lastMovedAtVersion: 4,
-            );
-          }
           if (pawn.id == 'blue_pawn_1') {
-            return pawn.copyWith(
-              position: PawnRoutePosition(
-                section: PawnRouteSection.mainTrack,
-                progress: blueProgress,
-              ),
-              lastMovedAtVersion: 9,
-            );
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: blueProgress,
+            ));
           }
           return pawn;
         }).toList(growable: false),
@@ -273,9 +257,6 @@ void main() {
         expectedVersion: state.version,
         pawnId: 'orange_pawn_1',
       );
-      final green = transition.state.pawns.firstWhere(
-        (pawn) => pawn.id == 'green_pawn_1',
-      );
       final blue = transition.state.pawns.firstWhere(
         (pawn) => pawn.id == 'blue_pawn_1',
       );
@@ -283,13 +264,69 @@ void main() {
         (pawn) => pawn.id == 'magenta_pawn_1',
       );
 
-      expect(green.position.section, PawnRouteSection.mainTrack);
       expect(blue.position.section, PawnRouteSection.yard);
       expect(magenta.position.section, PawnRouteSection.mainTrack);
       expect(
         transition.events.where((event) => event.type == 'PawnCaptured')
             .map((event) => event.pawnId),
         <String?>['blue_pawn_1'],
+      );
+    });
+
+    test('protects an opposing stack under the existing default capture policy', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final orangePath = setup.paths.forPlayer('orange');
+      final targetCell = orangePath.cellAtProgress(2)!;
+      final greenProgress =
+          setup.paths.forPlayer('green').mainTrackCells.indexOf(targetCell);
+      final blueProgress =
+          setup.paths.forPlayer('blue').mainTrackCells.indexOf(targetCell);
+      final state = setup.initialState.copyWith(
+        currentPlayerIndex: 0,
+        scheduledPlayerIndex: 0,
+        pendingRoll: 1,
+        pawns: setup.initialState.pawns.map((pawn) {
+          if (pawn.id == 'orange_pawn_1') {
+            return pawn.copyWith(position: const PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: 1,
+            ));
+          }
+          if (pawn.id == 'green_pawn_1') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: greenProgress,
+            ));
+          }
+          if (pawn.id == 'blue_pawn_1') {
+            return pawn.copyWith(position: PawnRoutePosition(
+              section: PawnRouteSection.mainTrack,
+              progress: blueProgress,
+            ));
+          }
+          return pawn;
+        }).toList(growable: false),
+      );
+
+      final transition = setup.engine.move(
+        state,
+        playerId: 'orange',
+        expectedVersion: state.version,
+        pawnId: 'orange_pawn_1',
+      );
+
+      expect(
+        transition.state.pawns
+            .where((pawn) => pawn.id == 'green_pawn_1' || pawn.id == 'blue_pawn_1')
+            .every((pawn) => pawn.position.section == PawnRouteSection.mainTrack),
+        isTrue,
+      );
+      expect(
+        transition.events.where((event) => event.type == 'PawnCaptured'),
+        isEmpty,
       );
     });
 
