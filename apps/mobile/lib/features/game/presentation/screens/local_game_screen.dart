@@ -1003,10 +1003,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                                 for (final visual in visuals)
                                   if (!isAiTurn && legalIds.contains(visual.pawnId))
                                     Positioned(
-                                      left: visual.point.x * size.width - cellSize * 0.5,
-                                      top: visual.point.y * size.height - cellSize * 0.5,
-                                      width: cellSize,
-                                      height: cellSize,
+                                      left: visual.point.x * size.width - math.max(cellSize, 44 * scale) * 0.5,
+                                      top: visual.point.y * size.height - math.max(cellSize, 44 * scale) * 0.5,
+                                      width: math.max(cellSize, 44 * scale),
+                                      height: math.max(cellSize, 44 * scale),
                                       child: Semantics(
                                         button: true,
                                         label: _accessiblePawnName(visual.pawnId),
@@ -1072,11 +1072,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                             child: Text(
                               state.completed
                                   ? '${state.winnerPlayerId?.toUpperCase() ?? current.toUpperCase()} · WINNER'
-                                  : isAiTurn
-                                      ? '${current.toUpperCase()} · THINKING'
-                                      : state.pendingRoll == null
-                                          ? 'Your Turn'
-                                          : 'Rolling...',
+                                  : _diceRolling
+                                      ? 'Rolling...'
+                                      : isAiTurn
+                                          ? "${current.toUpperCase()}'s Turn"
+                                          : state.pendingRoll == null
+                                              ? 'Your Turn'
+                                              : current.toUpperCase(),
                               key: const ValueKey('portrait_turn_indicator'),
                               style: const TextStyle(
                                 color: Color(0xFFFFE6A0),
