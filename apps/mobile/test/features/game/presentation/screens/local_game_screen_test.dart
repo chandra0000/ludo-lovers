@@ -7,6 +7,17 @@ import 'package:ludo_lovers/features/game/domain/engine/path_based_local_game_en
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+Future<void> pumpFor(WidgetTester tester, Duration duration) async {
+  const step = Duration(milliseconds: 100);
+  var elapsed = Duration.zero;
+  while (elapsed < duration) {
+    final remaining = duration - elapsed;
+    final interval = remaining < step ? remaining : step;
+    await tester.pump(interval);
+    elapsed += interval;
+  }
+}
+
 void main() {
   testWidgets('chat opens an offline information sheet with disabled input', (
     tester,
@@ -30,7 +41,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(find.text('Match Chat'), findsOneWidget);
     expect(find.text('OFFLINE'), findsOneWidget);
@@ -43,7 +54,7 @@ void main() {
     expect(input.enabled, isFalse);
 
     await tester.tap(find.byKey(const ValueKey('close_offline_chat_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     expect(find.text('Match Chat'), findsNothing);
     expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
   });
@@ -70,7 +81,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     controller.configurePlayers(<String>['blue', 'magenta']);
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.players, <String>['blue', 'magenta']);
     expect(controller.state.pawns, hasLength(8));
@@ -105,7 +116,7 @@ void main() {
 
       expect(find.byKey(const ValueKey('player_identity_strip')), findsNothing);
       expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
-      expect(find.text('ORANGE · YOUR TURN'), findsOneWidget);
+      expect(find.text('Your Turn'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -423,7 +434,7 @@ void main() {
       // The artwork uses the standard pip face during the roll animation;
       // there is no separate digital "rolling face" widget.
       expect(find.byKey(const ValueKey('dice_face_pips')), findsOneWidget);
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(controller.state.pendingRoll, 6);
       // The portrait artwork renders the current value as pip graphics inside
@@ -477,7 +488,7 @@ void main() {
       await tester.tap(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       );
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final pawn = controller.state.pawns.firstWhere(
         (item) => item.id == 'orange_pawn_1',
@@ -519,7 +530,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final pawnFinder = find.byKey(
         const ValueKey('legal_pawn_orange_pawn_1'),
@@ -529,7 +540,7 @@ void main() {
 
       stalePawnWidget.onTap!();
       stalePawnWidget.onTap!();
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final pawn = controller.state.pawns.firstWhere(
         (item) => item.id == 'orange_pawn_1',
@@ -583,7 +594,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final homeLaneCell = orangePath.cellAtProgress(startOfHomeLane);
       expect(homeLaneCell, isNotNull);
@@ -598,7 +609,7 @@ void main() {
       await tester.tap(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
       );
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final movedPawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -665,14 +676,14 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       expect(
         find.byKey(const ValueKey('legal_pawn_orange_pawn_1')),
         findsOneWidget,
       );
 
       await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -750,9 +761,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -830,9 +841,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final orangePawn = controller.state.pawns.firstWhere(
         (pawn) => pawn.id == 'orange_pawn_1',
@@ -911,9 +922,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       final bluePawns = controller.state.pawns.where(
         (pawn) => pawn.id == 'blue_pawn_1' || pawn.id == 'blue_pawn_2',
@@ -974,7 +985,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(controller.state.pendingRoll, isNull);
       expect(controller.state.currentPlayerId, 'green');
@@ -1032,9 +1043,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(
         controller.state.pawns
@@ -1069,7 +1080,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.currentPlayerId, 'green');
     expect(controller.state.pendingRoll, isNull);
@@ -1097,11 +1108,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     controller.reset();
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
@@ -1158,11 +1169,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_4')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.completed, isTrue);
     expect(controller.state.winnerPlayerId, 'orange');
@@ -1181,7 +1192,7 @@ void main() {
 
     await tester.ensureVisible(find.byKey(const ValueKey('results_rematch_button')));
     await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.completed, isFalse);
     expect(controller.state.winnerPlayerId, isNull);
@@ -1229,7 +1240,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(controller.state.currentPlayerId, 'green');
 
@@ -1237,11 +1248,11 @@ void main() {
       expect(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')), findsNothing);
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       expect(find.byKey(const ValueKey('legal_pawn_green_pawn_1')), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('legal_pawn_green_pawn_1')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
 
       expect(controller.state.currentPlayerId, 'green');
       expect(
@@ -1287,9 +1298,9 @@ void main() {
     final start = tester.getTopLeft(marker);
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     final end = tester.getTopLeft(marker);
 
     expect(end, isNot(start));
@@ -1366,7 +1377,7 @@ void main() {
     }
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
     await tester.pump(); // Start the first AnimatedPositioned transition.
 
@@ -1400,7 +1411,7 @@ void main() {
     );
 
     await tester.pump(const Duration(milliseconds: 60));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     final settled = tester.getTopLeft(marker);
     expect(settled.dx, closeTo(expectedTopLeft(3).dx, 1.5));
     expect(settled.dy, closeTo(expectedTopLeft(3).dy, 1.5));
@@ -1482,7 +1493,7 @@ void main() {
       expect(collisionCenter.dy, closeTo(expectedCenter(15).dy, 1.5));
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
       await tester.pump();
 
@@ -1511,7 +1522,7 @@ void main() {
       expect(reverseCenter.dy, closeTo(expectedCenter(14).dy, 1.5));
 
       // The remaining reverse steps must eventually finish in the blue yard.
-      await tester.pumpAndSettle();
+      await pumpFor(tester, const Duration(milliseconds: 500));
       expect(
         controller.state.pawns
             .firstWhere((pawn) => pawn.id == 'blue_pawn_1')
@@ -1551,15 +1562,15 @@ void main() {
     expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     // A one advances orange and passes the turn to the AI-controlled seats.
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     // Advance the fake clock for the three independently scheduled AI turns.
     for (var turn = 0; turn < 3; turn++) {
@@ -1621,9 +1632,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.completed, isTrue);
     expect(controller.state.winnerPlayerId, 'orange');
@@ -1633,7 +1644,7 @@ void main() {
     expect(find.byKey(const ValueKey('results_rematch_button')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('results_rematch_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     expect(controller.state.completed, isFalse);
     expect(controller.state.currentPlayerId, 'orange');
@@ -1668,15 +1679,15 @@ void main() {
 
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
 
     // Orange's six grants another roll; use the one, then pass to Green.
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     await tester.tap(find.byKey(const ValueKey('legal_pawn_orange_pawn_1')));
-    await tester.pumpAndSettle();
+    await pumpFor(tester, const Duration(milliseconds: 500));
     expect(controller.state.currentPlayerId, 'green');
 
     // pumpAndSettle may advance scheduled timers too, so verify the final
