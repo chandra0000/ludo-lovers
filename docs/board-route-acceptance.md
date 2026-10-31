@@ -1,50 +1,56 @@
-# Ludo Lovers board-route acceptance checklist
+# Ludo Lovers — Board Route Acceptance
 
-## Status
+**Reviewed:** 2026-10-31  
+**Current status:** Structural checks pass in CI; physical-device visual acceptance is the remaining board-layout gate.
 
-**Structural route validation implemented; visual/gameplay approval still blocked.** The project owner confirmed safe/star IDs `{0, 8, 13, 21, 26, 34, 39, 47}`. Keep `ClassicLudoBoardCoordinateFactory.isGameplayReady` false until a fresh phone screenshot confirms the rendered route and pawn centers match the approved board reference.
+## Board contract
 
-This checklist deliberately records the current defects without guessing which grid cells should replace them. The current board art/reference does not provide enough cell-by-cell evidence to safely infer those corrections.
+- 15×15 logical grid.
+- 52 unique physical shared-track cells, indexed 0–51.
+- Entry offsets: Orange 0, Green 13, Magenta 26, Blue 39.
+- 51 shared-track steps per player, followed by five private home-lane cells.
+- Separate centre finish at grid coordinate (7,7).
+- Owner-confirmed safe/star IDs: 0, 8, 13, 21, 26, 34, 39, 47.
+- Turn order: Orange → Green → Magenta → Blue.
 
-## Independent reference cross-check (2026-10-18)
+## Route and topology findings
 
-A read-only comparison against the public `rojanparajuli/Flutter_ludo` board constants found that its 52-cell shared-track sequence, start indexes `0, 13, 26, 39`, and safe-cell indexes `0, 8, 13, 21, 26, 34, 39, 47` match this repository's current values when row/column coordinates are normalized. Reference: https://github.com/rojanparajuli/Flutter_ludo/blob/master/lib/constant/board_constants.dart
+The canonical coordinate sequence contains four intentional diagonal corner connectors: 4→5, 17→18, 30→31, and 43→44. Their exact endpoints are locked by the independent golden geometry test. The audit permits only these documented diagonal links; any other non-neighbour transition is an error.
 
-This is useful corroboration, not approval to enable gameplay. The selected Ludo Lovers convention is five coloured home-lane cells plus a separate centre finish. The physical loop retains 52 unique cells, but each player traverses 51 cells and turns directly into its private lane before the adjacent outer corner. Tests lock each player-relative path. The project owner confirmed safe/star IDs. Remaining approval blocker: inspect a fresh on-device rendering for cell-center alignment and clipping before changing the release gate. Do not copy third-party code into this repository.
+Each player route is a rotation of the same physical loop. The route traverses 51 shared cells before entering its own five-cell lane. It does not traverse the outer corner immediately adjacent to that lane. The final shared cell connects orthogonally to the first lane cell for all four seats. Blue's route explicitly covers the 50→51→0 wraparound.
 
-The four diagonal coordinate transitions listed below also occur in that reference sequence. The geometry audit now treats exactly these four one-cell diagonal corner links as structurally valid, while reporting any other non-neighbour transition as a defect. The four corner links are structurally locked. Each player branches orthogonally from its final traversed shared cell into its own home lane after 51 cells, skipping the adjacent outer corner. This is structural validation only: `isGameplayReady` remains false behind `isVisualTopologyApproved` until the rendered board is checked on-device.
-
-## Known diagonal corner transitions
-
-The current 52-cell loop has four non-orthogonal transitions:
-
-| From index | From coordinate (column, row) | To index | To coordinate (column, row) | Required review |
-| ---: | --- | ---: | --- | --- |
-| 4 | (5, 6) | 5 | (6, 5) | Structurally locked; verify visual alignment on-device. |
-| 17 | (8, 5) | 18 | (9, 6) | Structurally locked; verify visual alignment on-device. |
-| 30 | (9, 8) | 31 | (8, 9) | Structurally locked; verify visual alignment on-device. |
-| 43 | (6, 9) | 44 | (5, 8) | Structurally locked; verify visual alignment on-device. |
-
-Do not simply remove these diagnostics or mark the route ready. The listed transitions are retained as diagnostic review points, not presumed defects. A valid route must remain consistent with the actual board cells and every seat-relative route.
+The geometry and movement contract is internally consistent in source and automated tests. This is a structural finding, not proof that every cell centre matches the artwork on a physical phone.
 
 ## Acceptance checklist
 
-- [ ] Obtain/review a clear, straight-on board image or annotated cell-by-cell reference.
-- [ ] Confirm the shared-track order clockwise or counter-clockwise, including all four corners.
-- [ ] Confirm the exact entry/start cell and direction for orange, green, blue, and magenta.
-- [ ] Confirm each private home lane's five physical cells and the separate centre finish position.
-- [x] Safe/star cell IDs confirmed by the project owner: 0, 8, 13, 21, 26, 34, 39, 47. Keep rule semantics local-prototype-only until the rules profile is formally locked.
-- [x] Add acceptance tests for exactly 52 unique shared-track cells inside the 15×15 grid.
-- [x] Add acceptance tests for every consecutive shared-track pair, including wraparound and the four explicitly validated diagonal corner connections.
-- [x] Add acceptance tests for lane uniqueness, non-overlap, continuity, and the final shared-cell-to-lane connection.
-- [x] Add acceptance tests that each player-relative path traverses 51 shared cells, skips the adjacent outer corner, then enters its own lane at progress 51.
-- [ ] Run board geometry, route mapping, movement, safe-cell, capture, finish, and board-backed widget acceptance tests.
-- [ ] Review any intentional rule differences (safe squares, capture stacks, six bonus, exact finish) and document the selected rule profile.
-- [ ] Only after all evidence and tests agree, deliberately update the release gate and its tests.
+### Automated checks
+- [x] Exactly 52 unique shared-track cells, all in the 15×15 grid.
+- [x] Entry indexes and start markers agree.
+- [x] Four documented diagonal connectors have exact expected endpoints.
+- [x] No undocumented non-neighbour transition is accepted.
+- [x] Player-relative paths share the same physical loop.
+- [x] Each path has 51 traversed shared cells and five home-lane cells.
+- [x] Home lanes are unique, continuous, in bounds, and do not overlap the shared track or each other.
+- [x] Safe-cell IDs are unique/in range and centralized.
+- [x] Blue wraparound and intermediate pawn movement have test coverage.
+- [x] Centre finish is separate from track and home lanes.
+- [x] Latest CI run #803 passed formatting, analysis, tests, Android debug build, and artifact upload.
 
-## Current engineering safeguards
+### Physical Android acceptance
+- [ ] Install the latest debug APK.
+- [ ] Inspect the full board against the original supplied reference.
+- [ ] Confirm cell centres and pawn starting positions for all four colours.
+- [ ] Move pawns through straight sections, all four corner connectors, wraparound, and home lanes.
+- [ ] Check captures and safe-cell behaviour in a local match.
+- [ ] Check exact-finish and overshoot behaviour against the chosen local rules profile.
+- [ ] Submit a full-screen phone screenshot for review.
 
-- The logical movement engine remains pure Dart and separate from Flutter presentation.
-- The route geometry audit validates all 51 traversed player-relative steps across the 52-cell physical loop, the four known diagonal corner connections, home-lane branches, entries, safe-cell IDs, and rejects other non-neighbour transitions; the visual-approval release gate remains closed.
-- Local Game Lab / board-backed UI remains a development prototype and visibly warns that route and safe cells are provisional.
-- No online multiplayer, server-authoritative dice, or release-ready gameplay is claimed by this document.
+## Current release decision
+
+Keep `isVisualTopologyApproved` and `isGameplayReady` false until the physical-device checks above are completed. Do not change the approved artwork or the user's supplied layout measurements to make a test pass. If the screenshot reveals a mismatch, record the exact cell/coordinate and correct the canonical definition, route fixture, tests, and renderer together.
+
+## Scope and limitations
+
+The current build is suitable for **development installation and device validation**. It is not a production release. Online multiplayer, server-authoritative dice, and production rules approval are not included in this milestone.
+
+Latest workflow: https://github.com/chandra0000/ludo-lovers/actions/runs/41158369544
