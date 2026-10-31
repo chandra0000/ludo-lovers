@@ -263,8 +263,11 @@ void main() {
     );
     expect(boardArtwork.fit, BoxFit.fill);
     expect(boardArtwork.alignment, Alignment.center);
+    expect(boardArtwork.image, isA<ResizeImage>());
+    final resizedArtwork = boardArtwork.image as ResizeImage;
+    expect(resizedArtwork.imageProvider, isA<AssetImage>());
     expect(
-      (boardArtwork.image as AssetImage).assetName,
+      (resizedArtwork.imageProvider as AssetImage).assetName,
       'assets/images/ludo_board_glass.png',
     );
     expect(boardArtwork.cacheWidth, 1152);
