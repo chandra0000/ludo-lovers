@@ -82,9 +82,15 @@ class _LudoBoardOverlayState extends State<LudoBoardOverlay>
   }
 
   String get _statusText {
-    if (widget.isCompleted) return '${widget.winnerName ?? widget.playerName} · WINNER';
-    if (widget.isRolling) return 'Rolling...';
-    if (widget.isOpponentTurn) return "${widget.playerName}'s Turn";
+    if (widget.isCompleted) {
+      return '${widget.winnerName ?? widget.playerName} · WINNER';
+    }
+    if (widget.isRolling) {
+      return 'Rolling...';
+    }
+    if (widget.isOpponentTurn) {
+      return "${widget.playerName}'s Turn";
+    }
     if (widget.isLocalTurn && widget.colorName != null) {
       return widget.colorName!.toUpperCase();
     }
