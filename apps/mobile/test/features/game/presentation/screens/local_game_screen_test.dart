@@ -143,7 +143,7 @@ void main() {
     expect(find.byType(BottomSheet), findsNothing);
     expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
 
-    await pumpFor(tester, const Duration(seconds: 2));
+    await pumpFor(tester, const Duration(milliseconds: 2700));
     expect(find.text('Online mode is not enabled'), findsNothing);
   });
 
