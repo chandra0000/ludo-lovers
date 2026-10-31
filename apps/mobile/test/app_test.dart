@@ -6,9 +6,8 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 Future<void> pumpFor(WidgetTester tester, Duration duration) async {
-  // Flush the rebuild without advancing fake time; gameplay timers must remain
-  // under each test's explicit control.
-  await tester.pump();
+  // Advance the requested frame duration so route and UI transitions settle.
+  await tester.pump(duration);
 }
 
 void main() {
