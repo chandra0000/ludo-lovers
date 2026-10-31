@@ -44,8 +44,8 @@ jobs:
 
       - name: Generate Android platform scaffold if needed
         run: |
-          if [ ! -d android ]; then
-            flutter create --platforms=android --org com.ludolovers --project-name ludo_lovers .
+          if [ ! -d android ] || [ ! -d ios ]; then
+            flutter create --platforms=android,ios --org com.ludolovers --project-name ludo_lovers .
           fi
           rm -f test/widget_test.dart
 
