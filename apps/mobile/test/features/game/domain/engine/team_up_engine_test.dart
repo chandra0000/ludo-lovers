@@ -19,6 +19,34 @@ void main() {
       expect(setup.engine.profile.id, 'team-up-v1-provisional');
     });
 
+    test('rejects a Team Up state that does not contain four pawns per seat', () {
+      final setup = LocalGameFactory.create(
+        allowProvisionalRoutes: true,
+        mode: LocalGameMode.teamUp,
+      );
+      final malformed = setup.initialState.copyWith(
+        pawns: setup.initialState.pawns
+            .where((pawn) => pawn.id != 'blue_pawn_4')
+            .toList(growable: false),
+      );
+
+      expect(
+        () => setup.engine.roll(
+          malformed,
+          playerId: 'orange',
+          expectedVersion: malformed.version,
+          value: 2,
+        ),
+        throwsA(
+          isA<LocalGameException>().having(
+            (error) => error.error,
+            'error',
+            LocalActionError.invalidState,
+          ),
+        ),
+      );
+    });
+
     test('rejects Team Up when seats are missing or out of scheduled order', () {
       expect(
         () => LocalGameFactory.create(
@@ -208,6 +236,7 @@ void main() {
         currentPlayerIndex: 0,
         scheduledPlayerIndex: 0,
         pendingRoll: 1,
+        version: 10,
         pawns: setup.initialState.pawns.map((pawn) {
           if (pawn.id == 'orange_pawn_1') {
             return pawn.copyWith(position: const PawnRoutePosition(
