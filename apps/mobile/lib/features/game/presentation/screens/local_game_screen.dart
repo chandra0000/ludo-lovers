@@ -757,7 +757,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               const _RuleRow(
                 number: '3',
                 title: 'Safe stars & captures',
-                detail: 'Star tiles are safe squares. Landing on an opponent on an unprotected square sends that pawn back to its yard and earns a capture reward roll.',
+                detail: _controller.setup.engine.isTeamUp
+                    ? 'Safe stars protect everyone. Teammates can share cells and never capture each other. On an unsafe opposing stack, only its most recently moved pawn is captured.'
+                    : 'Star tiles are safe squares. Landing on an opponent on an unprotected square sends that pawn back to its yard and earns a capture reward roll.',
               ),
               const _RuleRow(
                 number: '4',
