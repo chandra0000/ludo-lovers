@@ -746,7 +746,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     avatar: CircleAvatar(backgroundColor: color, radius: 8),
                     selectedColor: color.withValues(alpha: 0.22),
                     side: BorderSide(
-                      color: selected ? color : AppTheme.cream24,
+                      color: selected ? color : AppTheme.cream.withValues(alpha: 0.24),
                       width: selected ? 1.5 : 1,
                     ),
                     labelStyle: TextStyle(
@@ -1632,7 +1632,7 @@ class _GlassConePawnPainter extends CustomPainter {
       ..close();
     canvas.drawOval(
       Rect.fromCenter(center: Offset(center, h * 0.93), width: w * 0.82, height: h * 0.18),
-      Paint()..color = Colors.black.withValues(alpha: 0.55),
+      Paint()..color = AppTheme.black.withValues(alpha: 0.55),
     );
     if (isActive) {
       // Gold selection halo belongs to the pawn itself; no detached tile
@@ -1667,7 +1667,7 @@ class _GlassConePawnPainter extends CustomPainter {
     canvas.drawPath(conePath, Paint()..shader = LinearGradient(
       begin: Alignment.topLeft, end: Alignment.bottomRight,
       colors: <Color>[
-        Color.lerp(color, Colors.white, 0.82)!.withValues(alpha: 0.98),
+        Color.lerp(color, AppTheme.cream, 0.82)!.withValues(alpha: 0.98),
         Color.lerp(color, Colors.white, 0.25)!.withValues(alpha: 0.94),
         color.withValues(alpha: 0.97),
         Color.lerp(color, Colors.black, 0.62)!,
