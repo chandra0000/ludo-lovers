@@ -8,7 +8,7 @@ import 'package:ludo_lovers/features/game/presentation/controllers/local_game_co
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 void main() {
-  testWidgets('chat sends local preview messages from the portrait match screen', (
+  testWidgets('chat opens an offline information sheet with disabled input', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(900, 1600);
@@ -27,10 +27,21 @@ void main() {
     );
 
     await tester.tap(find.byKey(const ValueKey('open_match_chat_button')));
-    await tester.pump();
-    expect(find.text('Online mode is not enabled'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 2));
-    expect(find.text('Online mode is not enabled'), findsNothing);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Match Chat'), findsOneWidget);
+    expect(find.text('OFFLINE'), findsOneWidget);
+    expect(find.text('Online chat is coming soon. You can keep playing your local match while we prepare multiplayer chat.'), findsOneWidget);
+    expect(find.textContaining('You are playing offline.'), findsOneWidget);
+
+    final input = tester.widget<TextField>(
+      find.byKey(const ValueKey('offline_chat_message_input')),
+    );
+    expect(input.enabled, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey('close_offline_chat_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Match Chat'), findsNothing);
     expect(find.byKey(const ValueKey('open_match_chat_button')), findsOneWidget);
   });
 
