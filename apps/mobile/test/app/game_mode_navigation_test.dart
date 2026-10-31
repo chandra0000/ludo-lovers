@@ -45,6 +45,7 @@ void main() {
     expect(find.byKey(const ValueKey('mode_vs_computer_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_two_players_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('mode_four_players_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mode_team_up_button')), findsOneWidget);
     expect(find.text('Online rooms'), findsNothing);
   });
 
