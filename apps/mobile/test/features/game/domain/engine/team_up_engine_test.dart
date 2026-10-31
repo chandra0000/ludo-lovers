@@ -180,12 +180,6 @@ void main() {
               progress: orangeTargetProgress - 1,
             ));
           }
-          if (pawn.id == 'magenta_pawn_1') {
-            return pawn.copyWith(position: PawnRoutePosition(
-              section: PawnRouteSection.mainTrack,
-              progress: magentaProgress,
-            ));
-          }
           if (pawn.id == 'green_pawn_1') {
             return pawn.copyWith(position: PawnRoutePosition(
               section: PawnRouteSection.mainTrack,
