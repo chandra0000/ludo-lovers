@@ -1472,7 +1472,7 @@ void main() {
       ),
     );
 
-    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
+    expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await tester.pumpAndSettle();
@@ -1494,7 +1494,7 @@ void main() {
     expect(controller.state.currentPlayerId, 'orange');
     expect(controller.state.pendingRoll, isNull);
     expect(rollIndex, 5);
-    expect(find.byKey(const ValueKey('ai_mode_status')), findsOneWidget);
+    expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
   });
 
 
