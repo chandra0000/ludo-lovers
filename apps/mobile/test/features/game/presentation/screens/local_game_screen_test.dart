@@ -127,6 +127,9 @@ void main() {
       (boardArtwork.image as AssetImage).assetName,
       'assets/images/ludo_board_glass.png',
     );
+    final artworkRect = tester.getRect(
+      find.byKey(const ValueKey('live_game_board_artwork')),
+    );
     final boardRect = tester.getRect(
       find.byKey(const ValueKey('local_game_board')),
     );
@@ -139,10 +142,12 @@ void main() {
     final diceRect = tester.getRect(
       find.byKey(const ValueKey('roll_dice_button')),
     );
-    expect(diceRect.left, greaterThanOrEqualTo(boardRect.left));
-    expect(diceRect.top, greaterThanOrEqualTo(boardRect.top));
-    expect(diceRect.right, lessThanOrEqualTo(boardRect.right));
-    expect(diceRect.bottom, lessThanOrEqualTo(boardRect.bottom));
+    // The dice sits below the square board, within the full portrait artwork.
+    // Compare it with the artwork canvas, not the board's 542x542 rectangle.
+    expect(diceRect.left, greaterThanOrEqualTo(artworkRect.left));
+    expect(diceRect.top, greaterThanOrEqualTo(artworkRect.top));
+    expect(diceRect.right, lessThanOrEqualTo(artworkRect.right));
+    expect(diceRect.bottom, lessThanOrEqualTo(artworkRect.bottom));
     expect(
       find.byKey(const ValueKey('roll_dice_button_semantics')),
       findsOneWidget,
@@ -387,7 +392,9 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
       await tester.pump();
-      expect(find.byKey(const ValueKey('dice_rolling_face')), findsOneWidget);
+      // The artwork uses the standard pip face during the roll animation;
+      // there is no separate digital "rolling face" widget.
+      expect(find.byKey(const ValueKey('dice_face_pips')), findsOneWidget);
       await tester.pumpAndSettle();
 
       expect(controller.state.pendingRoll, 6);
