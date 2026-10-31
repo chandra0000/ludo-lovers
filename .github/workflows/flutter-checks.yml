@@ -49,6 +49,30 @@ jobs:
           fi
           rm -f test/widget_test.dart
 
+      - name: Set Android launcher app name
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          content = manifest.read_text(encoding="utf-8")
+          updated, replacements = re.subn(
+              r'android:label="[^"]*"',
+              'android:label="Ludo lovers"',
+              content,
+              count=1,
+          )
+          if replacements != 1:
+              raise SystemExit(
+                  f"Expected one android:label in {manifest}, found {replacements}"
+              )
+          manifest.write_text(updated, encoding="utf-8")
+          if 'android:label="Ludo lovers"' not in updated:
+              raise SystemExit("Android launcher label was not updated")
+          print("Android launcher label set to: Ludo lovers")
+          PY
+
       - name: Format Dart sources
         run: dart format .
 
