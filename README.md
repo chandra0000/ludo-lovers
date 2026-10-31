@@ -92,18 +92,18 @@ This repository now contains a foundation layer that is intentionally engineerin
 - Recent route-acceptance tests cover each seat's track wrap, home-lane entry, exact finish, and overshoot behavior. These tests verify movement-model boundaries, not whether the physical route matches the intended board art.
 
 
-### Team Up mode rules (specification; engine integration pending)
+### Team Up mode (local engine and UI integrated; board remains provisional)
 
-The confirmed 2-vs-2 rules are documented in [the Ludo game rules and acceptance tests](docs/game-rules/ludo-game-rules.md#16-team-up-mode--confirmed-product-rules):
+The confirmed 2-vs-2 rules are documented in [the Ludo game rules and acceptance tests](docs/game-rules/ludo-game-rules.md#16-team-up-mode--confirmed-product-rules) and [the implementation acceptance checklist](docs/team-up-mode-acceptance.md):
 
 - Team A: Orange + Magenta. Team B: Green + Blue.
 - Scheduled order stays Orange → Green → Magenta → Blue.
-- Friendly teammates may stack; safe cells protect all pawns; opposing stacks follow last-arrival capture priority.
-- A player who finishes all four pawns still rolls on their scheduled turns; the result and any bonus six roll transfer to their teammate.
-- A scheduled roll is skipped when both teammates are finished.
+- Teammates may share cells and never capture each other; safe cells protect every pawn.
+- Unsafe mixed stacks use explicit last-arrival priority stored in game state. The stacks remain until a side leaves, protected-stack departure resolves captures, and equal-sized stacks are won by the last-arriving side.
+- Finished players' scheduled turns and bonus rolls transfer to their teammate without changing seat order.
 - A team wins only when all eight of its pawns reach final home.
 
-The initial Team Up helper and helper-level tests exist, but full gameplay-engine integration and end-to-end acceptance are still pending. Do not treat Team Up as gameplay-ready until engine-level capture/turn-transfer/victory tests and the Flutter analysis, test, and Android debug APK checks pass.
+Team Up is available as a separate local mode and displays team identities, transferred turns, and team victory. Engine acceptance tests cover stack lifecycle (including more than two occupants), turn transfer, both team wins, and Classic isolation. It is not online/server-authoritative, and it is not release-ready while the shared board route and safe-cell geometry remain provisional.
 
 ## Initial alpha target
 
