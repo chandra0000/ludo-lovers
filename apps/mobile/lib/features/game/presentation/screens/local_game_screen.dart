@@ -841,45 +841,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
   }
 
-  Future<void> _confirmLeave() async {
-    final shouldLeave = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.panel,
-        title: const Text('Leave this match?'),
-        content: const Text(
-          'Your current local match will end. You can start a new match from the home screen.',
-          style: TextStyle(color: AppTheme.readableText),
-        ),
-        actions: <Widget>[
-          TextButton(
-            key: const ValueKey('cancel_leave_match_button'),
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Stay in match'),
-          ),
-          ElevatedButton(
-            key: const ValueKey('confirm_leave_match_button'),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Leave match'),
-          ),
-        ],
-      ),
-    );
-    if (shouldLeave == true && mounted) {
-      _aiTimer?.cancel();
-      _aiTimer = null;
-      _pawnStepTimer?.cancel();
-      _pawnStepTimer = null;
-      _pawnAnimationGeneration++;
-      _capturedPawnVisualsByMover.clear();
-      _capturedPawnReturnPointsByMover.clear();
-      _animatedPawnPoints.clear();
-      // Return to the app home, not an intermediate setup screen.
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    }
-  }
-
-
   // Retained for the next help-menu iteration; currently not exposed in the UI.
   // ignore: unused_element
   void _showRules() {
