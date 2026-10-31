@@ -677,6 +677,9 @@ class PathBasedLocalGameEngine {
       final cell = paths
           .forPlayer(pawn.playerId)
           .cellAtProgress(pawn.position.progress!);
+      if (cell == null) {
+        throw const LocalGameException(LocalActionError.invalidState);
+      }
       teamsByCell
           .putIfAbsent(cell, () => <TeamUpTeam>{})
           .add(TeamUpRules.teamFor(pawn.playerId));
