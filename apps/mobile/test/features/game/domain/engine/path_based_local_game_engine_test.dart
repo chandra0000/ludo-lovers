@@ -1160,4 +1160,73 @@ void main() {
     );
   });
 
+
+  test('three consecutive sixes in a real move sequence forfeit the third move', () {
+    var state = initial;
+
+    for (final pawnId in <String>['o1', 'o2']) {
+      final rolled = engine.roll(
+        state,
+        playerId: 'orange',
+        expectedVersion: state.version,
+        value: 6,
+      );
+      expect(rolled.state.pendingRoll, 6);
+      expect(engine.legalPawnIds(rolled.state), contains(pawnId));
+      final moved = engine.move(
+        rolled.state,
+        playerId: 'orange',
+        expectedVersion: rolled.state.version,
+        pawnId: pawnId,
+      );
+      state = moved.state;
+      expect(state.currentPlayerId, 'orange');
+      expect(state.pendingRoll, isNull);
+    }
+
+    expect(state.consecutiveSixes, 2);
+    final thirdSix = engine.roll(
+      state,
+      playerId: 'orange',
+      expectedVersion: state.version,
+      value: 6,
+    );
+
+    expect(thirdSix.state.currentPlayerId, 'blue');
+    expect(thirdSix.state.pendingRoll, isNull);
+    expect(thirdSix.state.consecutiveSixes, 0);
+    expect(
+      thirdSix.events.map((event) => event.type),
+      <String>['DiceRolled', 'TurnEnded'],
+    );
+    expect(engine.legalPawnIds(thirdSix.state), isEmpty);
+    expect(state.currentPlayerId, 'orange');
+    expect(state.version, thirdSix.state.version - 1);
+  });
+
+  test('rejects invalid dice values without mutating the state snapshot', () {
+    for (final invalidValue in <int>[0, 7, -1, 99]) {
+      expect(
+        () => engine.roll(
+          initial,
+          playerId: 'orange',
+          expectedVersion: initial.version,
+          value: invalidValue,
+        ),
+        throwsA(
+          isA<LocalGameException>().having(
+            (error) => error.error,
+            'error',
+            LocalActionError.invalidRoll,
+          ),
+        ),
+        reason: 'Dice value $invalidValue must be rejected.',
+      );
+      expect(initial.version, 0);
+      expect(initial.pendingRoll, isNull);
+      expect(initial.consecutiveSixes, 0);
+    }
+  });
+
+
 }
