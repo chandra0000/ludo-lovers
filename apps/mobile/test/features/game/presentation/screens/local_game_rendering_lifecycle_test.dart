@@ -173,6 +173,53 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('cancels the dice animation timer when leaving mid-roll',
+      (tester) async {
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
+        home: const Scaffold(body: Center(child: Text('Home'))),
+      ),
+    );
+    navigatorKey.currentState!.push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => LocalGameScreen(controller: controller),
+      ),
+    );
+    await tester.pump();
+    await pumpFor(tester, const Duration(milliseconds: 100));
+
+    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    await pumpFor(tester, const Duration(milliseconds: 100));
+    final versionAfterRoll = controller.state.version;
+    expect(versionAfterRoll, greaterThan(0));
+
+    navigatorKey.currentState!.pop();
+    await tester.pump();
+    await pumpFor(tester, const Duration(milliseconds: 1000));
+
+    expect(controller.state.version, versionAfterRoll);
+    expect(find.text('Home'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('cancels AI work and detaches screen listeners across 50 exits',
       (tester) async {
     final controller = LocalGameController(nextDiceValue: () => 6);
