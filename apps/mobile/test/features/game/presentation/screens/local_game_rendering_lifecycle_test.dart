@@ -71,8 +71,9 @@ Future<void> pumpScreen(
   required LocalGameController controller,
   required AssetBundle bundle,
   bool playAgainstAi = false,
+  Size surface = const Size(900, 1600),
 }) async {
-  tester.view.physicalSize = const Size(900, 1600);
+  tester.view.physicalSize = surface;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
@@ -141,6 +142,34 @@ void main() {
     );
     expect(find.text('BOARD ARTWORK UNAVAILABLE'), findsOneWidget);
     expect(find.byKey(const ValueKey('roll_dice_button_semantics')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keeps board and dice visible in a portrait tablet viewport',
+      (tester) async {
+    final controller = LocalGameController(nextDiceValue: () => 6);
+    addTearDown(controller.dispose);
+
+    await pumpScreen(
+      tester,
+      controller: controller,
+      bundle: rootBundle,
+      surface: const Size(800, 1280),
+    );
+    await pumpFor(tester, const Duration(milliseconds: 600));
+
+    final viewport = const Rect.fromLTWH(0, 0, 800, 1280);
+    final board = tester.getRect(
+      find.byKey(const ValueKey('local_game_board')),
+    );
+    final dice = tester.getRect(
+      find.byKey(const ValueKey('roll_dice_button')),
+    );
+
+    expect(viewport.contains(board.topLeft), isTrue);
+    expect(viewport.contains(board.bottomRight), isTrue);
+    expect(viewport.contains(dice.topLeft), isTrue);
+    expect(viewport.contains(dice.bottomRight), isTrue);
     expect(tester.takeException(), isNull);
   });
 
