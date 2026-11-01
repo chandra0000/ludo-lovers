@@ -33,9 +33,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/ludo_lovers_logo.jpg
-    - assets/images/ludo_board_final.png
-    - assets/images/ludo_board.jpg
-    - assets/images/ludo_board_glass.png
+    - assets/images/ludo_board_glass.webp
 
 # Generates Android mipmap launcher icons and the iOS AppIcon.appiconset.
 # The supplied artwork is used as the foreground; the solid luxury-black
