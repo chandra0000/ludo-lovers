@@ -88,7 +88,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   final bool _soundEnabled = true;
   bool _diceRolling = false;
   bool _boardPreloadStarted = false;
-  Object? _boardPreloadError;
   late final ImageProvider<Object> _boardArtworkProvider = ResizeImage(
     const AssetImage('assets/images/ludo_board_glass.webp'),
     width: 576,
@@ -136,8 +135,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         _boardArtworkProvider,
         context,
         onError: (exception, stackTrace) {
-          if (!mounted) return;
-          setState(() => _boardPreloadError = exception);
+          // Image.errorBuilder below renders the visible fallback.
         },
       ),
     );
