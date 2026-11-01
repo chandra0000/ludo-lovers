@@ -958,12 +958,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         key: const ValueKey('live_game_board_artwork'),
                         fit: BoxFit.fill,
                         alignment: Alignment.center,
-                        // The source artwork is larger than a phone needs.
-                        // Decode close to the maximum 2x portrait canvas size
-                        // to avoid allocating a huge full-resolution bitmap on
-                        // memory-constrained Android devices.
-                        cacheWidth: 576,
-                        cacheHeight: 1024,
+                        // The ResizeImage provider above caps decoded pixels.
                         filterQuality: FilterQuality.medium,
                         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                           if (wasSynchronouslyLoaded || frame != null) {
