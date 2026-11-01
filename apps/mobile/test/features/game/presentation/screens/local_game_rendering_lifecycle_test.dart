@@ -81,6 +81,14 @@ Future<void> pumpScreen(
     DefaultAssetBundle(
       bundle: bundle,
       child: MaterialApp(
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
         home: LocalGameScreen(
           controller: controller,
           playAgainstAi: playAgainstAi,
