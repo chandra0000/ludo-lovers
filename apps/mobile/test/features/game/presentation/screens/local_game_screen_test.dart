@@ -270,8 +270,8 @@ void main() {
       (resizedArtwork.imageProvider as AssetImage).assetName,
       'assets/images/ludo_board_glass.png',
     );
-    expect(resizedArtwork.width, 1152);
-    expect(resizedArtwork.height, 2048);
+    expect(resizedArtwork.width, 576);
+    expect(resizedArtwork.height, 1024);
     expect(boardArtwork.errorBuilder, isNotNull);
     final artworkRect = tester.getRect(
       find.byKey(const ValueKey('live_game_board_artwork')),
