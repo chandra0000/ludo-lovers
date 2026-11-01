@@ -24,6 +24,31 @@ void main() {
           reason: 'Structural consistency is not visual approval.');
     });
 
+    test('strict orthogonal topology reports diagonal edges and entry parity conflicts', () {
+      expect(
+        ClassicLudoBoardGeometryAudit.isOrthogonalTopologyValid,
+        isFalse,
+        reason: 'The current candidate route must not be approved as orthogonal.',
+      );
+      expect(
+        ClassicLudoBoardGeometryAudit.orthogonalTopologyBlockers
+            .where((issue) => issue.contains('is not orthogonal'))
+            .length,
+        4,
+      );
+      expect(
+        ClassicLudoBoardGeometryAudit.orthogonalTopologyBlockers
+            .where((issue) => issue.contains('orthogonal steps require'))
+            .length,
+        4,
+        reason: '13-step entry intervals connect markers of matching parity.',
+      );
+      expect(
+        ClassicLudoBoardGeometryAudit.orthogonalTopologyBlockers,
+        isNotEmpty,
+      );
+    });
+
     test('center finish is in bounds and separate from track and lanes', () {
       const finish = ClassicLudoBoardDefinition.centerFinishCell;
       expect(finish.isInsideBoard, isTrue);
