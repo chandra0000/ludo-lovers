@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -158,7 +157,7 @@ void main() {
     );
     await pumpFor(tester, const Duration(milliseconds: 600));
 
-    final viewport = const Rect.fromLTWH(0, 0, 800, 1280);
+    const viewport = Rect.fromLTWH(0, 0, 800, 1280);
     final board = tester.getRect(
       find.byKey(const ValueKey('local_game_board')),
     );
