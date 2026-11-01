@@ -8,6 +8,20 @@ import 'package:ludo_lovers/features/game/domain/engine/local_game_factory.dart'
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
+class _NoTransitionsBuilder extends PageTransitionsBuilder {
+  const _NoTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) =>
+      child;
+}
+
 class _DelayedBoardAssetBundle extends CachingAssetBundle {
   final Completer<ByteData> _boardBytes = Completer<ByteData>();
 
@@ -145,6 +159,14 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         navigatorKey: navigatorKey,
+        theme: ThemeData(
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              for (final platform in TargetPlatform.values)
+                platform: const _NoTransitionsBuilder(),
+            },
+          ),
+        ),
         home: const Scaffold(body: Center(child: Text('Home'))),
       ),
     );
