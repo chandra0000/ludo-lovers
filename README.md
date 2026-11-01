@@ -81,6 +81,10 @@ Tasks are tracked by step number so progress is easy to follow:
 10. Virtual coins, customization, and social features
 11. Love Mode, progression, accessibility, testing, beta, and release
 
+## Gameplay verification plan
+
+The current four-phase acceptance plan (asset/rendering stability, board geometry, engine rules, and integration/stress testing) is tracked in [the four-phase gameplay verification plan](docs/quality/four-phase-gameplay-verification.md). The board route remains provisional until the exact artwork and safe-cell mapping are visually approved.
+
 ## Current implementation status
 
 This repository now contains a foundation layer that is intentionally engineering-driven:
