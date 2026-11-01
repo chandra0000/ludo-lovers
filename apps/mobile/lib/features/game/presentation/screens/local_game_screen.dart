@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../app/theme/app_theme.dart';
@@ -86,6 +87,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _aiThinking = false;
   final bool _soundEnabled = true;
   bool _diceRolling = false;
+  bool _boardPreloadStarted = false;
+  Object? _boardPreloadError;
+  late final ImageProvider<Object> _boardArtworkProvider = ResizeImage(
+    const AssetImage('assets/images/ludo_board_glass.webp'),
+    width: 576,
+    height: 1024,
+  );
   int _rollingFace = 1;
   int _diceRollTicks = 0;
   Timer? _diceRollTimer;
@@ -112,6 +120,27 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       if (!mounted) return;
       _scheduleAiTurn(_controller.state);
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_boardPreloadStarted) return;
+    _boardPreloadStarted = true;
+
+    // Decode the same bounded provider used by the visible Image widget before
+    // the first gameplay frame. Flutter's image cache then shares the decoded
+    // bitmap instead of decoding the full-resolution source a second time.
+    unawaited(
+      precacheImage(
+        _boardArtworkProvider,
+        context,
+        onError: (exception, stackTrace) {
+          if (!mounted) return;
+          setState(() => _boardPreloadError = exception);
+        },
+      ),
+    );
   }
 
   @override
@@ -926,8 +955,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       top: frameTop,
                       width: frameWidth,
                       height: frameHeight,
-                      child: Image.asset(
-                        'assets/images/ludo_board_glass.webp',
+                      child: Image(
+                        image: _boardArtworkProvider,
                         key: const ValueKey('live_game_board_artwork'),
                         fit: BoxFit.fill,
                         alignment: Alignment.center,
