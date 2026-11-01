@@ -11,7 +11,7 @@ import sys
 SOURCE = Path("assets/images/ludo_board_glass.png")
 OUTPUT = Path("assets/images/ludo_board_glass.webp")
 MAX_EDGE = 1440
-TARGET_BYTES = 500 * 1024
+TARGET_BYTES = 300 * 1024
 QUALITIES = (90, 86, 82, 78, 74)
 
 
@@ -58,10 +58,10 @@ def main() -> None:
     print(f"Board output: {image.width}x{image.height}, {output_bytes:,} bytes")
     print(f"WebP quality: {chosen_quality}; size reduction: {reduction:.1f}%")
     if output_bytes > TARGET_BYTES:
-        print(
-            "WARNING: output remains above 500 KB at the minimum quality "
-            "threshold; inspect visual quality before lowering it further.",
-            file=sys.stderr,
+        raise SystemExit(
+            "Optimized board exceeds the 300 KB runtime budget; "
+            "inspect the source artwork/quality settings instead of "
+            "shipping an asset that fails the Flutter asset test."
         )
 
 
