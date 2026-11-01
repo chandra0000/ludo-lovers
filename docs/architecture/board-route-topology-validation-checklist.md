@@ -45,7 +45,42 @@ Each player's final traversed shared cell joins the first private-lane cell orth
 
 The route tests also check unique/in-bounds coordinates, loop wraparound, player entry alignment, home-lane continuity and uniqueness, lane/track separation, safe-cell ranges, and the separate centre finish.
 
-## 3. What is validated versus what is not
+## 3. Strict orthogonal-route blocker (2026-11-01)
+
+The implementation now exposes a separate strict orthogonal-topology audit:
+`ClassicLudoBoardGeometryAudit.isOrthogonalTopologyValid` and
+`orthogonalTopologyBlockers`. Candidate geometry consistency and strict
+orthogonal compliance are deliberately separate results.
+
+The current 52-cell candidate has four diagonal edges (4→5, 17→18, 30→31,
+43→44). More importantly, the four current entry markers are all on the same
+checkerboard parity:
+
+- Orange (1,6): odd
+- Green (8,1): odd
+- Magenta (13,8): odd
+- Blue (6,13): odd
+
+An orthogonal grid step always flips checkerboard parity. Therefore, an odd
+13-edge interval must connect opposite parity, but each current 13-edge entry
+interval connects matching parity. No route can simultaneously preserve these
+four exact marker coordinates, preserve 13 edges between entries, and use
+orthogonal-only movement. The new tests lock this contradiction as an explicit
+blocker rather than silently accepting diagonals or fabricating coordinates.
+
+**Decision required before changing coordinates:** either retain the exact
+visual entry markers and approve/document the four diagonal connector model,
+or revise the entry-marker coordinates/interval contract using the owner's
+original board reference. Do not guess a new route from generic Ludo layouts.
+The exact original `1000545512.jpg` reference is still not present in the
+available project evidence.
+
+The safe-cell constant has also been renamed semantically to
+`provisionalSafeTrackCellIds`; the old `approvedSafeTrackCellIds` remains
+only as a deprecated compatibility alias. Its name must not be read as visual
+or rules approval.
+
+## 4. What is validated versus what is not
 
 ### Automated structural validation — implemented
 
