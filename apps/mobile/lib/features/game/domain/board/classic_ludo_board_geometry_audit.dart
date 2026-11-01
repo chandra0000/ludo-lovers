@@ -243,4 +243,16 @@ class ClassicLudoBoardGeometryAudit {
 
   /// True only for internal consistency, not final visual/rules approval.
   static bool get isStructurallyConsistent => inspect().isEmpty;
+
+  /// Strict topology status required by the orthogonal-grid acceptance rule.
+  /// This is intentionally separate from candidate-geometry consistency:
+  /// documented diagonals can be internally mapped while still violating
+  /// the requested orthogonal-only route contract.
+  static bool get isOrthogonalTopologyValid =>
+      ClassicLudoBoardCoordinateFactory.isOrthogonalTopologyValid;
+
+  /// Explicit blockers for an orthogonal-only board route, including the
+  /// checkerboard-parity conflict between the current 13-step entry markers.
+  static List<String> get orthogonalTopologyBlockers =>
+      ClassicLudoBoardCoordinateFactory.topologyBlockers;
 }
