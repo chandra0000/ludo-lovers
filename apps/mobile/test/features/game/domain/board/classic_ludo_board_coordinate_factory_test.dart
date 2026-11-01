@@ -261,7 +261,7 @@ void main() {
         39: BoardGridCell(column: 6, row: 13),
         47: BoardGridCell(column: 2, row: 8),
       };
-      expect(ClassicLudoBoardDefinition.approvedSafeTrackCellIds,
+      expect(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds,
           expected.keys.toSet());
       for (final safe in expected.entries) {
         expect(ClassicLudoBoardCoordinateFactory.sharedTrack[safe.key], safe.value);
