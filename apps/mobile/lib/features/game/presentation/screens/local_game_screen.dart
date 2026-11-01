@@ -108,6 +108,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     _playAgainstAi = widget.playAgainstAi;
     _lastObservedState = _controller.state;
     _controller.addListener(_handleControllerChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _scheduleAiTurn(_controller.state);
+    });
   }
 
   @override
@@ -172,6 +176,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     final previous = _lastObservedState;
     final current = _controller.state;
     _lastObservedState = current;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _scheduleAiTurn(_controller.state);
+    });
     final message = _controller.lastMessage ?? '';
     if (message.contains('DiceRolled')) _playFeedbackSound();
     if (message.contains('PawnCaptured') || message.contains('PawnFinished') ||
@@ -902,7 +910,6 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               builder: (context, _) {
                 try {
                 final state = _controller.state;
-                _scheduleAiTurn(state);
                 final current = state.currentPlayerId;
                 final isAiTurn = _playAgainstAi && current != _humanPlayerId;
                 final legalIds = _controller.legalPawnIds.toSet();
@@ -928,9 +935,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         // Decode close to the maximum 2x portrait canvas size
                         // to avoid allocating a huge full-resolution bitmap on
                         // memory-constrained Android devices.
-                        cacheWidth: 1152,
-                        cacheHeight: 2048,
-                        filterQuality: FilterQuality.high,
+                        cacheWidth: 576,
+                        cacheHeight: 1024,
+                        filterQuality: FilterQuality.medium,
                         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                           if (wasSynchronouslyLoaded || frame != null) {
                             return child;
