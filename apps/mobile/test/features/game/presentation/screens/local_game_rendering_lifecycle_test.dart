@@ -175,34 +175,12 @@ void main() {
       (tester) async {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
-    final navigatorKey = GlobalKey<NavigatorState>();
 
-    tester.view.physicalSize = const Size(900, 1600);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      MaterialApp(
-        navigatorKey: navigatorKey,
-        theme: ThemeData(
-          pageTransitionsTheme: PageTransitionsTheme(
-            builders: {
-              for (final platform in TargetPlatform.values)
-                platform: const _NoTransitionsBuilder(),
-            },
-          ),
-        ),
-        home: const Scaffold(body: Center(child: Text('Home'))),
-      ),
+    await pumpScreen(
+      tester,
+      controller: controller,
+      bundle: rootBundle,
     );
-    navigatorKey.currentState!.push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => LocalGameScreen(controller: controller),
-      ),
-    );
-    await tester.pump();
-    // Let the match route finish its initial layout before tapping the dice.
     await pumpFor(tester, const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
@@ -210,8 +188,11 @@ void main() {
     final versionAfterRoll = controller.state.version;
     expect(versionAfterRoll, greaterThan(0));
 
-    navigatorKey.currentState!.pop();
-    await tester.pump();
+    // Replacing the route root disposes LocalGameScreen immediately while
+    // its presentation-only dice timer is still active.
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: Center(child: Text('Home')))),
+    );
     await pumpFor(tester, const Duration(milliseconds: 1000));
 
     expect(controller.state.version, versionAfterRoll);
