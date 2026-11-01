@@ -30,5 +30,10 @@ void main() {
     expect(frame.image.height, lessThanOrEqualTo(1024));
     expect(frame.image.width, greaterThan(0));
     expect(frame.image.height, greaterThan(0));
+    expect(
+      frame.image.width / frame.image.height,
+      closeTo(9 / 16, 0.001),
+      reason: 'The approved portrait board artwork must keep its 9:16 aspect ratio.',
+    );
   });
 }
