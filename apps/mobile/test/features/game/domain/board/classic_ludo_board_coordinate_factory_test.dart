@@ -51,6 +51,42 @@ void main() {
       }
     });
 
+    test('locks the four seat entries to the agreed player-relative offsets', () {
+      const expectedEntries = <String, int>{
+        'orange': 0,
+        'green': 13,
+        'magenta': 26,
+        'blue': 39,
+      };
+      final actualEntries = <String, int>{
+        for (final seat in ClassicLudoBoardDefinition.seats)
+          seat.id: seat.provisionalTrackEntryIndex,
+      };
+      expect(actualEntries, expectedEntries);
+
+      for (final seat in ClassicLudoBoardDefinition.seats) {
+        expect(
+          seat.startMarker,
+          ClassicLudoBoardCoordinateFactory.sharedTrack[
+              expectedEntries[seat.id]!],
+          reason: '${seat.id} marker must match its agreed entry cell.',
+        );
+      }
+    });
+
+    test('the shared route closes from cell 51 to cell 0 without a gap', () {
+      const route = ClassicLudoBoardCoordinateFactory.sharedTrack;
+      final last = route[51];
+      final first = route[0];
+      expect(last, const BoardGridCell(column: 0, row: 6));
+      expect(first, const BoardGridCell(column: 1, row: 6));
+      expect(
+        (last.column - first.column).abs() +
+            (last.row - first.row).abs(),
+        1,
+      );
+    });
+
     test('seat start markers align with their physical shared-track indexes', () {
       for (final seat in ClassicLudoBoardDefinition.seats) {
         final routeCell =
