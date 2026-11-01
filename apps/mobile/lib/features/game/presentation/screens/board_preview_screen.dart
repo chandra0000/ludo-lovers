@@ -54,7 +54,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
 
 
   void _showRouteAudit() {
-    final auditIssues = ClassicLudoBoardGeometryAudit.inspect();
+    final auditIssues = <String>[\n      ...ClassicLudoBoardGeometryAudit.inspect(),\n      ...ClassicLudoBoardGeometryAudit.orthogonalTopologyBlockers,\n    ];
     final blockers = auditIssues
         .where((issue) => issue.contains('not an approved neighbouring-cell connection'))
         .toList(growable: false);
