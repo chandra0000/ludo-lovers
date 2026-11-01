@@ -875,7 +875,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 ),
               const SizedBox(height: 6),
               Text(
-                'Owner-confirmed safe-cell IDs: ${(ClassicLudoBoardDefinition.approvedSafeTrackCellIds.toList()..sort()).join(', ')}',
+                'Provisional safe-cell IDs: ${(ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.toList()..sort()).join(', ')}',
                 key: const ValueKey('provisional_safe_cell_ids'),
                 style: const TextStyle(
                   color: AppTheme.readableText,
