@@ -58,7 +58,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
     final blockers = auditIssues
         .where((issue) => issue.contains('not an approved neighbouring-cell connection'))
         .toList(growable: false);
-    final safeCells = ClassicLudoBoardDefinition.approvedSafeTrackCellIds
+    final safeCells = ClassicLudoBoardDefinition.provisionalSafeTrackCellIds
         .toList()
       ..sort();
 
@@ -124,7 +124,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               ],
               const SizedBox(height: 8),
               const Text(
-                'Owner-confirmed safe track IDs',
+                'Provisional safe track IDs',
                 style: TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 4),
@@ -143,7 +143,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'The owner-confirmed safe-cell map contains eight cells: the four player starts and star cells at IDs 8, 21, 34, and 47. The physical loop has 52 cells. The current candidate route still has four diagonal shared-loop transitions, so it does not pass the orthogonal-continuity release gate. Entry indexes and safe-cell IDs remain provisional until the route is reconciled against the approved artwork. A fresh phone screenshot is also required to confirm rendered cell-center alignment before enabling release gameplay.',
+                'The candidate safe-cell map contains eight provisional cells: the four player starts and star cells at IDs 8, 21, 34, and 47. The physical loop has 52 cells. The current candidate route still has four diagonal shared-loop transitions, so it does not pass the orthogonal-continuity release gate. All entry indexes and safe-cell IDs remain provisional until the route is reconciled against the original board artwork. A fresh phone screenshot is also required to confirm rendered cell-center alignment before enabling release gameplay.',
                 style: TextStyle(color: AppTheme.mutedText, height: 1.4),
               ),
             ],
@@ -249,7 +249,7 @@ class _BoardPreviewScreenState extends State<BoardPreviewScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.length} invalid transitions · ${ClassicLudoBoardDefinition.approvedSafeTrackCellIds.length} owner-confirmed safe cells',
+                            '${ClassicLudoBoardCoordinateFactory.invalidTransitionIndexes.length} invalid transitions · ${ClassicLudoBoardDefinition.provisionalSafeTrackCellIds.length} provisional safe cells',
                             key: const ValueKey('board_route_gate_counts'),
                             style: const TextStyle(
                               color: AppTheme.cream,
