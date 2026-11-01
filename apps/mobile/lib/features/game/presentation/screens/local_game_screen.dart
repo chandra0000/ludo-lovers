@@ -927,7 +927,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                       width: frameWidth,
                       height: frameHeight,
                       child: Image.asset(
-                        'assets/images/ludo_board_glass.png',
+                        'assets/images/ludo_board_glass.webp',
                         key: const ValueKey('live_game_board_artwork'),
                         fit: BoxFit.fill,
                         alignment: Alignment.center,
