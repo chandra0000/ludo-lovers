@@ -13,7 +13,7 @@ generated from the source during the Flutter validation/build workflow.
 
 The optimizer preserves the source aspect ratio, caps the longest edge at
 1440 pixels, retains transparency when present, and tries WebP quality levels
-from 90 down to 74 to target a file size below 500 KB. If the result remains
+from 90 down to 74 to target a file size below 300 KB. If the result remains
 above the target, the build reports a warning rather than silently reducing
 quality further.
 
