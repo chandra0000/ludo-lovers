@@ -226,14 +226,16 @@ class ClassicLudoBoardDefinition {
     ),
   ];
 
-  /// Safe/star cells confirmed by the project owner against the board artwork.
-  /// Keep the IDs centralized so the renderer and rules engine share one set.
-  static const Set<int> approvedSafeTrackCellIds = <int>{
+  /// Candidate safe/star cells for the current prototype rules profile.
+  /// These IDs are range-checked and centralized, but are NOT visually or
+  /// rules-approved until matched against the owner's exact board reference.
+  static const Set<int> provisionalSafeTrackCellIds = <int>{
     0, 8, 13, 21, 26, 34, 39, 47,
   };
 
-  /// Backwards-compatible alias for existing prototype UI and tests.
-  static const Set<int> provisionalSafeTrackCellIds = approvedSafeTrackCellIds;
+  /// Deprecated compatibility alias. Do not interpret this as approval.
+  @Deprecated('Use provisionalSafeTrackCellIds; visual approval is pending.')
+  static const Set<int> approvedSafeTrackCellIds = provisionalSafeTrackCellIds;
 
   static ClassicLudoSeat seatFor(String playerId) {
     return seats.firstWhere(
