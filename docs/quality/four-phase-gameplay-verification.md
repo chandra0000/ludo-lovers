@@ -33,6 +33,29 @@ This plan is intentionally evidence-driven. A checkbox is only complete when the
 - Safe cells are currently provisional: `{0, 8, 13, 21, 26, 34, 39, 47}`.
 - Seat entries are Orange 0, Green 13, Magenta 26 and Blue 39.
 
+### Library artwork comparison (2026-11-01)
+
+Compared the available Library artwork variants: `ludo_board_glass.png`,
+`Ludo Lovers: Royal Neon Showdown.png`, `Neon Gold Ludo Lovers Game UI.png`,
+and `Ludo Lovers: Luxury Game UI Showcase.png`. The gameplay artwork is a
+portrait 9:16 composition with a square 15 × 15 board. The current screen maps
+that board into the 576 × 1024 design canvas at (17, 205) with a 542 × 542
+playable square. The four displayed seat yards are top-left Orange, top-right
+Green, bottom-left Blue, and bottom-right Magenta. The current 15 × 15 yard
+centers and the entry markers (Orange (1,6), Green (8,1), Magenta (13,8),
+Blue (6,13)) are consistent with the available game-board variants.
+
+The variants are not pixel-identical: some show different pawn occupancy and
+star decoration. Therefore, they are useful for confirming seat orientation
+and broad pawn placement, but they do not authorize changing the route or
+safe-cell IDs. The separately referenced original `1000545512.jpg` was not
+found in the Library listing. Keep the route and safe-cell map provisional
+until that exact reference or an explicitly approved replacement is available.
+
+A regression test now checks the four yard groups against their four distinct
+artwork quadrants and verifies each of the four pawn-well centers, not only
+Orange's yard.
+
 ### Acceptance work
 - [ ] Assert exactly 52 unique, in-bounds shared cells and verify every transition, including 51 → 0, against the approved topology contract.
 - [ ] Assert the four entry markers and route offsets against the approved board artwork.
