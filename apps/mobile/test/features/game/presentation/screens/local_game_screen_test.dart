@@ -268,7 +268,7 @@ void main() {
     expect(resizedArtwork.imageProvider, isA<AssetImage>());
     expect(
       (resizedArtwork.imageProvider as AssetImage).assetName,
-      'assets/images/ludo_board_glass.png',
+      'assets/images/ludo_board_glass.webp',
     );
     expect(resizedArtwork.width, 576);
     expect(resizedArtwork.height, 1024);
