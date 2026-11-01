@@ -33,6 +33,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Optimize gameplay board artwork
+        run: |
+          python3 -m venv .asset-venv
+          .asset-venv/bin/python -m pip install --disable-pip-version-check Pillow==11.3.0
+          .asset-venv/bin/python tool/optimize_game_artwork.py
+
+      - name: Clear Flutter build outputs
+        run: flutter clean
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
