@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ludo_lovers/features/game/presentation/controllers/local_game_controller.dart';
+import 'package:ludo_lovers/features/game/presentation/widgets/animated_dice_widget.dart';
 import 'package:ludo_lovers/features/game/presentation/screens/local_game_screen.dart';
 
 class _NoTransitionsBuilder extends PageTransitionsBuilder {
@@ -191,7 +192,7 @@ void main() {
     );
     await pumpFor(tester, const Duration(milliseconds: 400));
 
-    await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
+    tester.widget<AnimatedDiceWidget>(find.byType(AnimatedDiceWidget)).onRoll();
     await pumpFor(tester, const Duration(milliseconds: 100));
     final versionAfterRoll = controller.state.version;
     expect(versionAfterRoll, greaterThan(0));
