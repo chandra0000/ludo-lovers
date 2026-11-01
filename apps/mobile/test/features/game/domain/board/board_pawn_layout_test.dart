@@ -81,19 +81,39 @@ void main() {
       expect(position.point.y, pawnLayout.layout.forCell(220).y);
     });
 
-    test('places yard pawns in four distinct slots inside their quadrant', () {
-      final points = <String>{};
-      for (var slot = 0; slot < 4; slot++) {
-        final pawn = pawnLayout.resolve(
-          playerId: 'orange',
-          pawnId: 'orange-$slot',
-          position: const PawnRoutePosition(section: PawnRouteSection.yard),
-          yardSlot: slot,
-        );
-        expect(pawn.point.isValid, isTrue);
-        points.add('${pawn.point.x},${pawn.point.y}');
+    test('maps all four yard groups to the four artwork token wells', () {
+      const expectedYardOrigins = <String, (int, int)>{
+        'orange': (0, 0),
+        'green': (9, 0),
+        'blue': (0, 9),
+        'magenta': (9, 9),
+      };
+      for (final entry in expectedYardOrigins.entries) {
+        final points = <String>{};
+        for (var slot = 0; slot < 4; slot++) {
+          final pawn = pawnLayout.resolve(
+            playerId: entry.key,
+            pawnId: '${entry.key}-$slot',
+            position: const PawnRoutePosition(section: PawnRouteSection.yard),
+            yardSlot: slot,
+          );
+          final columnOffset = slot.isEven ? 2.22 : 3.78;
+          final rowOffset = slot < 2 ? 2.22 : 3.78;
+          expect(pawn.point.isValid, isTrue);
+          expect(
+            pawn.point.x,
+            closeTo((entry.value.$1 + columnOffset) / 15, 0.000001),
+            reason: '${entry.key} yard slot $slot horizontal artwork alignment',
+          );
+          expect(
+            pawn.point.y,
+            closeTo((entry.value.$2 + rowOffset) / 15, 0.000001),
+            reason: '${entry.key} yard slot $slot vertical artwork alignment',
+          );
+          points.add('${pawn.point.x},${pawn.point.y}');
+        }
+        expect(points, hasLength(4), reason: '${entry.key} yard wells must be unique');
       }
-      expect(points, hasLength(4));
     });
 
     test('places finished pawns at the board center', () {
