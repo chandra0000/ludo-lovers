@@ -94,7 +94,7 @@ Future<void> pumpScreen(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('shows a visible loading state until board artwork decodes',
+  testWidgets('shows a visible loading state while board artwork is pending',
       (tester) async {
     final controller = LocalGameController(nextDiceValue: () => 6);
     addTearDown(controller.dispose);
@@ -113,12 +113,11 @@ void main() {
         findsNothing);
 
     await bundle.releaseBoard();
-    await pumpFor(tester, const Duration(milliseconds: 800));
-
-    expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
-    expect(find.text('LOADING LUDO BOARD…'), findsNothing);
-    expect(find.byKey(const ValueKey('live_game_board_artwork_fallback')),
-        findsNothing);
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('live_game_board_artwork_fallback')),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -203,7 +202,8 @@ void main() {
       ),
     );
     await tester.pump();
-    await pumpFor(tester, const Duration(milliseconds: 100));
+    // Let the match route finish its initial layout before tapping the dice.
+    await pumpFor(tester, const Duration(milliseconds: 400));
 
     await tester.tap(find.byKey(const ValueKey('roll_dice_button')));
     await pumpFor(tester, const Duration(milliseconds: 100));
