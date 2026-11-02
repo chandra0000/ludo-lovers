@@ -9,14 +9,14 @@ This plan is intentionally evidence-driven. A checkbox is only complete when the
 ## Phase 1 — asset and rendering stability
 
 ### Existing implementation to retain
-- The approved PNG remains the lossless master; the build generates `ludo_board_glass.png` with `apps/mobile/tool/optimize_game_artwork.py`.
-- The optimizer applies EXIF orientation, preserves aspect ratio/transparency, caps the longest edge at 1440 px, and targets 500 KB.
+- `ludo_board_glass.png` is committed and declared directly in `pubspec.yaml`; clean checkouts do not depend on a generated or untracked WebP file.
 - `LocalGameScreen` uses a bounded `ResizeImage` provider (576 × 1024), preloads it with `precacheImage`, and has an image error fallback.
-- `gameplay_board_asset_test.dart` loads and decodes the bundled WebP and checks the phone decode bounds.
+- `gameplay_board_asset_test.dart` loads the committed PNG, checks its PNG signature, and decodes it within the phone render bounds.
+- The optional WebP optimizer is not part of the required build path and its output is not referenced by gameplay.
 
 ### Acceptance work
-- [ ] Record the generated WebP's exact width, height, byte size, source dimensions, and compression reduction in the CI log. Fail if the file is empty, malformed, not WebP, or exceeds the agreed hard runtime budget (currently 300 KB in the asset test).
-- [ ] Verify decoded dimensions and aspect ratio against the source, not only maximum dimensions.
+- [ ] Record the committed PNG's exact dimensions and byte size; establish an explicit bundled-asset budget before replacing the source artwork with an optimized derivative.
+- [ ] Verify decoded dimensions and aspect ratio against the committed PNG source, not only maximum dimensions.
 - [ ] Test successful board rendering and a deliberately missing/corrupt asset; the error state must remain visible and must not leave a black/empty gameplay surface.
 - [ ] Test the loading state before decode completes.
 - [ ] Verify board, pawn and dice widgets are painted in the same frame after loading, for all four modes.
@@ -105,7 +105,7 @@ The canonical engine is pure Dart and must remain independent of Flutter/Flame r
 ## Current known blockers and safeguards
 
 1. Board route, corner transitions and safe-cell placement are still provisional pending exact artwork review.
-2. The existing board asset test proves bundle loading and codec decoding; it does not by itself prove a fully painted gameplay frame or successful fallback behavior.
+2. The board asset test proves bundle loading and codec decoding; widget lifecycle tests separately cover loading and failed-asset fallback, but a full painted-frame assertion for every mode remains required.
 3. CI green status does not certify physical-device visuals, memory behavior, or gameplay correctness outside the covered tests.
 4. Online multiplayer, server-authoritative dice, and online fairness verification are outside this local-game verification plan.
 
@@ -113,7 +113,7 @@ The canonical engine is pure Dart and must remain independent of Flutter/Flame r
 
 Attach to the milestone/PR:
 - CI run URL and exact commit SHA.
-- WebP dimensions and byte size from the build log.
+- Committed PNG dimensions and byte size; record optimized derivative metrics only if a derivative becomes the runtime asset.
 - Test names/results for rendering, loading/error states, disposal, geometry, engine rules and all four modes.
 - Device/layout matrix and screenshots.
 - Repeated-entry/exit and memory observations.
