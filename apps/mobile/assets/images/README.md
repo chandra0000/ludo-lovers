@@ -1,7 +1,7 @@
 # Ludo Lovers image assets
 
-The approved source artwork is kept in this directory. Runtime game artwork is
-generated from the source during the Flutter validation/build workflow.
+The approved source artwork is kept in this directory. The gameplay screen loads
+the committed PNG directly; a clean Flutter build needs no image-generation step.
 
 ## Gameplay board
 
@@ -17,7 +17,7 @@ from 90 down to 74 to target a file size below 300 KB. If the result remains
 above the target, the build reports a warning rather than silently reducing
 quality further.
 
-To generate the runtime asset locally from `apps/mobile`:
+To generate an optional WebP derivative locally from `apps/mobile` (not required by the app or CI):
 
 ```bash
 python3 -m venv .asset-venv
