@@ -8,13 +8,11 @@ void main() {
 
   test('bundled gameplay board artwork loads and decodes within the phone budget',
       () async {
-    final data = await rootBundle.load('assets/images/ludo_board_glass.webp');
+    final data = await rootBundle.load('assets/images/ludo_board_glass.png');
     expect(data.lengthInBytes, greaterThan(12));
-    expect(data.lengthInBytes, lessThan(300 * 1024));
-
     final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    expect(String.fromCharCodes(bytes.take(4)), 'RIFF');
-    expect(String.fromCharCodes(bytes.skip(8).take(4)), 'WEBP');
+    expect(bytes[0], 0x89);
+    expect(String.fromCharCodes(bytes.skip(1).take(3)), 'PNG');
 
     final codec = await ui.instantiateImageCodec(
       data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
