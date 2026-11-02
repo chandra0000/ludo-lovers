@@ -30,13 +30,13 @@ class _DelayedBoardAssetBundle extends CachingAssetBundle {
   Future<void> releaseBoard() async {
     if (_boardBytes.isCompleted) return;
     _boardBytes.complete(
-      await rootBundle.load('assets/images/ludo_board_glass.webp'),
+      await rootBundle.load('assets/images/ludo_board_glass.png'),
     );
   }
 
   @override
   Future<ByteData> load(String key) {
-    if (key.endsWith('ludo_board_glass.webp')) {
+    if (key.endsWith('ludo_board_glass.png')) {
       _requested = true;
       return _boardBytes.future;
     }
@@ -47,7 +47,7 @@ class _DelayedBoardAssetBundle extends CachingAssetBundle {
 class _FailingBoardAssetBundle extends CachingAssetBundle {
   @override
   Future<ByteData> load(String key) {
-    if (key.endsWith('ludo_board_glass.webp')) {
+    if (key.endsWith('ludo_board_glass.png')) {
       return Future<ByteData>.error(
         StateError('Intentional missing-board-artwork test failure'),
       );
