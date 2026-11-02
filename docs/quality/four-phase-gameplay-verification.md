@@ -9,7 +9,7 @@ This plan is intentionally evidence-driven. A checkbox is only complete when the
 ## Phase 1 — asset and rendering stability
 
 ### Existing implementation to retain
-- The approved PNG remains the lossless master; the build generates `ludo_board_glass.webp` with `apps/mobile/tool/optimize_game_artwork.py`.
+- The approved PNG remains the lossless master; the build generates `ludo_board_glass.png` with `apps/mobile/tool/optimize_game_artwork.py`.
 - The optimizer applies EXIF orientation, preserves aspect ratio/transparency, caps the longest edge at 1440 px, and targets 500 KB.
 - `LocalGameScreen` uses a bounded `ResizeImage` provider (576 × 1024), preloads it with `precacheImage`, and has an image error fallback.
 - `gameplay_board_asset_test.dart` loads and decodes the bundled WebP and checks the phone decode bounds.
