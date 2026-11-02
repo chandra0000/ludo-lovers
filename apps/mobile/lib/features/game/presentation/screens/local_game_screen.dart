@@ -88,7 +88,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _diceRolling = false;
   bool _boardPreloadStarted = false;
   late final ImageProvider<Object> _boardArtworkProvider = ResizeImage(
-    const AssetImage('assets/images/ludo_board_glass.webp'),
+    const AssetImage('assets/images/ludo_board_glass.png'),
     width: 576,
     height: 1024,
   );
