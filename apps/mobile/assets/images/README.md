@@ -5,11 +5,11 @@ generated from the source during the Flutter validation/build workflow.
 
 ## Gameplay board
 
-- `ludo_board_glass.png` — lossless source/master artwork. Do not delete or
-  replace it without approving the visual result.
-- `ludo_board_glass.webp` — generated, phone-sized runtime asset. It is
-  intentionally not committed; the optimization script creates it before
-  Flutter dependency resolution and build.
+- `ludo_board_glass.png` — committed gameplay artwork and runtime asset. Do not
+  delete or replace it without approving the visual result.
+- `ludo_board_glass.webp` — optional generated optimization output. It is not
+  referenced by the Flutter app because generated files are not guaranteed to
+  exist in a clean checkout.
 
 The optimizer preserves the source aspect ratio, caps the longest edge at
 1440 pixels, retains transparency when present, and tries WebP quality levels
