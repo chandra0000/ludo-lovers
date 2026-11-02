@@ -75,7 +75,7 @@ void main() {
     expect(find.text('Route & safe-cell audit'), findsOneWidget);
     expect(find.text('NOT APPROVED FOR RELEASE'), findsOneWidget);
     expect(find.textContaining('4 (5,6) → 5 (6,5)'), findsOneWidget);
-    expect(find.text('Owner-confirmed safe track IDs'), findsOneWidget);
+    expect(find.text('Provisional safe track IDs'), findsOneWidget);
     expect(find.text('0, 8, 13, 21, 26, 34, 39, 47'), findsOneWidget);
   });
 
