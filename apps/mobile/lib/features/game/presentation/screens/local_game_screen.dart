@@ -77,6 +77,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   Timer? _aiTimer;
   Timer? _pawnStepTimer;
   LocalGameState? _lastObservedState;
+  bool _controllerReady = false;
+  String? _initializationError;
   final Map<String, BoardPoint> _animatedPawnPoints = <String, BoardPoint>{};
   final Map<String, Set<String>> _capturedPawnVisualsByMover = <String, Set<String>>{};
   final Map<String, Map<String, List<BoardPoint>>> _capturedPawnReturnPointsByMover =
@@ -112,12 +114,25 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     // the game UI and restore system bars when leaving the match.
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _playAgainstAi = widget.playAgainstAi;
-    _lastObservedState = _controller.state;
-    _controller.addListener(_handleControllerChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _scheduleAiTurn(_controller.state);
-    });
+    // Controller/setup creation is lazy. Guard it here so a bad setup cannot
+    // leave the route showing only the Scaffold background on a real device.
+    try {
+      _lastObservedState = _controller.state;
+      _controller.addListener(_handleControllerChanged);
+      _controllerReady = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_controllerReady) return;
+        _scheduleAiTurn(_controller.state);
+      });
+    } on Object catch (error, stackTrace) {
+      _initializationError = error.toString();
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: error,
+        stack: stackTrace,
+        library: 'Ludo Lovers gameplay',
+        context: ErrorDescription('while initializing the local match controller'),
+      ));
+    }
   }
 
   @override
@@ -143,11 +158,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    _controller.removeListener(_handleControllerChanged);
+    if (_controllerReady) {
+      _controller.removeListener(_handleControllerChanged);
+    }
     _aiTimer?.cancel();
     _pawnStepTimer?.cancel();
     _diceRollTimer?.cancel();
-    if (widget.controller == null) _controller.dispose();
+    if (_controllerReady && widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
@@ -899,6 +916,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final initializationError = _initializationError;
+    if (initializationError != null) {
+      return Scaffold(
+        backgroundColor: AppTheme.black,
+        body: SafeArea(
+          child: _GameplayRenderFallback(
+            message: 'Controller initialization failed: $initializationError',
+            onBack: () => Navigator.of(context).maybePop(),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.black,
       body: SafeArea(
