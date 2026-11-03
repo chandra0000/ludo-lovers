@@ -7,6 +7,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -110,9 +111,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   void initState() {
     super.initState();
-    // Use the full Android viewport for gameplay. Keep app navigation inside
-    // the game UI and restore system bars when leaving the match.
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // Keep Android system bars visible while investigating device viewport
+    // rendering. Immersive mode can change the surface after route transitions.
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _playAgainstAi = widget.playAgainstAi;
     // Controller/setup creation is lazy. Guard it here so a bad setup cannot
     // leave the route showing only the Scaffold background on a real device.
@@ -961,10 +962,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
             double dy(double y) => frameTop + y * scale;
             double ds(double value) => value * scale;
 
-            return AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                try {
+            return Stack(
+              children: <Widget>[
+                AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, _) {
+                    try {
                 final state = _controller.state;
                 final current = state.currentPlayerId;
                 final isAiTurn = _playAgainstAi && current != _humanPlayerId;
@@ -1355,8 +1358,37 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                     message: error.toString(),
                     onBack: () => Navigator.of(context).maybePop(),
                   );
-                }
-              },
+                    }
+                  },
+                ),
+                if (kDebugMode)
+                  Positioned(
+                    left: 8,
+                    right: 8,
+                    top: 8,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade900.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.greenAccent),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          child: Text(
+                            'DEBUG: LOCAL GAME SCREEN BUILD ACTIVE',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             );
           },
         ),
