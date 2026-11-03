@@ -917,6 +917,62 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Isolate the route from the game renderer in debug APKs. If this
+    // full-screen diagnostic is not visible, the failure is before this
+    // widget's build method (route/navigation/platform surface), not the
+    // board, image decoder, controller, or gameplay overlays.
+    if (kDebugMode) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF24104A),
+        body: SafeArea(
+          child: Center(
+            child: Container(
+              width: double.infinity,
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF101010),
+                border: Border.all(color: Colors.greenAccent, width: 3),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.bug_report, color: Colors.greenAccent, size: 54),
+                  SizedBox(height: 18),
+                  Text(
+                    'LOCAL GAME ROUTE IS ACTIVE',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'DEBUG ISOLATION SCREEN · BUILD 1044',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.greenAccent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'If this message is visible, Android has painted the gameplay route. The blank screen is inside the normal gameplay renderer.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70, height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     final initializationError = _initializationError;
     if (initializationError != null) {
       return Scaffold(
