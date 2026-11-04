@@ -76,4 +76,53 @@ void main() {
     expect(find.byKey(const ValueKey('portrait_turn_indicator')), findsOneWidget);
     expect(find.byKey(const ValueKey('how_to_play_button')), findsOneWidget);
   });
+
+  testWidgets(
+    'real launch flow reaches a fully rendered match and survives repeated navigation',
+    (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(const LudoLoversApp());
+      // The production splash waits 2.5s and then fades to the compact hub.
+      await pumpFor(tester, const Duration(milliseconds: 3000));
+      expect(find.byType(GameModeSelectionScreen), findsOneWidget);
+      expect(find.text('CHOOSE YOUR GAME'), findsOneWidget);
+
+      Future<void> openMode(String key) async {
+        await tester.tap(find.byKey(ValueKey<String>(key)));
+        await pumpFor(tester, const Duration(milliseconds: 600));
+        expect(find.byType(LocalGameScreen), findsOneWidget);
+        expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
+        expect(find.byKey(const ValueKey('roll_dice_button')), findsOneWidget);
+        expect(find.byKey(const ValueKey('live_game_board_artwork')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      }
+
+      Future<void> returnToHub() async {
+        Navigator.of(tester.element(find.byType(LocalGameScreen))).pop();
+        await pumpFor(tester, const Duration(milliseconds: 500));
+        expect(find.byType(GameModeSelectionScreen), findsOneWidget);
+      }
+
+      await openMode('mode_four_players_button');
+      await returnToHub();
+
+      await openMode('mode_vs_computer_button');
+      await returnToHub();
+
+      await tester.tap(find.byKey(const ValueKey('mode_two_players_button')));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('start_two_player_match_button')));
+      await pumpFor(tester, const Duration(milliseconds: 600));
+      expect(find.byType(LocalGameScreen), findsOneWidget);
+      expect(find.byKey(const ValueKey('local_game_board')), findsOneWidget);
+      await returnToHub();
+
+      await openMode('mode_team_up_button');
+    },
+  );
+
 }
