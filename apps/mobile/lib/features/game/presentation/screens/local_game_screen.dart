@@ -1793,12 +1793,35 @@ class _TeamIdentityLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
-        Text(members, textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.readableText, fontSize: 11, fontWeight: FontWeight.w800)),
-      ],
+    // The banner is positioned on a scaled 576x1024 reference canvas.
+    // Scale its two-line labels down on compact phones instead of allowing
+    // fixed font metrics to overflow the banner's constrained height.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+            ),
+          ),
+          Text(
+            members,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppTheme.readableText,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
