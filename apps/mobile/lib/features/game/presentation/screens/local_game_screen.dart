@@ -90,6 +90,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   final bool _soundEnabled = true;
   bool _diceRolling = false;
   bool _boardPreloadStarted = false;
+  bool _boardArtworkFrameLogged = false;
   late final ImageProvider<Object> _boardArtworkProvider = ResizeImage(
     const AssetImage('assets/images/ludo_board_glass.webp'),
     width: 576,
@@ -150,7 +151,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         _boardArtworkProvider,
         context,
         onError: (exception, stackTrace) {
-          // Image.errorBuilder below renders the visible fallback.
+          // Keep preload failures visible in Android logcat. The Image widget's
+          // errorBuilder renders the on-screen fallback independently.
+          debugPrint('[LudoLovers][BoardArtworkPreloadError] $exception');
+          if (stackTrace != null) {
+            debugPrintStack(stackTrace: stackTrace);
+          }
         },
       ),
     );
@@ -994,6 +1000,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                         filterQuality: FilterQuality.medium,
                         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                           if (wasSynchronouslyLoaded || frame != null) {
+                            if (!_boardArtworkFrameLogged) {
+                              _boardArtworkFrameLogged = true;
+                              debugPrint(
+                                '[LudoLovers][BoardArtworkReady] '
+                                '576x1024 decoded frame=${frame ?? 0}',
+                              );
+                            }
                             return child;
                           }
                           return const DecoratedBox(
@@ -1021,7 +1034,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                           );
                         },
                         semanticLabel: 'Complete Ludo Lovers portrait game layout',
-                        errorBuilder: (context, error, stackTrace) => DecoratedBox(
+                        errorBuilder: (context, error, stackTrace) {
+                          debugPrint('[LudoLovers][BoardArtworkDecodeError] $error');
+                          if (stackTrace != null) {
+                            debugPrintStack(stackTrace: stackTrace);
+                          }
+                          return DecoratedBox(
                           key: const ValueKey('live_game_board_artwork_fallback'),
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(
@@ -1045,7 +1063,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               ),
                             ),
                           ),
-                        ),
+                        );
+                        },
                       ),
                     ),
                     // Keep decorative/social controls behind gameplay hit targets.
