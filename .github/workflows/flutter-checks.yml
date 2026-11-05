@@ -102,7 +102,8 @@ jobs:
         run: flutter test
 
       - name: Build Android arm64 debug APK
-        run: flutter build apk --debug --target-platform android-arm64
+        run: |
+          flutter build apk --debug --target-platform android-arm64
           test -f build/app/outputs/flutter-apk/app-debug.apk
           mkdir -p build/device-test
           cp build/app/outputs/flutter-apk/app-debug.apk build/device-test/ludo-lovers-debug.apk
