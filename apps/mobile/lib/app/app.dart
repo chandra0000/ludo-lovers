@@ -43,13 +43,27 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
   final List<String> _selectedPlayers = <String>['orange', 'green'];
   bool _twoPlayerSetupVisible = false;
 
-  void _openMatch({required bool againstAi}) {
+  // Use an immediate opaque route while investigating device-only black
+  // frames during gameplay navigation. This removes the default Android
+  // route animation as a variable without changing match setup or rendering.
+  void _pushMatch(Widget screen) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => LocalGameScreen(
-          selectedPlayerIds: LocalGameFactory.playerIds,
-          playAgainstAi: againstAi,
-        ),
+      PageRouteBuilder<void>(
+        opaque: true,
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            child,
+      ),
+    );
+  }
+
+  void _openMatch({required bool againstAi}) {
+    _pushMatch(
+      LocalGameScreen(
+        selectedPlayerIds: LocalGameFactory.playerIds,
+        playAgainstAi: againstAi,
       ),
     );
   }
@@ -71,22 +85,18 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
 
   void _startTwoPlayerMatch() {
     if (_selectedPlayers.length != 2) return;
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => LocalGameScreen(
-          selectedPlayerIds: List<String>.of(_selectedPlayers),
-        ),
+    _pushMatch(
+      LocalGameScreen(
+        selectedPlayerIds: List<String>.of(_selectedPlayers),
       ),
     );
   }
 
   void _startTeamUpMatch() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const LocalGameScreen(
-          selectedPlayerIds: LocalGameFactory.playerIds,
-          gameMode: LocalGameMode.teamUp,
-        ),
+    _pushMatch(
+      const LocalGameScreen(
+        selectedPlayerIds: LocalGameFactory.playerIds,
+        gameMode: LocalGameMode.teamUp,
       ),
     );
   }
