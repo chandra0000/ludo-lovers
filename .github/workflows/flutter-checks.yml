@@ -103,15 +103,18 @@ jobs:
 
       - name: Build Android arm64 debug APK
         run: flutter build apk --debug --target-platform android-arm64
+          test -f build/app/outputs/flutter-apk/app-debug.apk
+          mkdir -p build/device-test
+          cp build/app/outputs/flutter-apk/app-debug.apk build/device-test/ludo-lovers-debug.apk
 
       - name: Report APK size
-        run: ls -lh build/app/outputs/flutter-apk/app-armeabi-v7a-debug.apk build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk 2>/dev/null || ls -lh build/app/outputs/flutter-apk/
+        run: ls -lh build/app/outputs/flutter-apk/app-debug.apk
 
       - name: Upload Android debug APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ludo-lovers-debug-apk-arm64
-          path: apps/mobile/build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
+          path: apps/mobile/build/device-test/ludo-lovers-debug.apk
           if-no-files-found: error
           retention-days: 7
