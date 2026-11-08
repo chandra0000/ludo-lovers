@@ -46,26 +46,47 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
   // Use an immediate opaque route while investigating device-only black
   // frames during gameplay navigation. This removes the default Android
   // route animation as a variable without changing match setup or rendering.
-  void _pushMatch(Widget screen) {
-    Navigator.of(context).push(
-      PageRouteBuilder<void>(
-        opaque: true,
-        pageBuilder: (context, animation, secondaryAnimation) => screen,
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-            child,
-      ),
+  void _pushMatch(Widget screen, {required String mode}) {
+    debugPrint(
+      '[LudoLovers][NavigationRequest] mode=$mode '
+      'screen=\${screen.runtimeType} mounted=$mounted',
     );
+    final route = PageRouteBuilder<void>(
+      settings: RouteSettings(name: '/gameplay/$mode'),
+      opaque: true,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        debugPrint(
+          '[LudoLovers][GameplayRouteBuild] mode=$mode '
+          'screen=\${screen.runtimeType}',
+        );
+        return screen;
+      },
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          child,
+    );
+    Navigator.of(context).push<void>(route).then<void>((_) {
+      debugPrint('[LudoLovers][GameplayRoutePopped] mode=$mode');
+    });
   }
 
-  void _openMatch({required bool againstAi}) {
+  void _openMatch({required bool againstAi, required String mode}) {
+    debugPrint(
+      '[LudoLovers][ModeSelected] mode=$mode againstAi=$againstAi',
+    );
     _pushMatch(
       LocalGameScreen(
         selectedPlayerIds: LocalGameFactory.playerIds,
         playAgainstAi: againstAi,
       ),
+      mode: mode,
     );
+  }
+
+  void _showTwoPlayerSetup() {
+    debugPrint('[LudoLovers][ModeSelected] mode=two_player_setup');
+    setState(() => _twoPlayerSetupVisible = true);
   }
 
   void _togglePlayer(String playerId) {
@@ -84,20 +105,33 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
   }
 
   void _startTwoPlayerMatch() {
-    if (_selectedPlayers.length != 2) return;
+    if (_selectedPlayers.length != 2) {
+      debugPrint(
+        '[LudoLovers][ModeSelectionRejected] mode=two_player '
+        'selectedPlayers=\${_selectedPlayers.length}',
+      );
+      return;
+    }
+    debugPrint(
+      '[LudoLovers][ModeSelected] mode=two_player '
+      'players=\${_selectedPlayers.join(',')}',
+    );
     _pushMatch(
       LocalGameScreen(
         selectedPlayerIds: List<String>.of(_selectedPlayers),
       ),
+      mode: 'two_player',
     );
   }
 
   void _startTeamUpMatch() {
+    debugPrint('[LudoLovers][ModeSelected] mode=team_up');
     _pushMatch(
       const LocalGameScreen(
         selectedPlayerIds: LocalGameFactory.playerIds,
         gameMode: LocalGameMode.teamUp,
       ),
+      mode: 'team_up',
     );
   }
 
@@ -192,7 +226,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
                         label: 'VS AI',
                         detail: '1 player',
                         accent: AppTheme.magenta,
-                        onTap: () => _openMatch(againstAi: true),
+                        onTap: () => _openMatch(againstAi: true, mode: 'vs_ai'),
                       ),
                       _ModeTile(
                         key: const ValueKey('mode_two_players_button'),
@@ -201,9 +235,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
                         detail: 'Choose colours',
                         accent: AppTheme.green,
                         selected: _twoPlayerSetupVisible,
-                        onTap: () => setState(
-                          () => _twoPlayerSetupVisible = true,
-                        ),
+                        onTap: _showTwoPlayerSetup,
                       ),
                       _ModeTile(
                         key: const ValueKey('mode_four_players_button'),
@@ -211,7 +243,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
                         label: '4P',
                         detail: 'Four players',
                         accent: AppTheme.blue,
-                        onTap: () => _openMatch(againstAi: false),
+                        onTap: () => _openMatch(againstAi: false, mode: 'four_player'),
                       ),
                       _ModeTile(
                         key: const ValueKey('mode_team_up_button'),
