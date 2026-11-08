@@ -56,7 +56,8 @@ class LocalGameScreen extends StatefulWidget {
   State<LocalGameScreen> createState() => _LocalGameScreenState();
 }
 
-class _LocalGameScreenState extends State<LocalGameScreen> {
+class _LocalGameScreenState extends State<LocalGameScreen>
+    with WidgetsBindingObserver {
   late final LocalGameController _controller = widget.controller ??
       LocalGameController(
         gameSetup: LocalGameFactory.create(
@@ -115,6 +116,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     debugPrint(
       '[LudoLovers][GameplayInit] mode=${widget.gameMode.name} '
       'selectedPlayers=${widget.selectedPlayerIds?.join(',') ?? 'default'} '
@@ -123,7 +125,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     );
     // Keep Android system bars visible while investigating device viewport
     // rendering. Immersive mode can change the surface after route transitions.
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    _requestEdgeToEdgeSystemUi(source: 'gameplay_init');
     _playAgainstAi = widget.playAgainstAi;
     // Controller/setup creation is lazy. Guard it here so a bad setup cannot
     // leave the route showing only the Scaffold background on a real device.
@@ -152,6 +154,46 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
         context: ErrorDescription('while initializing the local match controller'),
       ));
     }
+  }
+
+  void _requestEdgeToEdgeSystemUi({required String source}) {
+    debugPrint(
+      '[LudoLovers][SystemUiModeRequest] source=$source mode=edgeToEdge',
+    );
+    unawaited(
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then<void>(
+        (_) {
+          debugPrint(
+            '[LudoLovers][SystemUiModeApplied] source=$source',
+          );
+        },
+      ).catchError((Object error, StackTrace stackTrace) {
+        debugPrint(
+          '[LudoLovers][SystemUiModeError] source=$source error=$error',
+        );
+        debugPrintStack(stackTrace: stackTrace);
+      }),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint('[LudoLovers][AppLifecycle] state=${state.name}');
+  }
+
+  @override
+  void didChangeMetrics() {
+    final views = WidgetsBinding.instance.platformDispatcher.views;
+    if (views.isEmpty) {
+      debugPrint('[LudoLovers][WindowMetrics] no platform views');
+      return;
+    }
+    final view = views.first;
+    debugPrint(
+      '[LudoLovers][WindowMetrics] '
+      'physicalSize=${view.physicalSize} '
+      'devicePixelRatio=${view.devicePixelRatio}',
+    );
   }
 
   @override
@@ -188,6 +230,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _requestEdgeToEdgeSystemUi(source: 'gameplay_dispose');
     debugPrint(
       '[LudoLovers][GameplayDispose] '
       'mode=${widget.gameMode.name} mounted=$mounted',
