@@ -104,21 +104,6 @@ jobs:
           print("Android launcher label set to: Ludo lovers")
           print("Android Impeller renderer disabled for device compatibility")
 
-          wrapper = Path("android/gradle/wrapper/gradle-wrapper.properties")
-          wrapper_content = wrapper.read_text(encoding="utf-8")
-          wrapper_content, wrapper_urls = re.subn(
-              r"^distributionUrl=.*?(gradle-[^/]+?)-(?:all|bin)\.zip$",
-              r"distributionUrl=https\\://downloads.gradle-dn.com/distributions/\1-bin.zip",
-              wrapper_content,
-              count=1,
-              flags=re.MULTILINE,
-          )
-          if wrapper_urls != 1:
-              raise SystemExit(
-                  f"Expected one Gradle distributionUrl in {wrapper}, found {wrapper_urls}"
-              )
-          wrapper.write_text(wrapper_content, encoding="utf-8")
-          print("Gradle wrapper uses the official binary distribution host")
           PY
 
       - name: Format Dart sources
@@ -138,7 +123,18 @@ jobs:
 
       - name: Build Android arm64 debug APK
         run: |
-          flutter build apk --debug --target-platform android-arm64
+          for attempt in 1 2 3; do
+            if flutter build apk --debug --target-platform android-arm64 --dart-define=APP_BUILD_SHA=$GITHUB_SHA; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Android APK build failed after $attempt attempts."
+              exit 1
+            fi
+            delay=$((attempt * 20))
+            echo "Android APK build failed on attempt $attempt; retrying in ${delay}s."
+            sleep "$delay"
+          done
           test -f build/app/outputs/flutter-apk/app-debug.apk
           mkdir -p build/device-test
           cp build/app/outputs/flutter-apk/app-debug.apk build/device-test/ludo-lovers-debug.apk
