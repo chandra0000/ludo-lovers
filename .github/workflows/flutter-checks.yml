@@ -108,7 +108,7 @@ jobs:
           wrapper_content = wrapper.read_text(encoding="utf-8")
           wrapper_content, wrapper_urls = re.subn(
               r"^distributionUrl=.*?(gradle-[^/]+?)-(?:all|bin)\.zip$",
-              r"distributionUrl=https\\://downloads.gradle.org/distributions/\1-bin.zip",
+              r"distributionUrl=https\\://downloads.gradle-dn.com/distributions/\1-bin.zip",
               wrapper_content,
               count=1,
               flags=re.MULTILINE,
