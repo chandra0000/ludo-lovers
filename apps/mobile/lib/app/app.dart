@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../features/game/domain/engine/local_game_factory.dart';
 import '../features/game/presentation/screens/local_game_screen.dart';
-import 'splash_screen.dart';
 import 'theme/app_theme.dart';
 
 class LudoLoversApp extends StatelessWidget {
@@ -14,9 +13,10 @@ class LudoLoversApp extends StatelessWidget {
       title: 'Ludo Lovers',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: SplashScreen(
-        destinationBuilder: (_) => const GameModeSelectionScreen(),
-      ),
+      // Show the playable mode hub on the first Flutter frame. The previous
+      // timed splash delayed interaction for 2.5 seconds and could look like
+      // a black-screen hang on slower Android devices during startup.
+      home: const GameModeSelectionScreen(),
     );
   }
 }

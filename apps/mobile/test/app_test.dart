@@ -30,7 +30,21 @@ Future<void> pumpFor(WidgetTester tester, Duration duration) async {
 }
 
 void main() {
-  testWidgets('renders compact game hub directly after splash', (tester) async {
+  testWidgets('shows the game hub on the first app frame', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const LudoLoversApp());
+
+    expect(find.text('CHOOSE YOUR GAME'), findsOneWidget);
+    expect(find.text('VS AI'), findsOneWidget);
+    expect(find.byKey(const ValueKey('ludo_lovers_splash_logo')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('renders compact game hub without a timed splash', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
