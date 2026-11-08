@@ -56,7 +56,8 @@ class LocalGameScreen extends StatefulWidget {
   State<LocalGameScreen> createState() => _LocalGameScreenState();
 }
 
-class _LocalGameScreenState extends State<LocalGameScreen> {
+class _LocalGameScreenState extends State<LocalGameScreen>
+    with WidgetsBindingObserver {
   late final LocalGameController _controller = widget.controller ??
       LocalGameController(
         gameSetup: LocalGameFactory.create(
@@ -91,6 +92,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   bool _diceRolling = false;
   bool _boardPreloadStarted = false;
   bool _boardArtworkFrameLogged = false;
+  bool _boardLoadingLogged = false;
+  bool _gameplayLayoutLogged = false;
+  bool _gameplayFirstFrameLogged = false;
   late final ImageProvider<Object> _boardArtworkProvider = ResizeImage(
     const AssetImage('assets/images/ludo_board_glass.webp'),
     width: 576,
@@ -112,9 +116,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    debugPrint(
+      '[LudoLovers][GameplayInit] mode=${widget.gameMode.name} '
+      'selectedPlayers=${widget.selectedPlayerIds?.join(',') ?? 'default'} '
+      'againstAi=${widget.playAgainstAi} '
+      'controllerInjected=${widget.controller != null}',
+    );
     // Keep Android system bars visible while investigating device viewport
     // rendering. Immersive mode can change the surface after route transitions.
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    _requestEdgeToEdgeSystemUi(source: 'gameplay_init');
     _playAgainstAi = widget.playAgainstAi;
     // Controller/setup creation is lazy. Guard it here so a bad setup cannot
     // leave the route showing only the Scaffold background on a real device.
@@ -122,11 +133,19 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       _lastObservedState = _controller.state;
       _controller.addListener(_handleControllerChanged);
       _controllerReady = true;
+      debugPrint(
+        '[LudoLovers][GameplayControllerReady] '
+        'players=${_controller.state.players.join(',')} '
+        'currentPlayer=${_controller.state.currentPlayerId} '
+        'pawns=${_controller.state.pawns.length}',
+      );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !_controllerReady) return;
         _scheduleAiTurn(_controller.state);
       });
     } on Object catch (error, stackTrace) {
+      debugPrint('[LudoLovers][GameplayControllerInitError] $error');
+      debugPrintStack(stackTrace: stackTrace);
       _initializationError = error.toString();
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
@@ -137,11 +156,58 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
     }
   }
 
+  void _requestEdgeToEdgeSystemUi({required String source}) {
+    debugPrint(
+      '[LudoLovers][SystemUiModeRequest] source=$source mode=edgeToEdge',
+    );
+    unawaited(
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then<void>(
+        (_) {
+          debugPrint(
+            '[LudoLovers][SystemUiModeApplied] source=$source',
+          );
+        },
+      ).catchError((Object error, StackTrace stackTrace) {
+        debugPrint(
+          '[LudoLovers][SystemUiModeError] source=$source error=$error',
+        );
+        debugPrintStack(stackTrace: stackTrace);
+      }),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint('[LudoLovers][AppLifecycle] state=${state.name}');
+  }
+
+  @override
+  void didChangeMetrics() {
+    final views = WidgetsBinding.instance.platformDispatcher.views;
+    if (views.isEmpty) {
+      debugPrint('[LudoLovers][WindowMetrics] no platform views');
+      return;
+    }
+    final view = views.first;
+    debugPrint(
+      '[LudoLovers][WindowMetrics] '
+      'physicalSize=${view.physicalSize} '
+      'devicePixelRatio=${view.devicePixelRatio}',
+    );
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_boardPreloadStarted) return;
     _boardPreloadStarted = true;
+    debugPrint(
+      '[LudoLovers][BoardPreloadStart] '
+      'asset=assets/images/ludo_board_glass.webp '
+      'target=576x1024 '
+      'devicePixelRatio=${MediaQuery.devicePixelRatioOf(context)} '
+      'screen=${MediaQuery.sizeOf(context)}',
+    );
 
     // Decode the same bounded provider used by the visible Image widget before
     // the first gameplay frame. Flutter's image cache then shares the decoded
@@ -164,6 +230,12 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _requestEdgeToEdgeSystemUi(source: 'gameplay_dispose');
+    debugPrint(
+      '[LudoLovers][GameplayDispose] '
+      'mode=${widget.gameMode.name} mounted=$mounted',
+    );
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     if (_controllerReady) {
       _controller.removeListener(_handleControllerChanged);
@@ -948,10 +1020,32 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 !viewport.maxHeight.isFinite ||
                 viewport.maxWidth <= 0 ||
                 viewport.maxHeight <= 0) {
+              debugPrint(
+                '[LudoLovers][InvalidGameplayViewport] '
+                'width=${viewport.maxWidth} height=${viewport.maxHeight}',
+              );
               return _GameplayRenderFallback(
                 message: 'The Android viewport has invalid dimensions.',
                 onBack: () => Navigator.of(context).maybePop(),
               );
+            }
+            if (!_gameplayLayoutLogged) {
+              _gameplayLayoutLogged = true;
+              debugPrint(
+                '[LudoLovers][GameplayLayout] '
+                'viewport=${viewport.maxWidth}x${viewport.maxHeight} '
+                'media=${MediaQuery.sizeOf(context)} '
+                'devicePixelRatio=${MediaQuery.devicePixelRatioOf(context)}',
+              );
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted || _gameplayFirstFrameLogged) return;
+                _gameplayFirstFrameLogged = true;
+                debugPrint(
+                  '[LudoLovers][GameplayFirstFrameCallback] '
+                  'viewport=${viewport.maxWidth}x${viewport.maxHeight} '
+                  'mounted=$mounted',
+                );
+              });
             }
             const designWidth = 576.0;
             const designHeight = 1024.0;
@@ -1008,6 +1102,13 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                               );
                             }
                             return child;
+                          }
+                          if (!_boardLoadingLogged) {
+                            _boardLoadingLogged = true;
+                            debugPrint(
+                              '[LudoLovers][BoardArtworkLoading] '
+                              'asset=assets/images/ludo_board_glass.webp',
+                            );
                           }
                           return const DecoratedBox(
                             decoration: BoxDecoration(
