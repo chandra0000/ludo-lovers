@@ -9,10 +9,11 @@ This plan is intentionally evidence-driven. A checkbox is only complete when the
 ## Phase 1 — asset and rendering stability
 
 ### Existing implementation to retain
-- `ludo_board_glass.png` is committed and declared directly in `pubspec.yaml`; clean checkouts do not depend on a generated or untracked WebP file.
-- `LocalGameScreen` uses a bounded `ResizeImage` provider (576 × 1024), preloads it with `precacheImage`, and has an image error fallback.
-- `gameplay_board_asset_test.dart` loads the committed PNG, checks its PNG signature, and decodes it within the phone render bounds.
-- The optional WebP optimizer is not part of the required build path and its output is not referenced by gameplay.
+- `ludo_board_glass.png` is the committed lossless artwork master; `ludo_board_glass.webp` is the committed phone-sized runtime derivative.
+- `pubspec.yaml` declares the WebP runtime asset. `tool/optimize_game_artwork.py` regenerates it from the PNG source, and the Android CI workflow runs that generator before Flutter analysis, tests and APK build.
+- `LocalGameScreen` uses a bounded `ResizeImage` provider (576 × 1024), preloads it with `precacheImage`, and has visible loading and image-error fallback states.
+- `gameplay_board_asset_test.dart` loads the bundled WebP, checks its RIFF/WEBP signature and 300 KB budget, then decodes it within the phone render bounds and verifies the 9:16 aspect ratio.
+- Keep the PNG as the design master; do not replace it with the lossy runtime derivative or change the approved composition as part of performance debugging.
 
 ### Acceptance work
 - [ ] Record the committed PNG's exact dimensions and byte size; establish an explicit bundled-asset budget before replacing the source artwork with an optimized derivative.
