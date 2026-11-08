@@ -49,7 +49,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
   void _pushMatch(Widget screen, {required String mode}) {
     debugPrint(
       '[LudoLovers][NavigationRequest] mode=$mode '
-      'screen=\${screen.runtimeType} mounted=$mounted',
+      'screen=${screen.runtimeType} mounted=$mounted',
     );
     final route = PageRouteBuilder<void>(
       settings: RouteSettings(name: '/gameplay/$mode'),
@@ -57,7 +57,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
       pageBuilder: (context, animation, secondaryAnimation) {
         debugPrint(
           '[LudoLovers][GameplayRouteBuild] mode=$mode '
-          'screen=\${screen.runtimeType}',
+          'screen=${screen.runtimeType}',
         );
         return screen;
       },
@@ -108,13 +108,13 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
     if (_selectedPlayers.length != 2) {
       debugPrint(
         '[LudoLovers][ModeSelectionRejected] mode=two_player '
-        'selectedPlayers=\${_selectedPlayers.length}',
+        'selectedPlayers=${_selectedPlayers.length}',
       );
       return;
     }
     debugPrint(
       '[LudoLovers][ModeSelected] mode=two_player '
-      'players=\${_selectedPlayers.join(',')}',
+      'players=${_selectedPlayers.join(',')}',
     );
     _pushMatch(
       LocalGameScreen(
