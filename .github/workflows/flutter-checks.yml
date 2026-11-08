@@ -103,6 +103,22 @@ jobs:
           manifest.write_text(updated, encoding="utf-8")
           print("Android launcher label set to: Ludo lovers")
           print("Android Impeller renderer disabled for device compatibility")
+
+          wrapper = Path("android/gradle/wrapper/gradle-wrapper.properties")
+          wrapper_content = wrapper.read_text(encoding="utf-8")
+          wrapper_content, wrapper_urls = re.subn(
+              r"^distributionUrl=.*?(gradle-[^/]+?)-(?:all|bin)\.zip$",
+              r"distributionUrl=https\\://downloads.gradle.org/distributions/\1-bin.zip",
+              wrapper_content,
+              count=1,
+              flags=re.MULTILINE,
+          )
+          if wrapper_urls != 1:
+              raise SystemExit(
+                  f"Expected one Gradle distributionUrl in {wrapper}, found {wrapper_urls}"
+              )
+          wrapper.write_text(wrapper_content, encoding="utf-8")
+          print("Gradle wrapper uses the official binary distribution host")
           PY
 
       - name: Format Dart sources
