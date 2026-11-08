@@ -103,7 +103,7 @@ jobs:
 
       - name: Build Android arm64 debug APK
         run: |
-          flutter build apk --debug --target-platform android-arm64
+          flutter build apk --debug --target-platform android-arm64 --dart-define=APP_BUILD_SHA=$GITHUB_SHA
           test -f build/app/outputs/flutter-apk/app-debug.apk
           mkdir -p build/device-test
           cp build/app/outputs/flutter-apk/app-debug.apk build/device-test/ludo-lovers-debug.apk
