@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../features/game/domain/engine/local_game_factory.dart';
 import '../features/game/presentation/screens/local_game_screen.dart';
-import 'splash_screen.dart';
 import 'theme/app_theme.dart';
 
 class LudoLoversApp extends StatelessWidget {
@@ -14,9 +13,10 @@ class LudoLoversApp extends StatelessWidget {
       title: 'Ludo Lovers',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: SplashScreen(
-        destinationBuilder: (_) => const GameModeSelectionScreen(),
-      ),
+      // Render a useful screen on the very first Flutter frame. A timed,
+      // animated splash kept users on a nearly black screen during slow Android
+      // first-frame startup and made the launch delay look like a hang.
+      home: const GameModeSelectionScreen(),
     );
   }
 }
@@ -158,15 +158,20 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen> {
                       Container(
                         width: 42,
                         height: 42,
+                        clipBehavior: Clip.antiAlias,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppTheme.panelRaised,
                           border: Border.all(color: AppTheme.gold, width: 1.4),
                         ),
-                        child: const Icon(
-                          Icons.favorite_rounded,
-                          color: AppTheme.magenta,
-                          size: 23,
+                        child: Image.asset(
+                          'assets/images/ludo_lovers_logo.jpg',
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.favorite_rounded,
+                            color: AppTheme.magenta,
+                            size: 23,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 11),
