@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix/gameplay-black-screen-root-cause
     paths:
       - "apps/mobile/**"
       - ".github/workflows/flutter-checks.yml"
@@ -80,10 +81,28 @@ jobs:
               raise SystemExit(
                   f"Expected one android:label in {manifest}, found {replacements}"
               )
-          manifest.write_text(updated, encoding="utf-8")
           if 'android:label="Ludo lovers"' not in updated:
               raise SystemExit("Android launcher label was not updated")
+
+          if "io.flutter.embedding.android.EnableImpeller" not in updated:
+              impeller_metadata = '''    <meta-data
+                  android:name="io.flutter.embedding.android.EnableImpeller"
+                  android:value="false" />
+              '''
+              updated, application_tags = re.subn(
+                  r"</application>",
+                  impeller_metadata + "</application>",
+                  updated,
+                  count=1,
+              )
+              if application_tags != 1:
+                  raise SystemExit(
+                      f"Expected one </application> in {manifest}, found {application_tags}"
+                  )
+
+          manifest.write_text(updated, encoding="utf-8")
           print("Android launcher label set to: Ludo lovers")
+          print("Android Impeller renderer disabled for device compatibility")
           PY
 
       - name: Format Dart sources
