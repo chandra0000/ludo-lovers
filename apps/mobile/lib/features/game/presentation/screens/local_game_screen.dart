@@ -116,10 +116,10 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   void initState() {
     super.initState();
     debugPrint(
-      '[LudoLovers][GameplayInit] mode=\${widget.gameMode.name} '
-      'selectedPlayers=\${widget.selectedPlayerIds?.join(',') ?? 'default'} '
-      'againstAi=\${widget.playAgainstAi} '
-      'controllerInjected=\${widget.controller != null}',
+      '[LudoLovers][GameplayInit] mode=${widget.gameMode.name} '
+      'selectedPlayers=${widget.selectedPlayerIds?.join(',') ?? 'default'} '
+      'againstAi=${widget.playAgainstAi} '
+      'controllerInjected=${widget.controller != null}',
     );
     // Keep Android system bars visible while investigating device viewport
     // rendering. Immersive mode can change the surface after route transitions.
@@ -133,9 +133,9 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       _controllerReady = true;
       debugPrint(
         '[LudoLovers][GameplayControllerReady] '
-        'players=\${_controller.state.playerIds.join(',')} '
-        'currentPlayer=\${_controller.state.currentPlayerId} '
-        'pawns=\${_controller.state.pawns.length}',
+        'players=${_controller.state.players.join(',')} '
+        'currentPlayer=${_controller.state.currentPlayerId} '
+        'pawns=${_controller.state.pawns.length}',
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !_controllerReady) return;
@@ -163,8 +163,8 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
       '[LudoLovers][BoardPreloadStart] '
       'asset=assets/images/ludo_board_glass.webp '
       'target=576x1024 '
-      'devicePixelRatio=\${MediaQuery.devicePixelRatioOf(context)} '
-      'screen=\${MediaQuery.sizeOf(context)}',
+      'devicePixelRatio=${MediaQuery.devicePixelRatioOf(context)} '
+      'screen=${MediaQuery.sizeOf(context)}',
     );
 
     // Decode the same bounded provider used by the visible Image widget before
@@ -190,7 +190,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
   void dispose() {
     debugPrint(
       '[LudoLovers][GameplayDispose] '
-      'mode=\${widget.gameMode.name} mounted=$mounted',
+      'mode=${widget.gameMode.name} mounted=$mounted',
     );
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     if (_controllerReady) {
@@ -978,7 +978,7 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
                 viewport.maxHeight <= 0) {
               debugPrint(
                 '[LudoLovers][InvalidGameplayViewport] '
-                'width=\${viewport.maxWidth} height=\${viewport.maxHeight}',
+                'width=${viewport.maxWidth} height=${viewport.maxHeight}',
               );
               return _GameplayRenderFallback(
                 message: 'The Android viewport has invalid dimensions.',
@@ -989,16 +989,16 @@ class _LocalGameScreenState extends State<LocalGameScreen> {
               _gameplayLayoutLogged = true;
               debugPrint(
                 '[LudoLovers][GameplayLayout] '
-                'viewport=\${viewport.maxWidth}x\${viewport.maxHeight} '
-                'media=\${MediaQuery.sizeOf(context)} '
-                'devicePixelRatio=\${MediaQuery.devicePixelRatioOf(context)}',
+                'viewport=${viewport.maxWidth}x${viewport.maxHeight} '
+                'media=${MediaQuery.sizeOf(context)} '
+                'devicePixelRatio=${MediaQuery.devicePixelRatioOf(context)}',
               );
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted || _gameplayFirstFrameLogged) return;
                 _gameplayFirstFrameLogged = true;
                 debugPrint(
                   '[LudoLovers][GameplayFirstFrameCallback] '
-                  'viewport=\${viewport.maxWidth}x\${viewport.maxHeight} '
+                  'viewport=${viewport.maxWidth}x${viewport.maxHeight} '
                   'mounted=$mounted',
                 );
               });
