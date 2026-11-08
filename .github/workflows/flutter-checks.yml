@@ -38,6 +38,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.9
           cache: true
 
       - name: Show Flutter version
@@ -103,6 +104,19 @@ jobs:
           manifest.write_text(updated, encoding="utf-8")
           print("Android launcher label set to: Ludo lovers")
           print("Android Impeller renderer disabled for device compatibility")
+
+          wrapper = Path("android/gradle/wrapper/gradle-wrapper.properties")
+          wrapper_lines = [
+              line
+              for line in wrapper.read_text(encoding="utf-8").splitlines()
+              if not line.startswith(("distributionUrl=", "distributionSha256Sum="))
+          ]
+          wrapper_lines.extend([
+              "distributionUrl=https\\://mirrors.huaweicloud.com/gradle/gradle-9.3.1-bin.zip",
+              "distributionSha256Sum=b266d5ff6b90eada6dc3b20cb090e3731302e553a27c5d3e4df1f0d76beaff06",
+          ])
+          wrapper.write_text("\n".join(wrapper_lines) + "\n", encoding="utf-8")
+          print("Pinned Gradle 9.3.1 with the official SHA-256 checksum")
 
           PY
 
